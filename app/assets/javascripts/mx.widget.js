@@ -16,5 +16,5 @@
 	mx.widget.table = function(element, options) {
 		query(element).innerHTML = '<iframe src="http://widgets.dev/widget" scrolling="no" frameborder="0" style="border:none; overflow:hidden;" allowTransparency="true"></iframe>';
 	}
-	
+
 })();

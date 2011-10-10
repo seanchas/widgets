@@ -1,6 +1,185 @@
+<table style="border: 1px solid #ccc; width: 100%;"><tbody></tbody></table>
+
 <script type="text/javascript" charset="utf-8">
 	
 	!(function($, undefined) {
+
+		var engine = '<%= raw params[:engine] %>';
+		var market = '<%= raw params[:market] %>';
+		var params = '<%= raw params[:params] %>'.split(',');
+		var locale = '<%= raw params[:locale] %>';
+		var filter = 'small';
+
+		var _ = require('underscore');
+		
+		var t = function(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
+		
+		var iss_merge = function(data) {
+			return _.map(data.data, function(record) {
+				return _.reduce(record, function(memo, value, index) {
+					return memo[data.columns[index]] = value, memo; 
+				}, {});
+			});
+		}
+		
+		var iss_prepare_filters = function(filters) {
+			return _.reduce(filters, function(memo, filter) {
+				return (memo[filter.filter_name] || (memo[filter.filter_name] = [])).push({ id: filter.id, name: filter.name }), memo;
+			}, {});
+		}
+
+		var iss_prepare_columns = function(target, source) {
+			return _.extend(
+				_.reduce(target, function(memo, record) { return memo[record.id] = record, memo; }, {}),
+				_.reduce(source, function(memo, record) { return memo[record.id] = record, memo; }, {})
+			);
+		}
+		
+		var iss_prepare_records = function(target, source) {
+			target = _.reduce(target, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			source = _.reduce(source, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			return _.reduce(_.keys(target), function(memo, key) { return memo.push(_.extend(target[key], source[key])), memo; }, []);
+		}
+		
+		var ds = {};
+		
+		// filters
+		
+		ds.filters = (function() {
+			
+			var defer = Q.defer();
+
+			function onComplete(json) {
+				defer.resolve(iss_prepare_filters(iss_merge(json.filters)))
+			}
+
+			$.ajax({
+				url: 	t('/iss/engines/{{engine}}/markets/{{market}}/securities/columns/filters.json', {
+					engine: engine,
+					market: market
+				}),
+				method: 'get',
+				data: {
+					'iss.meta': 'off',
+					'iss.only': 'filters',
+					'lang': 	locale
+				},
+				complete: onComplete
+			});
+			
+			return defer.promise;
+			
+		})();
+		
+		// columns
+		
+		ds.columns = (function() {
+
+			var defer = Q.defer();
+			
+			function onComplete(json) {
+				defer.resolve(iss_prepare_columns(iss_merge(json.securities), iss_merge(json.marketdata)));
+			}
+			
+			$.ajax({
+				url: 	t('/iss/engines/{{engine}}/markets/{{market}}/securities/columns.json', {
+					engine: engine,
+					market: market
+				}),
+				method: 'get',
+				data: 	{
+					'iss.meta': 'off',
+					'iss.only': 'marketdata,securities',
+					'lang': 	locale
+				},
+				complete: onComplete
+			});
+			
+			return defer.promise;
+
+		})();
+
+		// records
+		
+		ds.records = (function() {
+			
+			var defer = Q.defer();
+			
+			var memo = [];
+
+			var boards = _.reduce(params, function(memo, param) {
+				var parts = param.split('/'), board = _.first(parts), security = _.last(parts);
+				return (memo[board] || (memo[board] = [])).push(security), memo;
+			}, {});
+			
+			function onSuccess(json) {
+				Array.prototype.push.apply(memo, iss_prepare_records(iss_merge(json.securities), iss_merge(json.marketdata)))
+			}
+			
+			function onComplete() {
+				defer.resolve(memo);
+			}
+			
+			onComplete = _.after(_.size(boards), onComplete);
+			
+			_.each(boards, function(securities, board) {
+				$.ajax({
+					url: 	t('/iss/engines/{{engine}}/markets/{{market}}/boards/{{board}}/securities.json', {
+						engine: engine,
+						market: market,
+						board: board
+					}),
+					method: 'get',
+					data: 	{
+						'iss.meta': 	'off',
+						'iss.only': 	'securities,marketdata',
+						'lang': 		locale,
+						'securities': 	securities.join(',')
+					},
+					success: 	onSuccess,
+					complete: 	onComplete
+				});
+			});
+			
+			return defer.promise;
+			
+		})();
+
+		function ready() {
+			return Q.isResolved(ds.filters) && Q.isResolved(ds.columns) && Q.isResolved(ds.records);
+		}
+
+		function render() {
+			if (!ready()) return;
+			
+			var filters = ds.filters.valueOf();
+			var columns = ds.columns.valueOf();
+			var records = ds.records.valueOf();
+			
+			var html = '';
+			
+			_.each(records, function(record) {
+
+				html += '<tr>';
+				
+				_.each(filters[filter], function(filter) {
+					var column = columns[filter.id];
+					var value = record[column.name];
+					html += '<td>' + value + '</td>';
+				});
+				
+				html += '</tr>';
+
+			});
+			
+			$('table > tbody').html(html);
+			
+		}
+
+		ds.filters.then(render);
+		ds.columns.then(render);
+		ds.records.then(render);
+
 	})(ender);
 	
 </script>
