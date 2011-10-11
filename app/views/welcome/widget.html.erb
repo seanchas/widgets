@@ -1,4 +1,12 @@
-<table style="border: 1px solid #ccc; width: 100%;"><tbody></tbody></table>
+<%= stylesheet_link_tag 'table' %>
+
+<style type="text/css" media="screen">
+	body {
+		margin: 0;
+	}
+</style>
+
+<table><tbody></tbody></table>
 
 <script type="text/javascript" charset="utf-8">
 	
@@ -11,7 +19,7 @@
 		var filter = 'small';
 
 		var _ = require('underscore');
-		
+
 		var t = function(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 		
 		var iss_merge = function(data) {
@@ -25,7 +33,7 @@
 		var iss_prepare_filters = function(filters) {
 			return _.reduce(filters, function(memo, filter) {
 				return (memo[filter.filter_name] || (memo[filter.filter_name] = [])).push({ id: filter.id, name: filter.name }), memo;
-			}, {});
+			}, {})[filter];
 		}
 
 		var iss_prepare_columns = function(target, source) {
@@ -39,6 +47,12 @@
 			target = _.reduce(target, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
 			source = _.reduce(source, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
 			return _.reduce(_.keys(target), function(memo, key) { return memo.push(_.extend(target[key], source[key])), memo; }, []);
+		}
+		
+		var iss_sort_records = function(records) {
+			return _.sortBy(records, function(record) {
+				return _.indexOf(params, [record.BOARDID, record.SECID].join('/'))
+			});
 		}
 		
 		var ds = {};
@@ -117,7 +131,7 @@
 			}
 			
 			function onComplete() {
-				defer.resolve(memo);
+				defer.resolve(iss_sort_records(memo));
 			}
 			
 			onComplete = _.after(_.size(boards), onComplete);
@@ -144,41 +158,56 @@
 			return defer.promise;
 			
 		})();
-
-		function ready() {
-			return Q.isResolved(ds.filters) && Q.isResolved(ds.columns) && Q.isResolved(ds.records);
+		
+		var visible_columns_ids = function() {
+			return _.pluck(ds.filters.valueOf(), 'id');
 		}
-
-		function render() {
-			if (!ready()) return;
-			
-			var filters = ds.filters.valueOf();
-			var columns = ds.columns.valueOf();
-			var records = ds.records.valueOf();
-			
-			var html = '';
-			
-			_.each(records, function(record) {
-
-				html += '<tr>';
-				
-				_.each(filters[filter], function(filter) {
-					var column = columns[filter.id];
-					var value = record[column.name];
-					html += '<td>' + value + '</td>';
+		
+		visible_columns_ids = _.memoize(visible_columns_ids);
+		
+		var visible_columns = function() {
+			return _.map(visible_columns_ids(), function(id) {
+				return _.detect(ds.columns.valueOf(), function(column) {
+					return column.id == id;
 				});
-				
-				html += '</tr>';
-
 			});
-			
-			$('table > tbody').html(html);
-			
+		}
+		
+		visible_columns = _.memoize(visible_columns);
+
+		function prepare_cell(cell, column) {
+			return {
+				value_for_render: cell,
+				type: column.type
+			};
+		}
+		
+		function prepare_row(row) {
+			row.cells = _.map(visible_columns(), function(column) {
+				return prepare_cell(row[column.name], column);
+			});
 		}
 
-		ds.filters.then(render);
-		ds.columns.then(render);
-		ds.records.then(render);
+		function render_cell(cell, index, cells) {
+			return $('<td>')
+				.addClass(cell.type)
+				.toggleClass('first', index == 0)
+				.toggleClass('last', index == _.size(cells) - 1)
+				.html($('<span>').html(cell.value_for_render));
+		}
+
+		function render_row(row, index) {
+			return $('<tr>')
+				.addClass(index % 2 ? 'even' : 'odd')
+				.html(_.flatten(_.map(row.cells, render_cell)));
+		}
+		
+		function render() {
+			_.each(ds.records.valueOf(), prepare_row);
+			$('table > tbody').html(_.flatten(_.map(ds.records.valueOf(), render_row)));
+		}
+
+		Q.join(ds.filters, ds.columns, ds.records, render);
 
 	})(ender);
 	
