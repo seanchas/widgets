@@ -17,6 +17,14 @@
 		var params = '<%= raw params[:params] %>'.split(',');
 		var locale = '<%= raw params[:locale] %>';
 		var filter = 'small';
+		
+		<%- if @filters -%>
+			var loaded_filters = <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- end -%>
+
+		<%- if @columns -%>
+			var loaded_columns = <%= raw @columns.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- end -%>
 
 		var _ = require('underscore');
 
@@ -63,6 +71,11 @@
 			
 			var defer = Q.defer();
 
+			if (loaded_filters) {
+				defer.resolve(loaded_filters)
+				return defer.promise;
+			}
+
 			function onComplete(json) {
 				defer.resolve(iss_prepare_filters(iss_merge(json.filters)))
 			}
@@ -91,6 +104,11 @@
 
 			var defer = Q.defer();
 			
+			if (loaded_columns) {
+				defer.resolve(loaded_columns)
+				return defer.promise;
+			}
+
 			function onComplete(json) {
 				defer.resolve(iss_prepare_columns(iss_merge(json.securities), iss_merge(json.marketdata)));
 			}

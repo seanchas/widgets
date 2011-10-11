@@ -5,9 +5,8 @@ class WelcomeController < ApplicationController
   end
   
   def widget
-    @engine = params[:engine]
-    @market = params[:market]
-    @params = params[:params]
+    @filters = ISS.filters(params[:engine], params[:market])[:small] rescue nil
+    @columns = ISS.columns(params[:engine], params[:market]) rescue nil
   end
 
 end
