@@ -45,4 +45,4 @@ namespace :deploy do
   
 end
 
-before  "deploy:migrate",     "deploy:update_configuration"
+after "deploy:update_code", "deploy:update_configuration"
