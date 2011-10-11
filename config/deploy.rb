@@ -8,6 +8,8 @@ set :repository,  "http://github.com/seanchas/Widgets.git"
 set :user,        :ror
 set :runner,      :ror
 set :use_sudo,    false
+set :scm, :git
+set :branch, "develop"
 
 set :deploy_to,   "/export/depo/ror/linux/appservers/#{application}"
 set :deploy_via,  :copy
