@@ -22,4 +22,5 @@ end
 
 group :production do
   gem 'mysql'
+  gem 'therubyracer'
 end
