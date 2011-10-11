@@ -2,48 +2,95 @@
 
 	body {
 		text-align: center;
+		margin: 0 auto;
 	}
 	
 	div.widgets_container {
 		margin: 0 auto;
 		text-align: left;
+		width: 900px;
 	}
 
-	div {
+	div.widget_container {
 		display: inline-block;
 		margin: 20px;
+		width: 400px;
 		vertical-align: top;
 	}
 	
-	iframe {
-		border: none;
+	div.widget_container iframe {
+		height: 200px;
 	}
 	
 </style>
 
 <div class="widgets_container">
 
-	<div>
+	<div class="widget_container">
 		<h2>Валюты</h2>
-		<iframe src="/widgets/widget?engine=currency&amp;market=selt&amp;params=CETS/USD000UTSTOM,CETS/USD000TODTOM,CETS/USD000000TOD,CETS/EUR000TODTOM,CETS/EUR_RUB__TOD,CETS/EUR_RUB__TOM&locale=ru"></iframe>	
+		<div id="currencies_container">
+		</div>
 	</div>
 
-
-	<div>
+	<div class="widget_container">
 		<h2>Индексы</h2>
-		<iframe src="/widgets/widget?engine=stock&amp;market=index&amp;params=SNDX/MICEXCGS,SNDX/MICEXCHM,SNDX/MICEXFNL,SNDX/MICEXM%26M,SNDX/MICEXMNF,SNDX/MICEXO%26G,SNDX/MICEXPWR,SNDX/MICEXTLC" style="height: 200px;"></iframe>	
+		<div id="indices_container">
+		</div>
 	</div>
 
-	<br />
-
-	<div>
+	<div class="widget_container">
 		<h2>Акции</h2>
-		<iframe src="/widgets/widget?engine=stock&amp;market=shares&amp;params=EQNE/GAZP,EQBR/LKOH,EQNL/ROSN,EQBR/RTKM,EQBR/SBER03,EQNL/VTBR,EQBR/HYDR" style="height: 180px;"></iframe>	
-	</div>
-
-	<div>
-		<h2>Акции</h2>
-		<iframe src="/widgets/widget?engine=stock&amp;market=shares&amp;params=EQNE/GAZP,EQBR/LKOH,EQNL/ROSN,EQBR/RTKM,EQBR/SBER03,EQNL/VTBR,EQBR/HYDR" style="height: 180px;"></iframe>	
+		<div id="shares_container">
+		</div>
 	</div>
 
 </div>
+
+<script type="text/javascript" charset="utf-8">
+
+	var data = {
+		'currency/selt': [
+			'CETS/USD000UTSTOM',
+			'CETS/USD000TODTOM',
+			'CETS/USD000000TOD',
+			'CETS/EUR000TODTOM',
+			'CETS/EUR_RUB__TOD',
+			'CETS/EUR_RUB__TOM'
+		],
+		'stock/index': [
+			'SNDX/MICEXCGS',
+			'SNDX/MICEXCHM',
+			'SNDX/MICEXFNL',
+			'SNDX/MICEXM&M',
+			'SNDX/MICEXMNF',
+			'SNDX/MICEXO&G',
+			'SNDX/MICEXPWR',
+			'SNDX/MICEXTLC'
+		],
+		'stock/shares': [
+			'EQNE/GAZP',
+			'EQBR/LKOH',
+			'EQNL/ROSN',
+			'EQBR/RTKM',
+			'EQBR/SBER03',
+			'EQNL/VTBR',
+			'EQBR/HYDR'
+		]
+	}
+	
+	var mappings = {
+		'currencies_container' : 	'currency/selt',
+		'indices_container': 		'stock/index',
+		'shares_container': 		'stock/shares',
+		'rts_container': 			'rts/rts'
+	}
+	
+	for (element in mappings) {
+		var engine_market = mappings[element];
+		var params = data[engine_market]; if (!params) break;
+		var parts = engine_market.split('/');
+
+		mx.widget.table(element, parts[0], parts[1], params);
+	}
+
+</script>
