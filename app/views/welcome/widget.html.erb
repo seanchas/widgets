@@ -177,7 +177,7 @@
 
 		function prepare_cell(cell, column) {
 			return {
-				value_for_render: cell,
+				value_for_render: cell || '&mdash;',
 				type: column.type
 			};
 		}
