@@ -49,10 +49,11 @@ Widgets::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  
-  root :to => 'welcome#index'
-  
-  get 'widget' => 'welcome#widget'
+
+  scope "/widgets" do
+    root :to => 'welcome#index'
+    get 'widget' => 'welcome#widget'
+  end
 
   # See how all your routes lay out with "rake routes"
 
