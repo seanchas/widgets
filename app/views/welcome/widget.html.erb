@@ -26,6 +26,7 @@
 		var cached_filters_key = ['filters', engine, market].join('/');
 		var cached_columns_key = ['columns', engine, market].join('/');
 		var cached_records_key = _.flatten(['records', engine, market, params]).join('/');
+		var cached_render_key = _.flatten(['render', engine, market, params]).join('/');
 
 		<%- if @filters -%>
 			var cached_filters = <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
@@ -40,6 +41,7 @@
 		<%- end -%>
 		
 		var cached_records = cache.get(cached_records_key);
+		var cached_render = cache.get(cached_render_key);
 
 		var t = function(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 		
@@ -239,9 +241,13 @@
 		function render() {
 			_.each(ds.records.valueOf(), prepare_row);
 			$('table > tbody').html(_.flatten(_.map(ds.records.valueOf(), render_row)));
+			cache.set(cached_render_key, $('table').html());
 		}
 
 		Q.join(ds.filters, ds.columns, ds.records, render);
+		
+		if (cached_render)
+			$('table').html(cached_render);
 
 	})(ender);
 	
