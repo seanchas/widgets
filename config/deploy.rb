@@ -1,6 +1,7 @@
 $:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 
 load 'deploy/assets'
+set :assets_path, 'widgets/assets'
 
 require "rvm/capistrano"
 require 'bundler/capistrano'
@@ -46,4 +47,4 @@ namespace :deploy do
   
 end
 
-after "deploy:update_code", "deploy:update_configuration"
+before "deploy:assets:precompile", "deploy:update_configuration"
