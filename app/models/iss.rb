@@ -8,7 +8,7 @@ module ISS
   class << self
   
     def filters(engine, market)
-      Rails.cache.fetch([:filters, engine, market].join('/')) do
+      Rails.cache.fetch([:filters, engine, market].join('/'), :expires_in => 5.minutes) do
         url = URI.parse("#{PREFIX}/engines/#{engine}/markets/#{market}/securities/columns/filters.json?iss.meta=off&iss.only=filters")
         res = Net::HTTP.start(url.host, url.port) do |http|
           http.get([url.path, url.query].join('?'))
@@ -18,7 +18,7 @@ module ISS
     end
   
     def columns(engine, market)
-      Rails.cache.fetch([:columns, engine, market].join('/')) do
+      Rails.cache.fetch([:columns, engine, market].join('/'), :expires_in => 5.minutes) do
         url = URI.parse("#{PREFIX}/engines/#{engine}/markets/#{market}/securities/columns.json?iss.meta=off&iss.only=securities,marketdata")
         res = Net::HTTP.start(url.host, url.port) do |http|
           http.get([url.path, url.query].join('?'))

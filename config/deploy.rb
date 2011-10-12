@@ -30,7 +30,8 @@ namespace :deploy do
 end
 
 configuration = [
-  'config/database.yml'
+  'config/database.yml',
+  'config/environments/production.rb'
 ]
 
 namespace :deploy do
