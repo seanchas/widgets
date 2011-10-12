@@ -1,4 +1,4 @@
-<%= javascript_include_tag 'ender', 'q' %>
+<%= javascript_include_tag 'widget' %>
 <%= stylesheet_link_tag 'table' %>
 
 <style type="text/css" media="screen">
@@ -13,23 +13,33 @@
 	
 	!(function($, undefined) {
 
+		var _ = require('underscore');
+
 		var engine = '<%= raw params[:engine] %>';
 		var market = '<%= raw params[:market] %>';
 		var params = '<%= raw params[:params] %>'.split(',');
 		var locale = '<%= raw params[:locale] %>';
 		var filter = 'small';
 		
-		var loaded_filters = null;
+		var cache = $.cache('widgets'), cache_expires_in = 5 * 60 * 1000;
+		
+		var cached_filters_key = ['filters', engine, market].join('/');
+		var cached_columns_key = ['columns', engine, market].join('/');
+		var cached_records_key = _.flatten(['records', engine, market, params]).join('/');
+
 		<%- if @filters -%>
-			loaded_filters = <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+			var cached_filters = <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- else -%>
+			var cached_filters = cache.get(cached_filters_key);
 		<%- end -%>
 		
-		var loaded_columns = null;
 		<%- if @columns -%>
-			loaded_columns = <%= raw @columns.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+			var cached_columns = <%= raw @columns.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- else -%>
+			var cached_columns = cache.get(cached_columns_key);
 		<%- end -%>
-
-		var _ = require('underscore');
+		
+		var cached_records = cache.get(cached_records_key);
 
 		var t = function(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 		
@@ -74,13 +84,13 @@
 			
 			var defer = Q.defer();
 
-			if (loaded_filters) {
-				defer.resolve(loaded_filters)
+			if (cached_filters) {
+				defer.resolve(cached_filters)
 				return defer.promise;
 			}
 
 			function onComplete(json) {
-				defer.resolve(iss_prepare_filters(iss_merge(json.filters)))
+				defer.resolve(cache.set(cached_filters_key, iss_prepare_filters(iss_merge(json.filters)), cache_expires_in))
 			}
 
 			$.ajax({
@@ -107,13 +117,13 @@
 
 			var defer = Q.defer();
 			
-			if (loaded_columns) {
-				defer.resolve(loaded_columns)
+			if (cached_columns) {
+				defer.resolve(cached_columns)
 				return defer.promise;
 			}
 
 			function onComplete(json) {
-				defer.resolve(iss_prepare_columns(iss_merge(json.securities), iss_merge(json.marketdata)));
+				defer.resolve(cache.set(cached_columns_key, iss_prepare_columns(iss_merge(json.securities), iss_merge(json.marketdata)), cache_expires_in));
 			}
 			
 			$.ajax({
@@ -140,6 +150,9 @@
 			
 			var defer = Q.defer();
 			
+			if (cached_records)
+				defer.resolve(cached_records);
+			
 			var memo = [];
 
 			var boards = _.reduce(params, function(memo, param) {
@@ -152,7 +165,7 @@
 			}
 			
 			function onComplete() {
-				defer.resolve(iss_sort_records(memo));
+				defer.resolve(cache.set(cached_records_key, iss_sort_records(memo)));
 			}
 			
 			onComplete = _.after(_.size(boards), onComplete);

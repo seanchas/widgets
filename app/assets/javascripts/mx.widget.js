@@ -9,7 +9,7 @@
 	function isNode(e) { return (e && e.nodeType && (e.nodeType == 1 || e.nodeType == 9)); }
 
 	function url(engine, market, params) {
-		return t('http://beta.micex.ru/widgets/widget?engine={{engine}}&market={{market}}&params={{params}}', {
+		return t('/widgets/widget?engine={{engine}}&market={{market}}&params={{params}}', {
 			engine: encodeURIComponent(engine),
 			market: encodeURIComponent(market),
 			params: encodeURIComponent(params.join(','))
