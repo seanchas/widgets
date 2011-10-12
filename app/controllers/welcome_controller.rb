@@ -7,7 +7,10 @@ class WelcomeController < ApplicationController
   def widget
     # @filters = ISS.filters(params[:engine], params[:market])[:small] rescue nil
     # @columns = ISS.columns(params[:engine], params[:market]) rescue nil
-    render :layout => false
+    respond_to do |format|
+      format.html { render :layout => false }
+      format.jsonp
+    end
   end
 
 end
