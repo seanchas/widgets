@@ -12,6 +12,8 @@ gem 'jquery-rails'
 
 gem 'capistrano'
 
+gem 'rack', '1.3.3'
+
 group :test do
   gem 'turn', :require => false
 end
@@ -23,4 +25,5 @@ end
 group :production do
   gem 'mysql'
   gem 'therubyracer'
+  gem 'memcache-client'
 end
