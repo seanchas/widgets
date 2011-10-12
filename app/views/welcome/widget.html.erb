@@ -71,7 +71,7 @@
 			
 			var defer = Q.defer();
 
-			if (loaded_filters) {
+			if (this.loaded_filters) {
 				defer.resolve(loaded_filters)
 				return defer.promise;
 			}
@@ -104,7 +104,7 @@
 
 			var defer = Q.defer();
 			
-			if (loaded_columns) {
+			if (this.loaded_columns) {
 				defer.resolve(loaded_columns)
 				return defer.promise;
 			}
