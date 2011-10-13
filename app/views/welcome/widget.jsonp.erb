@@ -1,5 +1,0 @@
-<%= params[:callback] %>({
-	filters: <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>,
-	columns: <%= raw @columns.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>,
-	records: <%= raw @records.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>
-});

@@ -1,3 +1,17 @@
+.table_container {
+    border-top: 1px solid #ccc;
+    padding: 1px 5px 0;
+    margin: 0 0 10px;
+    
+    h2 {
+        background-image: -webkit-linear-gradient(top, #e7e7e7, #fff);
+        font-size: 14px;
+        margin: 0 -5px 5px;
+        padding: .25em 10px;
+    }
+    
+}
+
 table.mx-widget-table {
 	background-color: #fff;
 	border-collapse: collapse;
@@ -9,8 +23,8 @@ table.mx-widget-table {
 	width: 100%;
 	
 
-	tr.odd td {
-		background: #e7e7e7;
+	tr.even td {
+		background: #f0f0f0;
 	}
 
 	

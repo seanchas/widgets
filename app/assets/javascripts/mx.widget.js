@@ -106,8 +106,10 @@
 		var cache_key	= ['records', engine, market, params].join('/');
 		var cached_data	= iss.cache.get(cache_key);
 
-		if (cached_data)
+		if (cached_data) {
 			defer.resolve(cached_data);
+			return defer.promise;
+		}
 
 		function onSuccess(json) {
 			defer.resolve(iss.cache.set(cache_key, iss.prepare_records(iss.merge(json.securities), iss.merge(json.marketdata))));
@@ -128,7 +130,7 @@
 
 	}
 	
-	function render(element, filters, columns, records, options) {
+	function render(element, filters, columns, records, cache_key, options) {
 		
 		function prepare_cell(column) {
 			return { 
@@ -164,6 +166,7 @@
 		table.append($('<tbody>').append($.flatten($.map(rows, render_row))));
 		
 		element.html('').append(table);
+		iss.cache.set(cache_key, element.html());
 	}
 
 	var default_options = {
@@ -175,18 +178,24 @@
 		
 		$.defaults(options || (options = {}), default_options);
 		
+		var cache_key = ['render', engine, market, params].join('/');
+		var cached_render = iss.cache.get(cache_key);
+		
+		if (cached_render)
+		    element.html(cached_render);
+		
 		var filters = iss.filters(engine, market);
 		var columns = iss.columns(engine, market);
 		var records = iss.records(engine, market, params);
 
-		Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), options); });
+		Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 		
 		setInterval(function() {
 			
 			records = iss.records(engine, market, params);
-			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), options); });
+			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 			
-		}, 5 * 1000);
+		}, 60 * 1000);
 		
 	}
 
