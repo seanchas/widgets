@@ -52,7 +52,7 @@
 		}
 		
 		function onSuccess(json) {
-			defer.resolve(iss.cache.set(cache_key, iss.prepare_filters(iss.merge(json.filters)), 5000));
+			defer.resolve(iss.cache.set(cache_key, iss.prepare_filters(iss.merge(json.filters)), 60 * 60 * 1000));
 		}
 		
 		$.ajax({
@@ -110,7 +110,7 @@
 			defer.resolve(cached_data);
 
 		function onSuccess(json) {
-			defer.resolve(iss.cache.set(cache_key, iss.prepare_records(iss.merge(json.securities), iss.merge(json.marketdata)), 60 * 60 * 1000));
+			defer.resolve(iss.cache.set(cache_key, iss.prepare_records(iss.merge(json.securities), iss.merge(json.marketdata))));
 		}
 		
 		$.ajax({
@@ -186,7 +186,7 @@
 			records = iss.records(engine, market, params);
 			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), options); });
 			
-		}, 60 * 1000);
+		}, 5 * 1000);
 		
 	}
 
