@@ -1,63 +1,193 @@
-//= require ender
-//= require q
+//= require widget
 
 !(function() {
 	
 	var mx = this.mx || (this.mx = {}); mx.widget || (mx.widget = {});
-
+	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 
-	function query(e) { return isNode(e) ? e : document.getElementById(e); }
-
-	function isNode(e) { return (e && e.nodeType && (e.nodeType == 1 || e.nodeType == 9)); }
-
-	function url(engine, market, params) {
-		return t('/widgets/widget.json?engine={{engine}}&market={{market}}&params={{params}}', {
-			engine: encodeURIComponent(engine),
-			market: encodeURIComponent(market),
-			params: encodeURIComponent(params.join(','))
-		});
+	var iss = {
+		host: 'http://beta.micex.ru',
+		
+		merge: function(data) {
+			return $.map(data.data, function(record) {
+				return $.reduce(record, function(memo, value, index) {
+					return memo[data.columns[index]] = value, memo; 
+				}, {});
+			});
+		},
+		
+		prepare_filters: function(filters) {
+			return $.reduce(filters, function(memo, record) {
+				return (memo[record.filter_name] || (memo[record.filter_name] = [])).push({ id: record.id, name: record.name }), memo;
+			}, {});
+		},
+		
+		prepare_columns: function(securities, marketdata) {
+			return $.extend(
+				$.reduce(securities, function(memo, record) { return memo[record.id] = record, memo; }, {}),
+				$.reduce(marketdata, function(memo, record) { return memo[record.id] = record, memo; }, {})
+			);
+		},
+		
+		prepare_records: function(securities, marketdata) {
+			securities = $.reduce(securities, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			marketdata = $.reduce(marketdata, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			return $.reduce($.keys(securities), function(memo, key) { return memo.push($.extend(securities[key], marketdata[key])), memo; }, []);
+		},
+		
+		cache: $.cache('iss/widgets')
 	}
 	
-	function iframe_document(iframe) {
-		return iframe.contentWindow.document;
+	iss.filters = function(engine, market) {
+		
+		var defer = Q.defer();
+		
+		var cache_key	= ['filters', engine, market].join('/');
+		var cached_data	= iss.cache.get(cache_key);
+
+		if (cached_data) {
+			defer.resolve(cached_data);
+			return defer.promise;
+		}
+		
+		function onSuccess(json) {
+			defer.resolve(iss.cache.set(cache_key, iss.prepare_filters(iss.merge(json.filters)), 5000));
+		}
+		
+		$.ajax({
+			url: t('{{host}}/iss/engines/{{engine}}/markets/{{market}}/securities/columns/filters.jsonp?iss.meta=off&iss.only=filters&callback=?', {
+				host: 	iss.host,
+				engine: encodeURIComponent(engine),
+				market: encodeURIComponent(market)
+			}),
+			type: 'jsonp',
+			success: onSuccess
+		})
+		
+		return defer.promise;
+		
+	};
+
+	iss.columns = function(engine, market) {
+
+		var defer = Q.defer();
+		
+		var cache_key	= ['columns', engine, market].join('/');
+		var cached_data	= iss.cache.get(cache_key);
+
+		if (cached_data) {
+			defer.resolve(cached_data);
+			return defer.promise;
+		}
+
+		function onSuccess(json) {
+			defer.resolve(iss.cache.set(cache_key, iss.prepare_columns(iss.merge(json.securities), iss.merge(json.marketdata)), 60 * 60 * 1000));
+		}
+		
+		$.ajax({
+			url: t('{{host}}/iss/engines/{{engine}}/markets/{{market}}/securities/columns.jsonp?iss.meta=off&iss.only=securities,marketdata&callback=?', {
+				host: 	iss.host,
+				engine: encodeURIComponent(engine),
+				market: encodeURIComponent(market)
+			}),
+			type: 'jsonp',
+			success: onSuccess
+		})
+		
+		return defer.promise;
+
 	}
 	
-	function ensure_content(document) {
-		return $('body > table', document);
+	iss.records = function(engine, market, params) {
+
+		var defer = Q.defer();
+		
+		var cache_key	= ['records', engine, market, params].join('/');
+		var cached_data	= iss.cache.get(cache_key);
+
+		if (cached_data)
+			defer.resolve(cached_data);
+
+		function onSuccess(json) {
+			defer.resolve(iss.cache.set(cache_key, iss.prepare_records(iss.merge(json.securities), iss.merge(json.marketdata)), 60 * 60 * 1000));
+		}
+		
+		$.ajax({
+			url: t('{{host}}/iss/engines/{{engine}}/markets/{{market}}/securities.jsonp?iss.meta=off&iss.only=securities,marketdata&securities={{params}}&callback=?', {
+				host: 	iss.host,
+				engine: encodeURIComponent(engine),
+				market: encodeURIComponent(market),
+				params: encodeURIComponent(params)
+			}),
+			type: 'jsonp',
+			success: onSuccess
+		})
+		
+		return defer.promise;
+
+	}
+	
+	function render(element, filters, columns, records, options) {
+		
+		function prepare_cell(column) {
+			return { 
+				type: 	column.type,
+				value: 	this[column.name]
+			}
+		}
+		
+		function prepare_row(record) {
+			return $.map(visible_columns, prepare_cell, record);
+		}
+		
+		function render_cell(cell, index, row) {
+			return $('<td>')
+				.addClass(cell.type)
+				.toggleClass('first', index === $.first(row))
+				.toggleClass('last', cell === $.last(row))
+				.html($('<span>').html(cell.value));
+		}
+		
+		function render_row(row, index) {
+			var el = $('<tr>').addClass(index % 2 ? 'even' : 'odd').append($.flatten($.map(row, render_cell)));
+			return el;
+		}
+
+		var visible_columns = (function() { return $.map($.pluck(filters[options.filter], 'id'), function(id) { return columns[id]; }); })();
+
+		var rows = (function() { return $.map(records, prepare_row) })();
+
+
+		var table = $('<table>').addClass('mx-widget-table');
+		
+		table.append($('<tbody>').append($.flatten($.map(rows, render_row))));
+		
+		element.html('').append(table);
 	}
 
-	// entry point
-	
-	$(window).bind('widget:loaded', function() {
-		console.log('widget loaded!')
-	})
-	
+	var default_options = {
+		filter: 'small'
+	}
 
 	mx.widget.table = function(element, engine, market, params, options) {
-		$.domReady(function() {
-			element = $(element); if (!element) return;
-			//var iframe = $('<iframe>').attr('style', 'border: none;').attr('src', url(engine, market, params));
-			//$(element).append(iframe);
-
-			$.ajax({
-				url: '/widgets/widget.jsonp?callback=?',
-				type: 'jsonp',
-				success: function(promise) {
-				}
-			});
-
-		});
-
-
-		/*
-		element = query(element); if (!element) return;
+		element = $(element); if (!element) return;
 		
-		query(element).innerHTML = t('<iframe src="{{url}}" style="border: none;"></iframe>', {
-			url: url(engine, market, params)
-		});
-		*/
+		$.defaults(options || (options = {}), default_options);
+		
+		var filters = iss.filters(engine, market);
+		var columns = iss.columns(engine, market);
+		var records = iss.records(engine, market, params);
 
+		Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), options); });
+		
+		setInterval(function() {
+			
+			records = iss.records(engine, market, params);
+			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), options); });
+			
+		}, 60 * 1000);
+		
 	}
 
 })();
