@@ -100,11 +100,13 @@
 
 	}
 	
-	iss.records = function(engine, market, params) {
+	iss.records = function(engine, market, params, force) {
 
 		var defer = Q.defer();
 		
 		var cache_key	= ['records', engine, market, params].join('/');
+		if (force)
+		    iss.cache.remove(cache_key);
 		var cached_data	= iss.cache.get(cache_key);
 
 		if (cached_data) {
@@ -187,16 +189,16 @@
 		
 		var filters = iss.filters(engine, market);
 		var columns = iss.columns(engine, market);
-		var records = iss.records(engine, market, params);
+		var records = iss.records(engine, market, params, true);
 
 		Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 		
 		setInterval(function() {
 			
-			records = iss.records(engine, market, params);
+			records = iss.records(engine, market, params, true);
 			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 			
-		}, 60 * 1000);
+		}, 10 * 1000);
 		
 	}
 	
