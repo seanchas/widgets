@@ -43,6 +43,7 @@ $footer-height: 64px;
         .middle_column,
         .right_column {
             display: table-cell;
+            vertical-align: top;
         }
         
         .left_column {

@@ -1,14 +1,19 @@
+
 <%- content_for :right_content do -%>
 
     <div class="table_container">
         <h2>Валюты</h2>
         <div id="currencies">
         </div>
+        <div id="currencies_chart" class="chart_container">
+        </div>
     </div>
     
     <div class="table_container">
         <h2>Индексы</h2>
         <div id="indices">
+        </div>
+        <div id="indices_chart" class="chart_container">
         </div>
     </div>
 
@@ -60,6 +65,9 @@
     		'PSFU:LKOH18',
     		'PSFU:HYDR'
         ]);
+        
+        mx.widget.chart('#currencies_chart', 'currency', 'selt', 'EUR000TODTOM');
+        mx.widget.chart('#indices_chart', 'stock', 'index', 'MICEXTLC');
     </script>
 
 <%- end -%>

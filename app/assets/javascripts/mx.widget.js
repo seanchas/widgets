@@ -6,6 +6,8 @@
 	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 
+    var reqwest = require('reqwest')
+
 	var iss = {
 		host: 'http://beta.micex.ru',
 		
@@ -197,6 +199,48 @@
 			
 		}, 60 * 1000);
 		
+	}
+	
+	var cs = {
+	    
+	    host: 'http://beta.micex.ru',
+	    
+	    calculate_dimensions: function(element) {
+	        var width = element.offset().width, height = Math.round(width / 2);
+	        return {
+	            'z1.width': width,
+	            'z1_c.height': height,
+	            'c.width': width,
+	            'c.height': height + 20
+	        }
+	    }
+	    
+	};
+
+	
+	cs.chart = function(element, engine, market, security) {
+
+        var dimensions = cs.calculate_dimensions(element);
+
+	    var url = t('{{host}}/cs/engines/{{engine}}/markets/{{market}}/securities/{{security}}.png?template=adv_no_volume&{{dimensions}}', {
+	        host: cs.host,
+	        engine: engine,
+	        market: market,
+	        security: security,
+	        dimensions: $.toQueryString(dimensions)
+	    });
+	    
+        var image = $('<img>').attr('src', url);
+        
+        image.bind('load', function() {
+            element.html('').append(image);
+        });
+	    
+	}
+	
+	mx.widget.chart = function(element, engine, market, security, options) {
+	    element = $(element); if (!element) return;
+	    cs.chart(element, engine, market, security);
 	}
 
 })();
