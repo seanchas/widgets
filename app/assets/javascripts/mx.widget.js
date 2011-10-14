@@ -146,15 +146,15 @@
 		}
 		
 		function render_cell(cell, index, row) {
-			return $('<td>')
+			return $.create('<td>')
 				.addClass(cell.type)
 				.toggleClass('first', index === $.first(row))
 				.toggleClass('last', cell === $.last(row))
-				.html($('<span>').html(cell.value));
+				.html($.create('<span>').html(cell.value));
 		}
 		
 		function render_row(row, index) {
-			var el = $('<tr>').addClass(index % 2 ? 'even' : 'odd').append($.flatten($.map(row, render_cell)));
+			var el = $.create('<tr>').addClass(index % 2 ? 'even' : 'odd').append($.flatten($.map(row, render_cell)));
 			return el;
 		}
 
@@ -163,9 +163,9 @@
 		var rows = (function() { return $.map(records, prepare_row) })();
 
 
-		var table = $('<table>').addClass('mx-widget-table');
+		var table = $.create('<table>').addClass('mx-widget-table');
 		
-		table.append($('<tbody>').append($.flatten($.map(rows, render_row))));
+		table.append($.create('<tbody>').append($.flatten($.map(rows, render_row))));
 		
 		element.html('').append(table);
 		iss.cache.set(cache_key, element.html());
@@ -230,7 +230,7 @@
 	        dimensions: $.toQueryString(dimensions)
 	    });
 	    
-        var image = $('<img>').attr('src', url);
+        var image = $.create('<img>').attr('src', url);
         
         image.bind('load', function() {
             element.html('').append(image);
