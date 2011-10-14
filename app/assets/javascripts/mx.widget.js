@@ -1,12 +1,10 @@
 //= require widget
 
-!(function() {
+!(function($) {
 	
 	var mx = this.mx || (this.mx = {}); mx.widget || (mx.widget = {});
 	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
-
-    var reqwest = require('reqwest')
 
 	var iss = {
 		host: 'http://beta.micex.ru',
@@ -41,6 +39,7 @@
 		cache: $.cache('iss/widgets')
 	}
 	
+
 	iss.filters = function(engine, market) {
 		
 		var defer = Q.defer();
@@ -243,4 +242,4 @@
 	    cs.chart(element, engine, market, security);
 	}
 
-})();
+})(ender.noConflict());
