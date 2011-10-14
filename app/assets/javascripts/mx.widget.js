@@ -6,6 +6,27 @@
 	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 
+    number_with_delimiter = function(number, options) {
+    	options = $.extend({}, options || {});
+
+    	var delimiter = options.delimiter || ' ';
+    	var separator = options.separator || ',';
+
+    	var parts = number.toString().split(".");
+
+    	parts[0] = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1" + delimiter);
+
+    	return parts.join(separator);
+    }
+
+    number_with_precision = function(number, options) {
+    	options = $.extend({}, options || {});
+
+    	var precision = options.precision || 2;
+
+    	return number_with_delimiter(new Number(number).toFixed(precision), options);
+    }
+
 	var iss = {
 		host: 'http://beta.micex.ru',
 		
@@ -135,10 +156,20 @@
 	
 	function render(element, filters, columns, records, cache_key, options) {
 		
+		function prepare_value(value, column) {
+		    switch(column.type) {
+		        case 'time':
+		            return $.initial(value.split(':')).join(':');
+		        case 'number':
+		            return number_with_precision(value, column.precision);
+		    }
+		    return value;
+		}
+		
 		function prepare_cell(column) {
 			return { 
 				type: 	column.type,
-				value: 	this[column.name]
+				value: 	prepare_value(this[column.name], column)
 			}
 		}
 		
@@ -184,8 +215,8 @@
 		var cache_key = ['render', engine, market, params].join('/');
 		var cached_render = iss.cache.get(cache_key);
 		
-		if (cached_render)
-		    element.html(cached_render);
+		//if (cached_render)
+		//    element.html(cached_render);
 		
 		var filters = iss.filters(engine, market);
 		var columns = iss.columns(engine, market);
@@ -198,7 +229,7 @@
 			records = iss.records(engine, market, params, true);
 			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 			
-		}, 10 * 1000);
+		}, 60 * 1000);
 		
 	}
 	
