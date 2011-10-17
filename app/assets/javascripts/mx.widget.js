@@ -157,17 +157,39 @@
 
 	}
 	
-	function row_data(row) {
-	    var table = $(row).closest('table');
+	function table_chart_data(row) {
+	    var row_data = row.data();
+	    var table_data = row.closest('table').data();
 	    return {
-	        engine:     table.attr('data-mx-engine'),
-	        market:     table.attr('data-mx-market'),
-	        board:      row.attr('data-mx-board'),
-	        security:   row.attr('data-mx-security')
+	        engine:     table_data.engine,
+	        market:     table_data.market,
+	        board:      row_data.board,
+	        security:   row_data.security
 	    }
 	}
 	
+	function render_table_chart(row) {
+	    var data        = table_chart_data(row);
+	    var next_row    = row.next('tr');
+
+	    if (next_row.hasClass('chart')) {
+	        if (next_row.is(':hidden'))
+	            $('tr.chart', row.closest('table')).hide();
+	        next_row.toggle()
+	    } else {
+    	    $('tr.chart', row.closest('table')).hide();
+
+	        next_row = $('<tr>').addClass('chart').html($('<td>').attr('colspan', _.size($('td', row))));
+	        next_row.insertAfter(row);
+	        mx.widget.chart($('td', next_row), data.engine, data.market, data.security);
+	    }
+	    
+	}
+	
 	function bind_table_events(element) {
+	    $(element).delegate('tr', 'click', function(event) {
+	        render_table_chart($(event.currentTarget));
+	    })
 	}
 	
 	function render(element, engine, market, filters, columns, records, cache_key, options) {
@@ -208,8 +230,8 @@
 		function render_row(row, index) {
 		    var el = $('<tr>')
 		        .data({
-		            'mx-board': row.board,
-		            'mx-security': row.security
+		            board: row.board,
+		            security: row.security
 		        })
 		        .addClass(index % 2 ? 'even' : 'odd');
 		    
@@ -222,7 +244,12 @@
 
 		var rows = (function() { return _.map(records, prepare_row) })();
 
-		var table = $('<table>').addClass('mx-widget-table');
+		var table = $('<table>')
+		    .addClass('mx-widget-table')
+		    .data({
+		        engine: engine,
+		        market: market
+		    });
 		
 		_.each(_.map(rows, render_row), function(row) {
 		    table.append(row)
@@ -291,10 +318,10 @@
 	        engine: engine,
 	        market: market,
 	        security: security,
-	        dimensions: _.toQueryString(dimensions)
+	        dimensions: $.param(dimensions)
 	    });
 	    
-        var image = $.create('<img>').attr('src', url);
+        var image = $('<img>').attr('src', url);
         
         image.bind('load', function() {
             element.html('').append(image);
@@ -307,4 +334,4 @@
 	    cs.chart(element, engine, market, security);
 	}
 
-})($, _);
+})($.noConflict(), _.noConflict());
