@@ -198,28 +198,39 @@
 		}
 		
 		function render_cell(cell, index, row) {
-			return $.create('<td>')
+			return $('<td>')
 				.addClass(cell.type)
 				.toggleClass('first', index === _.first(row))
 				.toggleClass('last', cell === _.last(row))
-				.html($.create('<span>').html(cell.value));
+				.html($('<span>').html(cell.value));
 		}
 		
 		function render_row(row, index) {
-			return $.create('<tr>').attr({ 'data-mx-board': row.board, 'data-mx-security': row.security }).addClass(index % 2 ? 'even' : 'odd').append(_.flatten(_.map(row.cells, render_cell)));
-		}
+		    var el = $('<tr>')
+		        .data({
+		            'mx-board': row.board,
+		            'mx-security': row.security
+		        })
+		        .addClass(index % 2 ? 'even' : 'odd');
+		    
+		    _.each(_.map(row.cells, render_cell), function(cell) { el.append(cell); });
 
+		    return el;
+		}
+		
 		var visible_columns = (function() { return _.map(_.pluck(filters[options.filter], 'id'), function(id) { return columns[id]; }); })();
 
 		var rows = (function() { return _.map(records, prepare_row) })();
 
-
-		var table = $.create('<table>').addClass('mx-widget-table').attr('data-mx-engine', engine).attr('data-mx-market', market);
+		var table = $('<table>').addClass('mx-widget-table');
 		
-		table.append($.create('<tbody>').append(_.flatten(_.map(rows, render_row))));
+		_.each(_.map(rows, render_row), function(row) {
+		    table.append(row)
+		});
 		
-		element.html('').append(table);
+		element.html(table);
 		iss.cache.set(cache_key, element.html());
+
 	}
 
 	var default_options = {
