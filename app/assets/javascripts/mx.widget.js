@@ -1,13 +1,16 @@
-//= require widget
+//= require jquery
+//= require q
+//= require underscore
+//= require kizzy
 
-!(function($) {
+!(function($, _) {
 	
 	var mx = this.mx || (this.mx = {}); mx.widget || (mx.widget = {});
 	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
 
     number_with_delimiter = function(number, options) {
-    	options = $.extend({}, options || {});
+    	options = _.extend({}, options || {});
 
     	var delimiter = options.delimiter || ' ';
     	var separator = options.separator || ',';
@@ -20,7 +23,7 @@
     }
 
     number_with_precision = function(number, options) {
-    	options = $.extend({}, options || {});
+    	options = _.extend({}, options || {});
 
     	var precision = options.precision || 2;
 
@@ -31,33 +34,33 @@
 		host: 'http://beta.micex.ru',
 		
 		merge: function(data) {
-			return $.map(data.data, function(record) {
-				return $.reduce(record, function(memo, value, index) {
+			return _.map(data.data, function(record) {
+				return _.reduce(record, function(memo, value, index) {
 					return memo[data.columns[index]] = value, memo; 
 				}, {});
 			});
 		},
 		
 		prepare_filters: function(filters) {
-			return $.reduce(filters, function(memo, record) {
+			return _.reduce(filters, function(memo, record) {
 				return (memo[record.filter_name] || (memo[record.filter_name] = [])).push({ id: record.id, name: record.name }), memo;
 			}, {});
 		},
 		
 		prepare_columns: function(securities, marketdata) {
-			return $.extend(
-				$.reduce(securities, function(memo, record) { return memo[record.id] = record, memo; }, {}),
-				$.reduce(marketdata, function(memo, record) { return memo[record.id] = record, memo; }, {})
+			return _.extend(
+				_.reduce(securities, function(memo, record) { return memo[record.id] = record, memo; }, {}),
+				_.reduce(marketdata, function(memo, record) { return memo[record.id] = record, memo; }, {})
 			);
 		},
 		
 		prepare_records: function(securities, marketdata) {
-			securities = $.reduce(securities, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
-			marketdata = $.reduce(marketdata, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
-			return $.reduce($.keys(securities), function(memo, key) { return memo.push($.extend(securities[key], marketdata[key])), memo; }, []);
+			securities = _.reduce(securities, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			marketdata = _.reduce(marketdata, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			return _.reduce(_.keys(securities), function(memo, key) { return memo.push(_.extend(securities[key], marketdata[key])), memo; }, []);
 		},
 		
-		cache: $.cache('iss/widgets')
+		cache: kizzy('iss/widgets')
 	}
 	
 
@@ -83,7 +86,7 @@
 				engine: encodeURIComponent(engine),
 				market: encodeURIComponent(market)
 			}),
-			type: 'jsonp',
+			dataType: 'jsonp',
 			success: onSuccess
 		})
 		
@@ -113,7 +116,7 @@
 				engine: encodeURIComponent(engine),
 				market: encodeURIComponent(market)
 			}),
-			type: 'jsonp',
+			dataType: 'jsonp',
 			success: onSuccess
 		})
 		
@@ -146,7 +149,7 @@
 				market: encodeURIComponent(market),
 				params: encodeURIComponent(params)
 			}),
-			type: 'jsonp',
+			dataType: 'jsonp',
 			success: onSuccess
 		})
 		
@@ -154,12 +157,25 @@
 
 	}
 	
-	function render(element, filters, columns, records, cache_key, options) {
+	function row_data(row) {
+	    var table = $(row).closest('table');
+	    return {
+	        engine:     table.attr('data-mx-engine'),
+	        market:     table.attr('data-mx-market'),
+	        board:      row.attr('data-mx-board'),
+	        security:   row.attr('data-mx-security')
+	    }
+	}
+	
+	function bind_table_events(element) {
+	}
+	
+	function render(element, engine, market, filters, columns, records, cache_key, options) {
 		
 		function prepare_value(value, column) {
 		    switch(column.type) {
 		        case 'time':
-		            return $.initial(value.split(':')).join(':');
+		            return _.initial(value.split(':')).join(':');
 		        case 'number':
 		            return number_with_precision(value, column.precision);
 		    }
@@ -174,30 +190,33 @@
 		}
 		
 		function prepare_row(record) {
-			return $.map(visible_columns, prepare_cell, record);
+			return {
+			    board: record['BOARDID'],
+			    security: record['SECID'],
+			    cells: _.map(visible_columns, prepare_cell, record)
+			};
 		}
 		
 		function render_cell(cell, index, row) {
 			return $.create('<td>')
 				.addClass(cell.type)
-				.toggleClass('first', index === $.first(row))
-				.toggleClass('last', cell === $.last(row))
+				.toggleClass('first', index === _.first(row))
+				.toggleClass('last', cell === _.last(row))
 				.html($.create('<span>').html(cell.value));
 		}
 		
 		function render_row(row, index) {
-			var el = $.create('<tr>').addClass(index % 2 ? 'even' : 'odd').append($.flatten($.map(row, render_cell)));
-			return el;
+			return $.create('<tr>').attr({ 'data-mx-board': row.board, 'data-mx-security': row.security }).addClass(index % 2 ? 'even' : 'odd').append(_.flatten(_.map(row.cells, render_cell)));
 		}
 
-		var visible_columns = (function() { return $.map($.pluck(filters[options.filter], 'id'), function(id) { return columns[id]; }); })();
+		var visible_columns = (function() { return _.map(_.pluck(filters[options.filter], 'id'), function(id) { return columns[id]; }); })();
 
-		var rows = (function() { return $.map(records, prepare_row) })();
+		var rows = (function() { return _.map(records, prepare_row) })();
 
 
-		var table = $.create('<table>').addClass('mx-widget-table');
+		var table = $.create('<table>').addClass('mx-widget-table').attr('data-mx-engine', engine).attr('data-mx-market', market);
 		
-		table.append($.create('<tbody>').append($.flatten($.map(rows, render_row))));
+		table.append($.create('<tbody>').append(_.flatten(_.map(rows, render_row))));
 		
 		element.html('').append(table);
 		iss.cache.set(cache_key, element.html());
@@ -210,7 +229,9 @@
 	mx.widget.table = function(element, engine, market, params, options) {
 		element = $(element); if (!element) return;
 		
-		$.defaults(options || (options = {}), default_options);
+		bind_table_events(element);
+		
+		_.defaults(options || (options = {}), default_options);
 		
 		var cache_key = ['render', engine, market, params].join('/');
 		var cached_render = iss.cache.get(cache_key);
@@ -222,12 +243,12 @@
 		var columns = iss.columns(engine, market);
 		var records = iss.records(engine, market, params, true);
 
-		Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
+		Q.join(filters, columns, records, function() { render(element, engine, market, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 		
 		setInterval(function() {
 			
 			records = iss.records(engine, market, params, true);
-			Q.join(filters, columns, records, function() { render(element, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
+			Q.join(filters, columns, records, function() { render(element, engine, market, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 			
 		}, 60 * 1000);
 		
@@ -238,7 +259,7 @@
 	    host: 'http://beta.micex.ru',
 	    
 	    calculate_dimensions: function(element) {
-	        var width = element.offset().width, height = Math.round(width / 2);
+	        var width = element.width(), height = Math.round(width / 2);
 	        return {
 	            'z1.width': width,
 	            'z1_c.height': height,
@@ -259,7 +280,7 @@
 	        engine: engine,
 	        market: market,
 	        security: security,
-	        dimensions: $.toQueryString(dimensions)
+	        dimensions: _.toQueryString(dimensions)
 	    });
 	    
         var image = $.create('<img>').attr('src', url);
@@ -275,4 +296,4 @@
 	    cs.chart(element, engine, market, security);
 	}
 
-})(ender.noConflict());
+})($, _);

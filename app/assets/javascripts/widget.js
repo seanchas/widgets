@@ -1,2 +1,0 @@
-//= require ender
-//= require q
