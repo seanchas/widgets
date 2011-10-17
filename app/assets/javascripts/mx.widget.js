@@ -215,8 +215,8 @@
 		var cache_key = ['render', engine, market, params].join('/');
 		var cached_render = iss.cache.get(cache_key);
 		
-		//if (cached_render)
-		//    element.html(cached_render);
+		if (cached_render)
+		    element.html(cached_render);
 		
 		var filters = iss.filters(engine, market);
 		var columns = iss.columns(engine, market);
