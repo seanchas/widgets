@@ -2,33 +2,13 @@
 //= require q
 //= require underscore
 //= require kizzy
+//= require mx.utils
 
-!(function($, _) {
+!(function($) {
 	
 	var mx = this.mx || (this.mx = {}); mx.widget || (mx.widget = {});
 	
 	function t(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
-
-    number_with_delimiter = function(number, options) {
-    	options = _.extend({}, options || {});
-
-    	var delimiter = options.delimiter || ' ';
-    	var separator = options.separator || ',';
-
-    	var parts = number.toString().split(".");
-
-    	parts[0] = parts[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1" + delimiter);
-
-    	return parts.join(separator);
-    }
-
-    number_with_precision = function(number, options) {
-    	options = _.extend({}, options || {});
-
-    	var precision = options.precision || 2;
-
-    	return number_with_delimiter(new Number(number).toFixed(precision), options);
-    }
 
 	var iss = {
 		host: 'http://beta.micex.ru',
@@ -198,7 +178,7 @@
 		        case 'time':
 		            return _.initial(value.split(':')).join(':');
 		        case 'number':
-		            return number_with_precision(value, column.precision);
+		            return mx.utils.number_with_precision(value, { precision: column.precision });
 		    }
 		    return value;
 		}
@@ -221,9 +201,9 @@
 		function render_cell(cell, index, row) {
 			return $('<td>')
 				.addClass(cell.type)
-				.toggleClass('first', index === _.first(row))
+				.toggleClass('first', cell === _.first(row))
 				.toggleClass('last', cell === _.last(row))
-				.html($('<span>').html(cell.value));
+				.html(cell.value);
 		}
 		
 		function render_row(row, index) {
@@ -256,6 +236,7 @@
 		});
 		
 		element.html(table);
+		
 		iss.cache.set(cache_key, element.html());
 
 	}
@@ -334,4 +315,4 @@
 	    cs.chart(element, engine, market, security);
 	}
 
-})($.noConflict(), _.noConflict());
+})($.noConflict());
