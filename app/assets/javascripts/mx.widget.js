@@ -183,7 +183,6 @@
 	        next_row.insertAfter(row);
 	        mx.widget.chart($('td', next_row), data.engine, data.market, data.security);
 	    }
-	    
 	}
 	
 	function bind_table_events(element) {
@@ -192,7 +191,7 @@
 	    })
 	}
 	
-	function render(element, engine, market, filters, columns, records, cache_key, options) {
+	function render(element, engine, market, cache_key, filters, columns, records, cache_key, options) {
 		
 		function prepare_value(value, column) {
 		    switch(column.type) {
@@ -229,9 +228,9 @@
 		
 		function render_row(row, index) {
 		    var el = $('<tr>')
-		        .data({
-		            board: row.board,
-		            security: row.security
+		        .attr({
+		            'data-board': row.board,
+		            'data-security': row.security
 		        })
 		        .addClass(index % 2 ? 'even' : 'odd');
 		    
@@ -246,10 +245,11 @@
 
 		var table = $('<table>')
 		    .addClass('mx-widget-table')
-		    .data({
-		        engine: engine,
-		        market: market
-		    });
+		    .attr({
+		        'data-engine': engine,
+		        'data-market': market
+		    })
+		    .data('cache-key', cache_key);
 		
 		_.each(_.map(rows, render_row), function(row) {
 		    table.append(row)
@@ -281,12 +281,12 @@
 		var columns = iss.columns(engine, market);
 		var records = iss.records(engine, market, params, true);
 
-		Q.join(filters, columns, records, function() { render(element, engine, market, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
+		Q.join(filters, columns, records, function() { render(element, engine, market, cache_key, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 		
 		setInterval(function() {
 			
 			records = iss.records(engine, market, params, true);
-			Q.join(filters, columns, records, function() { render(element, engine, market, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
+			Q.join(filters, columns, records, function() { render(element, engine, market, cache_key, filters.valueOf(), columns.valueOf(), records.valueOf(), cache_key, options); });
 			
 		}, 60 * 1000);
 		

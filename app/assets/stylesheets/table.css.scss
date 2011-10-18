@@ -29,7 +29,7 @@ table.mx-widget-table {
 
 	
 	td {
-		padding: 3px 3px 5px;
+ 		padding: 5px;
 		vertical-align: bottom;
 		white-space: nowrap;
 	}
@@ -51,5 +51,12 @@ table.mx-widget-table {
 		color: #888;
 		font-size: 10px;
 	}
+	
+	tr.chart {
+	    td {
+	        padding: 0;
+	    }
+	}
+	
 	
 }
