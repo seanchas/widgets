@@ -3,7 +3,7 @@ global = exports ? this
 global.mx        ?=  {}
 global.mx.utils  ?=  {}
 
-_u = global.mx.utils
+scope = global.mx.utils
 
 
 number_with_delimiter = (number, options = {}) ->
@@ -22,6 +22,12 @@ number_with_precision = (number, options = {}) ->
     
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)
 
+extract_options = (args) ->
+    options = _.last(args)
+    if typeof options == 'object' then options else {}
 
-_u.number_with_delimiter = number_with_delimiter
-_u.number_with_precision = number_with_precision
+
+_.extend scope,
+    number_with_delimiter:  number_with_delimiter
+    number_with_precision:  number_with_precision
+    extract_options:        extract_options

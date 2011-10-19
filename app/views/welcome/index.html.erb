@@ -1,20 +1,22 @@
 
 <%- content_for :right_content do -%>
 
-    <div id="chart_container">
-        
-    </div>
-
     <div class="table_container">
         <h2>Валюты</h2>
         <div id="currencies">
         </div>
     </div>
     
+    <div id="currencies_chart">
+    </div>
+
     <div class="table_container">
         <h2>Индексы</h2>
         <div id="indices">
         </div>
+    </div>
+
+    <div id="indices_chart">
     </div>
 
     <div class="table_container">
@@ -30,7 +32,7 @@
     </div>
 
     <script type="text/javascript" charset="utf-8">
-        mx.widget.table('#currencies', 'currency', 'selt', [
+        mx.widgets.table('#currencies', 'currency', 'selt', [
             'CETS:USD000UTSTOM',
             'CETS:USD000TODTOM',
             'CETS:USD000000TOD',
@@ -38,7 +40,7 @@
         ]);
 
 
-        mx.widget.table('#indices', 'stock', 'index', [
+        mx.widgets.table('#indices', 'stock', 'index', [
     		'SNDX:MICEXCGS',
     		'SNDX:MICEXCHM',
     		'SNDX:MICEXFNL',
@@ -49,7 +51,7 @@
     		'SNDX:MICEXTLC'
         ]);
 
-        mx.widget.table('#shares', 'stock', 'shares', [
+        mx.widgets.table('#shares', 'stock', 'shares', [
     		'EQNE:GAZP',
     		'EQBR:LKOH',
     		'EQNL:ROSN',
@@ -59,7 +61,7 @@
     		'EQBR:HYDR'
         ]);
 
-        mx.widget.table('#forts', 'futures', 'forts', [
+        mx.widgets.table('#forts', 'futures', 'forts', [
     		'PSFU:RIZ1',
     		'PSFU:SRZ1',
     		'PSFU:GZZ',
@@ -68,9 +70,19 @@
         ]);
 
         /*
-        mx.widget.chart('#currencies_chart', 'currency', 'selt', 'USD000000TOD');
-        mx.widget.chart('#indices_chart', 'stock', 'index', 'MICEXTLC');
+        mx.widgets.chart('#currencies_chart', {
+            engine: 'currency',
+            market: 'selt', 
+            security: 'USD000000TOD'
+        });
+
+        mx.widgets.chart('#indices_chart', {
+            engine: 'stock', 
+            market: 'index', 
+            security: 'MICEXTLC'
+        });
         */
+
     </script>
 
 <%- end -%>

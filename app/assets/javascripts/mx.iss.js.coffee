@@ -74,7 +74,7 @@ columns = (engine, market) ->
     deferred.promise()
 
 
-records = (engine, market, params...) ->
+records = (engine, market, params) ->
     deferred = $.Deferred();
 
     $.ajax
@@ -82,7 +82,7 @@ records = (engine, market, params...) ->
         data:
             'iss.meta': 'off'
             'iss.only': 'securities,marketdata'
-            'securities': params.join(',')
+            'securities': if _.isArray params then params.join(',') else params
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
