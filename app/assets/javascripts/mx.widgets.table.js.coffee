@@ -15,8 +15,8 @@ filter_scope = 'small'
 
 prepare_value = (column, value) ->
     switch column.type
-        when 'number' then  mx.utils.number_with_precision value, { precision: column.precision }
-        when 'time' then value.split(':')[0..1].join(':')
+        when 'number'   then mx.utils.number_with_precision value, { precision: column.precision }
+        when 'time'     then value.split(':')[0..1].join(':')
         else value
 
 
