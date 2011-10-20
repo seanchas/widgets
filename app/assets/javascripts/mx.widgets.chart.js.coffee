@@ -23,16 +23,18 @@ extend = (obj, mixin) ->
 calculate_dimensions = (element) ->
     width = element.width()
     height = width / 2
-    {
-        'c.width':      width,
-        'z1.width':     width,
-        'c.height':     height + 20,
-        'z1_c.height':  height
-    }
+
+    'c.width':      width
+    'z1.width':     width
+    'c.height':     height
+    'z1_c.height':  height
+    'z1.height':    height
+
 
 make_url = (element, engine, market, security) ->
     query = $.param(extend(calculate_dimensions(element), { template: cs_template, rnd: +new Date}))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
+
 
 make_image = (element, engine, market, security) ->
     $('<img>').attr({

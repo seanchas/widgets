@@ -3,8 +3,6 @@
 ##= require mx.utils
 ##= require kizzy
 
-###
-
 $ = jQuery
 
 global = module?.exports ? this
@@ -43,4 +41,3 @@ for name in names
     scope["#{name}_with_cache"]     = cached_method(name)
     scope["#{name}"]                = scope["#{name}_with_cache"]
 
-###
