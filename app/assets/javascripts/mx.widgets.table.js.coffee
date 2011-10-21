@@ -1,6 +1,7 @@
 ##= require jquery
 ##= require underscore
 ##= require mx.iss.persistent
+##= require mx.widgets.chart
 
 global = module?.exports ? ( exports ? this )
 
@@ -90,7 +91,7 @@ create_cell = (cell, container) ->
 # entry point
 
 table_widget = (element, engine, market, securities, options = {}) ->
-
+    
     # ensure element
     element = $ element; return unless element.exists()
 
@@ -124,10 +125,51 @@ table_widget = (element, engine, market, securities, options = {}) ->
             element.html table
             
 
-    # observe render events
+    # observe widget render event
     element.bind 'render:complete', () ->
         cache.set cache_key, element.html()
     
+    # observe chart render event
+    element.bind 'render:chart', (event, security) ->
+        # [board, security] = security.split(':')
+        # find or create chart row
+        # hide row if it's new
+        # hide all charts except this one
+    
+
+    # observe row clicks
+    element.delegate 'tbody tr', 'click', (event) ->
+        row = $ event.currentTarget
+        chart_row   = row.next('.chart')
+        if chart_row.exists() then toggle_chart chart_row else build_chart row
+
+
+    # build chart
+    build_chart = (row) ->
+        chart_cell = $('<td>')
+            .attr('colspan', $('td', row).size())
+        
+        chart_row = $('<tr>')
+            .addClass('chart')
+            .html(chart_cell)
+            .insertAfter(row)
+        
+        chart_cell.bind 'render:complete', () ->
+            chart_row.hide()
+            toggle_chart chart_row
+        
+        mx.widgets.chart chart_cell, 
+            engine: engine
+            market: market
+            security: row.data('security')
+        
+
+    # toggle chart
+    toggle_chart = (row) ->
+        row.siblings('.chart').hide()
+        row.toggle()
+        element.trigger 'render:complete'
+        
     # refresh table
     refresh = ->
         rds = mx.iss.records engine, market, securities, { force: true }
@@ -167,6 +209,8 @@ table_widget = (element, engine, market, securities, options = {}) ->
     
     # start async render with cached records data if possible
     refresh()
+    
+    # element.trigger 'render:chart', options.chart if options.chart
 
 
     undefined

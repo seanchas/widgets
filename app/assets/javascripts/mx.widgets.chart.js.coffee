@@ -36,10 +36,13 @@ make_url = (element, engine, market, security) ->
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
-make_image = (element, engine, market, security) ->
-    $('<img>').attr({
+make_image = (element, engine, market, security, width, height) ->
+    $('<img>').attr
         src: make_url(element, engine, market, security)
-    })
+        width: width
+        height: height
+            
+    
 
 
 
@@ -74,6 +77,11 @@ class ChartWidget
     
     onImageLoad: (event) =>
         @element.html(event.currentTarget)
+
+        @element.css('height', @element.height())
+
+        @element.trigger('render:complete')
+
         @refresh() if @refresh_timeout
         
 
