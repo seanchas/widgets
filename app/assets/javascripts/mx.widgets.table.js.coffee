@@ -1,4 +1,8 @@
-global = module?.exports ? this
+##= require jquery
+##= require underscore
+##= require mx.iss.persistent
+
+global = module?.exports ? ( exports ? this )
 
 global.mx           ||= {}
 global.mx.widgets   ||= {}
@@ -79,12 +83,13 @@ find_cell = (cell, container) ->
 create_cell = (cell, container) ->
     $('<td>')
         .attr({ 'data-name': cell.name })
+        .addClass(cell.type)
         .appendTo(container)
 
 
 # entry point
 
-table_widget = (element, engine, market, securities, options) ->
+table_widget = (element, engine, market, securities, options = {}) ->
 
     # ensure element
     element = $ element; return unless element.exists()
@@ -95,27 +100,35 @@ table_widget = (element, engine, market, securities, options) ->
     # fetch columns data
     cds = mx.iss.columns engine, market
 
-    # fetch records data
-    rds = mx.iss.records engine, market, securities
-    
+    # cache
+    cache_key       = _.flatten(['widget', 'table', engine, market, securities]).join('/')
+    cached_widget   = cache.get cache_key
+
     # clean element to be sure
     # no content exists and
     # no callback are present
     element.empty()
+
+    table = if cached_widget
+        $('table', element.html(cached_widget))
+    else
+        _.tap $('<table>')
+            .addClass('mx-widget-table')
+            .attr(
+                'data-engine': engine
+                'data-market': market
+            )
+            .html('<thead></thead><tbody></tbody>')
+            .hide()
+        , (table) ->
+            element.html table
+            
+
+    # observe render events
+    element.bind 'render:complete', () ->
+        cache.set cache_key, element.html()
     
-    # create table
-    table = $('<table>')
-        .addClass('mx-widget-table')
-        .attr(
-            'data-engine': engine
-            'data-market': market
-        )
-        .html('<thead></thead><tbody></tbody>')
-    
-    # insert table into DOM
-    element.html table.hide()
-    
-    # refresh function
+    # refresh table
     refresh = ->
         rds = mx.iss.records engine, market, securities, { force: true }
         $.when(fds, cds, rds).then (filters, columns, records) ->
@@ -124,6 +137,8 @@ table_widget = (element, engine, market, securities, options) ->
     # render function
     render = (filters, columns, records, table) ->
         
+        element.trigger 'render:started'
+
         # select visible fields
         fields  = (filter_columns columns, filters)
         
@@ -141,15 +156,17 @@ table_widget = (element, engine, market, securities, options) ->
                         table_cell = find_or_create_cell cell, table_row
                         table_cell.html(cell.value)
                 
-
+        # show table
         table.show()
         
-        setTimeout refresh, 10000
+        # refresh table records
+        _.delay refresh, (options.timeout || 60 * 1000)
+        
+        element.trigger 'render:complete'
         
     
-    # start async render
-    $.when(fds, cds, rds).then (filters, columns, records) ->
-        render filters[filter_scope], columns, records, table
+    # start async render with cached records data if possible
+    refresh()
 
 
     undefined

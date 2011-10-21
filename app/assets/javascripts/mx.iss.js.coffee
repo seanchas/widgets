@@ -1,13 +1,14 @@
 ##= require jquery
 ##= require underscore
 
-
-$ = jQuery
-
-global = module?.exports ? this
+global = module?.exports ? ( exports ? this )
 
 global.mx       ||= {}
 global.mx.iss   ||= {}
+
+
+$ = jQuery
+
 
 scope = global.mx.iss
 
@@ -41,8 +42,10 @@ iss_prepare_records = (securities, marketdata) ->
     , []
 
 
+
 cache_key = (args...) ->
     args.join('/')
+
 
 filters = (engine, market) ->
     deferred = $.Deferred();

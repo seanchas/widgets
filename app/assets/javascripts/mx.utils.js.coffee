@@ -1,4 +1,4 @@
-global = exports ? this
+global = module?.exports ? ( exports ? this )
 
 global.mx        ?=  {}
 global.mx.utils  ?=  {}
