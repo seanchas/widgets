@@ -1,5 +1,6 @@
 ##= require jquery
 ##= require underscore
+##= require backbone
 ##= require mx.iss.persistent
 ##= require mx.widgets.chart
 
@@ -88,6 +89,7 @@ create_cell = (cell, container) ->
         .appendTo(container)
 
 
+
 # entry point
 
 table_widget = (element, engine, market, securities, options = {}) ->
@@ -103,7 +105,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # cache
     cache_key       = _.flatten(['widget', 'table', engine, market, securities]).join('/')
-    cached_widget   = cache.get cache_key
+    cached_widget   = null #cache.get cache_key
 
     # clean element to be sure
     # no content exists and
@@ -127,7 +129,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # observe widget render event
     element.bind 'render:complete', () ->
-        cache.set cache_key, element.html()
+        # cache.set cache_key, element.html()
     
     # observe chart render event
     element.bind 'render:chart', (event, security) ->
@@ -207,7 +209,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
         element.trigger 'render:complete'
         
     
-    # start async render with cached records data if possible
+    # first update with old data
     refresh()
     
     # element.trigger 'render:chart', options.chart if options.chart
@@ -218,3 +220,15 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
 _.extend scope,
     table: table_widget
+
+# testing table with backbone
+
+class TableView extends Backbone.View
+
+    
+$ () ->
+    view = new TableView
+        el: $('#test_container')
+
+    view.render()
+
