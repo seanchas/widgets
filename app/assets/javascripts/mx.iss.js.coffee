@@ -12,7 +12,7 @@ $ = jQuery
 
 scope = global.mx.iss
 
-iss_host = "http://beta.micex.ru/iss"
+iss_host = "http://www.beta.micex.ru/iss"
 
 
 iss_merge_columns_and_data = (json) ->

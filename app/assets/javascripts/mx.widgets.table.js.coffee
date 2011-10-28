@@ -1,6 +1,7 @@
 ##= require jquery
 ##= require underscore
 ##= require backbone
+##= require mx.utils
 ##= require mx.iss.persistent
 ##= require mx.widgets.chart
 
@@ -221,14 +222,61 @@ table_widget = (element, engine, market, securities, options = {}) ->
 _.extend scope,
     table: table_widget
 
-# testing table with backbone
 
-class TableView extends Backbone.View
+# class based
 
+class CellModel extends Backbone.Model
     
+    initialize: (attributes, options = {}) ->
+
+class RowModel extends Backbone.Model
+	
+	initialize: (attributes, options = {}) ->
+		@id = [@get('BOARDID'), @get('SECID')].join('/')
+
+class CellsCollection extends Backbone.Collection
+    
+    model: CellModel
+    
+    initialize: (models, options = {}) ->
+        
+
+
+class RowsCollection extends Backbone.Collection
+
+	model: RowModel
+
+	initialize: (models, options = {}) ->
+		@engine		= options.engine
+		@market		= options.market
+		@securities	= options.securities
+
+	fetch: (options = {}) ->
+		mx.iss.records(@engine, @market, @securities, { force: options.force }).then (records) =>
+			@update records, options
+	
+	update: (models, options = {}) ->
+		if _.isArray models
+			@_update model, options for model in models
+		else
+			@_update models, options
+	
+	_update: (model, options = {}) ->
+		model = @_prepareModel model, options
+		if existing = @get model.id
+			existing.set model.attributes
+			existing.trigger 'update', existing, @, options unless options.silent
+		else
+			@_add model, options
+	
+	
+
 $ () ->
-    view = new TableView
-        el: $('#test_container')
 
-    view.render()
-
+	rows = new RowsCollection [],
+		engine: 'stock'
+		market: 'index'
+		securities: [
+			'SNDX:MICEXINDEXCF'
+			'SNDX:MICEXO&G'
+		]

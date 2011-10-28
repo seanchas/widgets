@@ -22,9 +22,11 @@ number_with_precision = (number, options = {}) ->
     
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)
 
+
 extract_options = (args) ->
     options = _.last(args)
     if typeof options == 'object' then options else {}
+
 
 
 _.extend scope,
