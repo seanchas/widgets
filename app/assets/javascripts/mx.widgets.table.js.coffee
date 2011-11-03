@@ -105,8 +105,8 @@ table_widget = (element, engine, market, securities, options = {}) ->
     cds = mx.iss.columns engine, market
 
     # cache
-    cache_key       = _.flatten(['widget', 'table', engine, market, securities]).join('/')
-    cached_widget   = null #cache.get cache_key
+    cache_key       = mx.utils.sha1(['widgets', 'table', location.path_name, JSON.stringify(_.rest arguments)].join('/'))
+    cached_widget   = cache.get cache_key
 
     # clean element to be sure
     # no content exists and
@@ -130,7 +130,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # observe widget render event
     element.bind 'render:complete', () ->
-        # cache.set cache_key, element.html()
+        cache.set cache_key, element.html()
     
     # observe chart render event
     element.bind 'render:chart', (event, security) ->
@@ -214,69 +214,9 @@ table_widget = (element, engine, market, securities, options = {}) ->
     refresh()
     
     # element.trigger 'render:chart', options.chart if options.chart
-
-
+    
     undefined
 
 
 _.extend scope,
     table: table_widget
-
-
-# class based
-
-class CellModel extends Backbone.Model
-    
-    initialize: (attributes, options = {}) ->
-
-class RowModel extends Backbone.Model
-	
-	initialize: (attributes, options = {}) ->
-		@id = [@get('BOARDID'), @get('SECID')].join('/')
-
-class CellsCollection extends Backbone.Collection
-    
-    model: CellModel
-    
-    initialize: (models, options = {}) ->
-        
-
-
-class RowsCollection extends Backbone.Collection
-
-	model: RowModel
-
-	initialize: (models, options = {}) ->
-		@engine		= options.engine
-		@market		= options.market
-		@securities	= options.securities
-
-	fetch: (options = {}) ->
-		mx.iss.records(@engine, @market, @securities, { force: options.force }).then (records) =>
-			@update records, options
-	
-	update: (models, options = {}) ->
-		if _.isArray models
-			@_update model, options for model in models
-		else
-			@_update models, options
-	
-	_update: (model, options = {}) ->
-		model = @_prepareModel model, options
-		if existing = @get model.id
-			existing.set model.attributes
-			existing.trigger 'update', existing, @, options unless options.silent
-		else
-			@_add model, options
-	
-	
-
-$ () ->
-
-	rows = new RowsCollection [],
-		engine: 'stock'
-		market: 'index'
-		securities: [
-			'SNDX:MICEXINDEXCF'
-			'SNDX:MICEXO&G'
-		]

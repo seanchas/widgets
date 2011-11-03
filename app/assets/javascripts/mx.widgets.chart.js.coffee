@@ -8,7 +8,7 @@ global.mx.widgets   ||= {}
 scope = global.mx.widgets
 
 
-cs_host         = "http://beta.micex.ru"
+cs_host         = "http://www.beta.micex.ru"
 cs_extension    = "png"
 cs_template     = "adv_no_volume"
 
@@ -25,6 +25,7 @@ calculate_dimensions = (element) ->
     height = width / 2
 
     'c.width':      width
+    'z1_c.width':   width
     'z1.width':     width
     'c.height':     height
     'z1_c.height':  height

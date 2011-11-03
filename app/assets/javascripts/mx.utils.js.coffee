@@ -29,7 +29,108 @@ extract_options = (args) ->
 
 
 
+sha1 = (string) ->
+    
+    digits = '0123456789abcdef'
+    
+    rotate = (number, shift) ->
+        (number << shift) | (number >>> (32 - shift))
+    
+    digest = (data) ->
+        result = ''
+        for i in [0 ... 20]
+            result +=   digits.charAt((data[i >> 2] >> ((3 - i % 4) * 8 + 4)) & 0xf) +
+                        digits.charAt((data[i >> 2] >> ((3 - i % 4) * 8 + 0)) & 0xf)
+        result
+        
+    
+    h = [
+        0x67452301
+        0xEFCDAB89
+        0x98BADCFE
+        0x10325476
+        0xC3D2E1F0
+    ]
+    
+    k = [
+        0x5A827999
+        0x6ED9EBA1
+        0x8F1BBCDC
+        0xCA62C1D6
+    ]
+    
+    n = 0x0ffffffff
+    
+    # prepare
+    
+    l = string.length
+    
+    words = for i in [0 ... l - 3] by 4
+        string.charCodeAt(i + 0) << 24 |
+        string.charCodeAt(i + 1) << 16 |
+        string.charCodeAt(i + 2) <<  8 |
+        string.charCodeAt(i + 3)
+
+    words.push switch l % 4
+        when 0 then 0x080000000
+        when 1 then string.charCodeAt(l - 1) << 24 | 0x0800000
+        when 2 then string.charCodeAt(l - 2) << 24 | string.charCodeAt(l - 1) << 16 | 0x08000
+        when 3 then string.charCodeAt(l - 3) << 24 | string.charCodeAt(l - 2) << 16 | string.charCodeAt(l - 1) << 8 | 0x080
+
+    while (words.length % 16) != 14
+        words.push 0
+    
+    words.push l >>> 29
+    words.push (l << 3) & n
+    
+    # calculation
+    
+    w = []
+    
+    for i in [0 ... words.length] by 16
+        
+        w[j] = words[i + j]                                             for j in [0 ... 16]
+        w[j] = rotate w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1    for j in [16 ... 80]
+        
+        a = h[0]
+        b = h[1]
+        c = h[2]
+        d = h[3]
+        e = h[4]
+        
+        for j in [0 ... 80]
+            
+            t = if (j < 20)
+                (rotate(a, 5) + ((b & c) | (~ b & d)) + e + w[j] + k[0]) & n
+            else if (j < 40)
+                (rotate(a, 5) + (b ^ c ^ d) + e + w[j] + k[1]) & n
+            else if (j < 60)
+                (rotate(a, 5) + ((b & c) | (b & d) | (c & d)) + e + w[j] + k[2]) & n
+            else
+                (rotate(a, 5) + (b ^ c ^ d) + e + w[j] + k[3]) & n
+            
+            e = d
+            d = c
+            c = rotate b, 30
+            b = a
+            a = t
+        
+        h[0] = (h[0] + a) & n
+        h[1] = (h[1] + b) & n
+        h[2] = (h[2] + c) & n
+        h[3] = (h[3] + d) & n
+        h[4] = (h[4] + e) & n
+    
+    # formatting
+    
+    digest h
+
+
 _.extend scope,
     number_with_delimiter:  number_with_delimiter
     number_with_precision:  number_with_precision
     extract_options:        extract_options
+    sha1:                   sha1
+
+
+# console.log sha1('')
