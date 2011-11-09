@@ -26,7 +26,7 @@ cached_method = (name) ->
     
         options = mx.utils.extract_options args
     
-        cache_key   = [name, args...].join('/')
+        cache_key   = mx.utils.sha1(['widgets', 'table', location.path_name, JSON.stringify(_.rest arguments)].join('/'))
         cache_data  = cache.get(cache_key) unless options.force
 
         return deferred.resolve(cache_data).promise() if cache_data?

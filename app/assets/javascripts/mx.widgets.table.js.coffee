@@ -2,8 +2,9 @@
 ##= require underscore
 ##= require backbone
 ##= require mx.utils
-##= require mx.iss.persistent
+##= require mx.iss
 ##= require mx.widgets.chart
+##= require kizzy
 
 global = module?.exports ? ( exports ? this )
 
@@ -31,25 +32,25 @@ escape_selector = (string) ->
 
 
 
-prepare_value = (column, value) ->
+prepare_value = (column, value, record) ->
     switch column.type
-        when 'number'   then mx.utils.number_with_precision value, { precision: column.precision }
+        when 'number'   then mx.utils.number_with_precision value, { precision: column.precision || record['DECIMALS'] }
         when 'time'     then value.split(':')[0..1].join(':')
         else value
 
 
 
-prepare_cell = (column, record) ->
-    type:   column.type
-    name:   column.name
-    value:  prepare_value column, record[column.name]
+prepare_cell = (field, record) ->
+    type:   field.type
+    name:   field.name
+    value:  prepare_value field, record[field.name], record
 
 
 
-prepare_row = (record, columns) ->
+prepare_row = (record, fields) ->
     board:      record.BOARDID
     security:   record.SECID
-    cells:      (prepare_cell column, record for column in columns)
+    cells:      (prepare_cell field, record for field in fields)
 
 
 
@@ -130,7 +131,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # observe widget render event
     element.bind 'render:complete', () ->
-        cache.set cache_key, element.html()
+        # cache.set cache_key, element.html()
     
     # observe chart render event
     element.bind 'render:chart', (event, security) ->
@@ -141,10 +142,12 @@ table_widget = (element, engine, market, securities, options = {}) ->
     
 
     # observe row clicks
+    ###
     element.delegate 'tbody tr', 'click', (event) ->
         row = $ event.currentTarget
         chart_row   = row.next('.chart')
         if chart_row.exists() then toggle_chart chart_row else build_chart row
+    ###
 
 
     # build chart
@@ -175,7 +178,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
         
     # refresh table
     refresh = ->
-        rds = mx.iss.records engine, market, securities, { force: true }
+        rds = mx.iss.records engine, market, securities, _.extend(options, { force: true })
         $.when(fds, cds, rds).then (filters, columns, records) ->
             render filters[filter_scope], columns, records, table
     

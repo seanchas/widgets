@@ -77,15 +77,29 @@ columns = (engine, market) ->
     deferred.promise()
 
 
-records = (engine, market, params) ->
+records = (engine, market, params, options = {}) ->
     deferred = $.Deferred();
 
+    known_keys = ['nearest']
+
+    params_name = options.params_name || 'securities'
+
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'securities,marketdata'
+
+    data[params_name] = if _.isArray params then params.join(',') else params
+    
+    options = _.reduce options, (memo, value, key) ->
+        memo[key] = value if _.include known_keys, key
+        return memo
+    , {}
+    
+    _.extend data, options
+    
     $.ajax
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
-        data:
-            'iss.meta': 'off'
-            'iss.only': 'securities,marketdata'
-            'securities': if _.isArray params then params.join(',') else params
+        data: data
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))

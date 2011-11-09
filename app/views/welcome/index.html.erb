@@ -6,21 +6,24 @@
 <%- content_for :right_content do -%>
 
     <div class="table_container">
+        <h2>Индексы</h2>
+        <div id="main_indices">
+        </div>
+        <div id="indices_chart">
+        </div>
+        <div id="other_indices">
+        </div>
+        <div id="state_indices">
+        </div>
+    </div>
+
+    <div class="table_container">
         <h2>Валюты</h2>
         <div id="currencies">
         </div>
     </div>
     
     <div id="currencies_chart">
-    </div>
-
-    <div class="table_container">
-        <h2>Индексы</h2>
-        <div id="indices">
-        </div>
-    </div>
-
-    <div id="indices_chart">
     </div>
 
     <div class="table_container">
@@ -45,36 +48,44 @@
             'CETS:EUR000TODTOM'
         ]);
 
-        mx.widgets.table('#indices', 'stock', 'index', [
-    		'SNDX:MICEXCGS',
-    		'SNDX:MICEXCHM',
-    		'SNDX:MICEXFNL',
-    		'SNDX:MICEXM&M',
-    		'SNDX:MICEXMNF',
-    		'SNDX:MICEXO&G',
-    		'SNDX:MICEXPWR',
-    		'SNDX:MICEXTLC'
+        mx.widgets.table('#main_indices', 'stock', 'index', [
+    		'SNDX:MICEXINDEXCF',
+    		'RTSI:RTSI'
+        ]);
+
+        mx.widgets.table('#other_indices', 'stock', 'index', [
+    		'SNDX:MICEXCBITR',
+    		'SNDX:MICEXMBITR',
+    		'RTSI:RTSVX',
+    		'SNDX:MICEXINNOV'
+        ]);
+
+        mx.widgets.table('#state_indices', 'state', 'index', [
+    		'GNDX:RGBI'
         ]);
 
         mx.widgets.table('#shares', 'stock', 'shares', [
     		'EQNE:GAZP',
-    		'EQBR:LKOH',
     		'EQNL:ROSN',
-    		'EQBR:RTKM',
-    		'EQBR:SBER03',
+    		'EQBR:LKOH',
     		'EQNL:VTBR',
     		'EQBR:HYDR'
         ], {
             chart: 'EQNE:GAZP'
         });
 
+
         mx.widgets.table('#forts', 'futures', 'forts', [
-    		'PSFU:RIZ1',
-    		'PSFU:SRZ1',
-    		'PSFU:GZZ',
-    		'PSFU:LKOH18',
-    		'PSFU:HYDR'
-        ]);
+            'RI',
+    		'MX',
+    		'SR',
+    		'Si',
+    		'GD'
+        ], {
+            params_name: 'sectypes',
+            chart: 'EQNE:GAZP',
+            nearest: 1
+        });
 
         /*
 
@@ -83,15 +94,15 @@
             market: 'selt', 
             security: 'EUR000TODTOM'
         });
+        
+        */
 
         mx.widgets.chart('#indices_chart', {
             engine: 'stock', 
             market: 'index', 
-            security: 'MICEXTLC'
+            security: 'MICEXINDEXCF'
         });
         
-        */
-
         })
     </script>
 

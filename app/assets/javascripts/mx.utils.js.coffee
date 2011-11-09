@@ -18,7 +18,7 @@ number_with_delimiter = (number, options = {}) ->
 
 
 number_with_precision = (number, options = {}) ->
-    precision = options.precision || 2
+    precision = options.precision ? 2
     
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)
 
