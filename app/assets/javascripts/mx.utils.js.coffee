@@ -7,6 +7,8 @@ scope = global.mx.utils
 
 
 number_with_delimiter = (number, options = {}) ->
+    return '-' unless number?
+
     delimiter   = options.delimiter || ' '
     separator   = options.separator || ','
 
@@ -18,6 +20,8 @@ number_with_delimiter = (number, options = {}) ->
 
 
 number_with_precision = (number, options = {}) ->
+    return '-' unless number?
+    
     precision = options.precision ? 2
     
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)

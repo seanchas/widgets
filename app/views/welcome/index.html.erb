@@ -38,6 +38,12 @@
         </div>
     </div>
 
+    <div class="table_container">
+        <h2>Опционы</h2>
+        <div id="options">
+        </div>
+    </div>
+
     <script type="text/javascript" charset="utf-8">
         jQuery(function() {
     
@@ -85,6 +91,11 @@
             params_name: 'sectypes',
             chart: 'EQNE:GAZP',
             nearest: 1
+        });
+
+        mx.widgets.table('#options', 'futures', 'options', [
+        ], {
+            leaders: 1
         });
 
         /*

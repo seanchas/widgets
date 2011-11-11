@@ -7,7 +7,7 @@ require "rvm/capistrano"
 require 'bundler/capistrano'
 
 set :application, "widgets"
-set :repository,  "http://github.com/seanchas/Widgets.git"
+set :repository,  "http://github.com/seanchas/widgets.git"
 set :user,        :ror
 set :runner,      :ror
 set :use_sudo,    false

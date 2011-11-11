@@ -80,7 +80,7 @@ columns = (engine, market) ->
 records = (engine, market, params, options = {}) ->
     deferred = $.Deferred();
 
-    known_keys = ['nearest']
+    known_keys = ['nearest', 'leaders']
 
     params_name = options.params_name || 'securities'
 
