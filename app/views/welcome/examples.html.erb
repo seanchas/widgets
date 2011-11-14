@@ -5,6 +5,12 @@
     </div>
 </p>
 
+<h6>HTML</h6>
+<pre>
+&lt;div id="shares_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
 <pre>
 mx.widgets.table('#shares_1', 'stock', 'shares', [
 	'EQNE:GAZP',
@@ -22,6 +28,12 @@ mx.widgets.table('#shares_1', 'stock', 'shares', [
     </div>
 </p>
 
+<h6>HTML</h6>
+<pre>
+&lt;div id="shares_2" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
 <pre>
 function sortBy_BOARDID_SECID(params, record) {
 	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
@@ -43,12 +55,18 @@ mx.widgets.table('#shares_2', 'stock', 'shares', [
     </div>
 </p>
 
+<h6>HTML</h6>
+<pre>
+&lt;div id="futures_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
 <pre>
 function sortBy_SECTYPE(params, record) {
 	return params.indexOf(record['SECTYPE']);
 }
 
-mx.widgets.table('#forts', 'futures', 'forts', [
+mx.widgets.table('#futures_1', 'futures', 'forts', [
     'RI',
     'MX',
     'SR',
@@ -66,11 +84,17 @@ mx.widgets.table('#forts', 'futures', 'forts', [
     </div>
 </p>
 
+<h6>HTML</h6>
 <pre>
-    mx.widgets.table('#options_1', 'futures', 'options', [
-    ], {
-        leaders: 1
-    });
+&lt;div id="options_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
+<pre>
+mx.widgets.table('#options_1', 'futures', 'options', [
+], {
+    leaders: 1
+});
 </pre>
 
 <script type="text/javascript" charset="utf-8">
