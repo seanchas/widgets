@@ -1,0 +1,123 @@
+<h1>Widgets.js</h1>
+
+<p>
+    <div id="shares_1" class="widget">
+    </div>
+</p>
+
+<pre>
+mx.widgets.table('#shares_1', 'stock', 'shares', [
+	'EQNE:GAZP',
+	'EQNL:ROSN',
+	'EQBR:LKOH',
+	'EQNL:VTBR',
+	'EQBR:HYDR'
+], {
+    cache: true
+});
+</pre>
+
+<p>
+    <div id="shares_2" class="widget">
+    </div>
+</p>
+
+<pre>
+function sortBy_BOARDID_SECID(params, record) {
+	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+}
+
+mx.widgets.table('#shares_2', 'stock', 'shares', [
+	'EQNE:GAZP',
+	'EQNL:ROSN',
+	'EQBR:LKOH',
+	'EQNL:VTBR',
+	'EQBR:HYDR'
+], {
+    sortBy: sortBy_BOARDID_SECID
+});
+</pre>
+
+<p>
+    <div id="futures_1" class="widget">
+    </div>
+</p>
+
+<pre>
+function sortBy_SECTYPE(params, record) {
+	return params.indexOf(record['SECTYPE']);
+}
+
+mx.widgets.table('#forts', 'futures', 'forts', [
+    'RI',
+    'MX',
+    'SR',
+    'Si',
+    'GD'
+], {
+    params_name: 'sectypes',
+    nearest: 1,
+    sortBy: sortBy_SECTYPE
+});
+</pre>
+
+<p>
+    <div id="options_1" class="widget">
+    </div>
+</p>
+
+<pre>
+    mx.widgets.table('#options_1', 'futures', 'options', [
+    ], {
+        leaders: 1
+    });
+</pre>
+
+<script type="text/javascript" charset="utf-8">
+    $(function() {
+        function sortBy_BOARDID_SECID(params, record) {
+        	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+        }
+
+		function sortBy_SECTYPE(params, record) {
+			return params.indexOf(record['SECTYPE']);
+		}
+
+        mx.widgets.table('#shares_1', 'stock', 'shares', [
+    		'EQNE:GAZP',
+    		'EQNL:ROSN',
+    		'EQBR:LKOH',
+    		'EQNL:VTBR',
+    		'EQBR:HYDR'
+        ], {
+            cache: true
+        });
+
+        mx.widgets.table('#shares_2', 'stock', 'shares', [
+    		'EQNE:GAZP',
+    		'EQNL:ROSN',
+    		'EQBR:LKOH',
+    		'EQNL:VTBR',
+    		'EQBR:HYDR'
+        ], {
+            sortBy: sortBy_BOARDID_SECID
+        });
+
+        mx.widgets.table('#futures_1', 'futures', 'forts', [
+            'RI',
+        	'MX',
+        	'SR',
+        	'Si',
+        	'GD'
+        ], {
+            params_name: 'sectypes',
+            nearest: 1,
+        	sortBy: sortBy_SECTYPE
+        });
+
+        mx.widgets.table('#options_1', 'futures', 'options', [
+        ], {
+            leaders: 1
+        });
+    })
+</script>

@@ -47,12 +47,21 @@
     <script type="text/javascript" charset="utf-8">
         jQuery(function() {
     
+		function sortBy_BOARDID_SECID(params, record) {
+			return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+		}
+
+		function sortBy_SECTYPE(params, record) {
+			return params.indexOf(record['SECTYPE']);
+		}
+
         mx.widgets.table('#currencies', 'currency', 'selt', [
             'CETS:USD000UTSTOM',
             'CETS:USD000TODTOM',
             'CETS:USD000000TOD',
             'CETS:EUR000TODTOM'
-        ]);
+        ], {
+		});
 
         mx.widgets.table('#main_indices', 'stock', 'index', [
     		'SNDX:MICEXINDEXCF',
@@ -64,7 +73,8 @@
     		'SNDX:MICEXMBITR',
     		'RTSI:RTSVX',
     		'SNDX:MICEXINNOV'
-        ]);
+        ], {
+		});
 
         mx.widgets.table('#state_indices', 'state', 'index', [
     		'GNDX:RGBI'
@@ -77,7 +87,7 @@
     		'EQNL:VTBR',
     		'EQBR:HYDR'
         ], {
-            chart: 'EQNE:GAZP'
+			sortBy: sortBy_BOARDID_SECID
         });
 
 
@@ -89,8 +99,8 @@
     		'GD'
         ], {
             params_name: 'sectypes',
-            chart: 'EQNE:GAZP',
-            nearest: 1
+            nearest: 1,
+			sortBy: sortBy_SECTYPE
         });
 
         mx.widgets.table('#options', 'futures', 'options', [

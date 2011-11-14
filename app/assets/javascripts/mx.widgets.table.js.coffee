@@ -58,6 +58,7 @@ filter_columns = (columns, filters) ->
     columns[filter.id] for filter in filters
 
 
+# table methods
 
 # row methods
 
@@ -107,7 +108,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # cache
     cache_key       = mx.utils.sha1(['widgets', 'table', location.path_name, JSON.stringify(_.rest arguments)].join('/'))
-    cached_widget   = cache.get cache_key
+    cached_widget   = cache.get cache_key if options.cache
 
     # clean element to be sure
     # no content exists and
@@ -131,7 +132,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # observe widget render event
     element.bind 'render:complete', () ->
-        # cache.set cache_key, element.html()
+        cache.set cache_key, element.html() if options.cache
     
     # observe chart render event
     element.bind 'render:chart', (event, security) ->
@@ -190,6 +191,13 @@ table_widget = (element, engine, market, securities, options = {}) ->
         # select visible fields
         fields  = (filter_columns columns, filters)
         
+        if options.sortBy
+            records = _.sortBy(records,
+                _.wrap(options.sortBy, (sorter, record) ->
+                    return sorter(securities, record)
+                )
+            )
+        
         # prepare rows data
         rows    = (prepare_row record, fields for record in records)
 
@@ -208,7 +216,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
         table.show()
         
         # refresh table records
-        _.delay refresh, (options.timeout || 60 * 1000)
+        _.delay refresh, (options.refresh_timeout || 60 * 1000)
         
         element.trigger 'render:complete'
         

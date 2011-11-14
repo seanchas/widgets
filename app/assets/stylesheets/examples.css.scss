@@ -1,0 +1,69 @@
+body {
+	background: #f0f0e5;
+	color: #252519;
+	font-size: 16px;
+	font-family: "Palatino Linotype", "Book Antiqua", Palatino, FreeSerif, serif;
+	line-height: 24px;
+}
+
+div.container {
+    margin: 50px 0 50px 50px;
+	width: 720px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 40px;
+}
+
+p {
+    width: 550px;
+}
+
+code, pre, tt {
+    color: #555555;
+    font-size: 12px;
+    font-family: Monaco, Consolas, "Lucida Console", monospace;
+    line-height: 18px;
+}
+
+code {
+    margin-left: 20px;
+}
+
+pre {
+    border-left: 6px solid #aaaa99;
+    margin: 0 0 30px;
+    padding: 2px 0 2px 12px;
+}
+
+.widget {
+    
+    table {
+        
+        background: #fff;
+        
+        width: 400px;
+        
+        td {
+     		padding: 5px;
+    		vertical-align: bottom;
+    		white-space: nowrap;
+    	}
+
+    	td.last {
+    		padding-right: 5px;
+    	}
+
+    	td.number {
+    		text-align: right;
+    	}
+
+    	td.time {
+    		@extend td.number;
+    		color: #888;
+    		font-size: 10px;
+    	}
+        
+    }
+    
+}

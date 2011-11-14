@@ -53,6 +53,7 @@ Widgets::Application.routes.draw do
   scope "/widgets" do
     root :to => 'welcome#index'
     get 'widget' => 'welcome#widget'
+    get 'examples' => 'welcome#examples'
   end
 
   # See how all your routes lay out with "rake routes"
