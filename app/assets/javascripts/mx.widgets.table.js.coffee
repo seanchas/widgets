@@ -18,7 +18,7 @@ $ = jQuery
 
 cache = kizzy('widgets')
 
-filter_scope = 'small'
+default_filter_name = 'small'
 
 
 $.fn.exists = ->
@@ -70,6 +70,7 @@ find_row = (row, container) ->
 
 create_row = (row, container) ->
     $('<tr>')
+        .addClass('row')
         .attr(
             'data-board':       row.board
             'data-security':    row.security
@@ -91,7 +92,22 @@ create_cell = (cell, container) ->
         .addClass(cell.type)
         .appendTo(container)
 
+# chart row methods
 
+find_or_create_chart_row = (row) ->
+    find_chart_row(row) ? create_chart_row(row)
+
+find_chart_row = (row) ->
+    row.next('tr.chart').if_exists()
+
+create_chart_row = (row) ->
+    $('<tr>')
+        .addClass('chart')
+        .addClass('new')
+        .attr({ 'data-security': row.data('security') })
+        .html("<td colspan=\"#{_.size $('td', row)}\">asd</td>")
+        .insertAfter(row)
+    
 
 # entry point
 
@@ -105,6 +121,9 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # fetch columns data
     cds = mx.iss.columns engine, market
+    
+    # filter name
+    filter_name = options.filter || default_filter_name
 
     # cache
     cache_key       = mx.utils.sha1(['widgets', 'table', location.path_name, JSON.stringify(_.rest arguments)].join('/'))
@@ -112,7 +131,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
 
     # clean element to be sure
     # no content exists and
-    # no callback are present
+    # no callbacks are present
     element.empty()
 
     table = if cached_widget
@@ -120,6 +139,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
     else
         _.tap $('<table>')
             .addClass('mx-widget-table')
+            .toggleClass('chart', options.chart?)
             .attr(
                 'data-engine': engine
                 'data-market': market
@@ -134,54 +154,45 @@ table_widget = (element, engine, market, securities, options = {}) ->
     element.bind 'render:complete', () ->
         cache.set cache_key, element.html() if options.cache
     
-    # observe chart render event
-    element.bind 'render:chart', (event, security) ->
-        # [board, security] = security.split(':')
-        # find or create chart row
-        # hide row if it's new
-        # hide all charts except this one
-    
-
-    # observe row clicks
-    ###
-    element.delegate 'tbody tr', 'click', (event) ->
-        row = $ event.currentTarget
-        chart_row   = row.next('.chart')
-        if chart_row.exists() then toggle_chart chart_row else build_chart row
-    ###
-
-
-    # build chart
-    build_chart = (row) ->
-        chart_cell = $('<td>')
-            .attr('colspan', $('td', row).size())
-        
-        chart_row = $('<tr>')
-            .addClass('chart')
-            .html(chart_cell)
-            .insertAfter(row)
-        
-        chart_cell.bind 'render:complete', () ->
-            chart_row.hide()
-            toggle_chart chart_row
-        
-        mx.widgets.chart chart_cell, 
-            engine: engine
-            market: market
-            security: row.data('security')
-        
-
-    # toggle chart
-    toggle_chart = (row) ->
-        row.siblings('.chart').hide()
-        row.toggle()
-        element.trigger 'render:complete'
-        
     # refresh table
     refresh = ->
         rds = mx.iss.records engine, market, securities, _.extend(options, { force: true })
         $.when(fds, cds, rds).then (filters, columns, records) ->
-            render filters[filter_scope], columns, records, table
+            render filters[filter_name], columns, records, table
+    
+    # refresh chart
+    refresh_chart = (row) ->
+        return unless row.exists()
+
+        cell    = $('td', row)
+        source  = mx.widgets.chart_url(cell, engine, market, row.data('security'))
+        image   = $("<img>").attr({ src: source })
+
+        image.on 'load', ->
+            cell.html image
+            element.trigger 'render:complete'
+    
+    # render chart
+    render_chart_for_row = (row) ->
+        return unless row.exists()
+        
+        row = find_or_create_chart_row(row)
+
+        unless row.hasClass('new')
+            if row.is(':visible') then row.hide() else row.show()
+        row.removeClass('new')
+
+        $('tr.chart', table).not(row).hide()
+
+        if row.is(":visible")
+            refresh_chart(row)
+    
+    # on row click
+    
+    on_row_click = (event) -> 
+        render_chart_for_row($(event.currentTarget))
+
+
     
     # render function
     render = (filters, columns, records, table) ->
@@ -204,8 +215,8 @@ table_widget = (element, engine, market, securities, options = {}) ->
         # container
         table_body = $('tbody', table)
         
-        for row in rows
-            do (row) ->
+        for row, index in rows
+            do (row, index) ->
                 table_row = find_or_create_row row, table_body
                 for cell in row.cells
                     do (cell) ->
@@ -215,16 +226,30 @@ table_widget = (element, engine, market, securities, options = {}) ->
         # show table
         table.show()
         
+        if options.chart? and _.isString(options.chart) and !cached_widget
+            render_default_chart options.chart
+        
+        refresh_chart $('tr.chart:visible', table)
+        
         # refresh table records
-        _.delay refresh, (options.refresh_timeout || 60 * 1000)
+        _.delay refresh, (options.refresh_timeout || 10 * 1000)
         
+        # trigger after render callbacks
         element.trigger 'render:complete'
-        
     
     # first update with old data
     refresh()
     
-    # element.trigger 'render:chart', options.chart if options.chart
+    # render default chart
+    render_default_chart = _.once (instrument) ->
+        [board, security] = instrument.split(':')
+        render_chart_for_row $("tr.row[data-board=#{escape_selector board}][data-security=#{escape_selector security}]", table)
+        
+    
+    # observe row clicks for chart rendering
+    
+    if options.chart?
+        table.on('click', 'tr.row', on_row_click)
     
     undefined
 

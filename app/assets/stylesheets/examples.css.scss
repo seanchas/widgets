@@ -46,6 +46,8 @@ pre {
     table {
         
         background: #fff;
+        border-collapse: collapse;
+        border-spacing: 0;
         
         width: 400px;
         
@@ -68,6 +70,31 @@ pre {
     		color: #888;
     		font-size: 10px;
     	}
+        
+    }
+    
+    table.chart {
+        
+        tr {
+            cursor: pointer;
+        }
+        
+        tr:hover {
+            
+            td {
+                background: #ccc;
+            }
+            
+        }
+        
+        tr.chart {
+            
+            td {
+                background: inherit;
+                padding: 0;
+            }
+            
+        }
         
     }
     

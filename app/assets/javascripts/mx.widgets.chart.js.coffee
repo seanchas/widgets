@@ -21,8 +21,8 @@ extend = (obj, mixin) ->
     obj
 
 calculate_dimensions = (element) ->
-    width = element.width()
-    height = width / 2
+    width   = element.width()
+    height  = width / 2
 
     'c.width':      width
     'z1_c.width':   width
@@ -32,17 +32,18 @@ calculate_dimensions = (element) ->
     'z1.height':    height
 
 
-make_url = (element, engine, market, security) ->
-    query = $.param(extend(calculate_dimensions(element), { template: cs_template, rnd: +new Date}))
+make_url = (element, engine, market, security, options = {}) ->
+    dimensions = calculate_dimensions(element)
+    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date}))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
 make_image = (element, engine, market, security, width, height) ->
     $('<img>').attr
-        src: make_url(element, engine, market, security)
-        width: width
+        src:    make_url(element, engine, market, security)
+        width:  width
         height: height
-            
+
     
 
 
@@ -92,3 +93,4 @@ chart_widget = (element, options) ->
 
 
 scope.chart = chart_widget
+scope.chart_url = make_url
