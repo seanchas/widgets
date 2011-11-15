@@ -1,5 +1,43 @@
 <h1>Widgets.js</h1>
 
+
+<pre>
+&lt;link href="http://assets.beta.micex.ru/widgets/assets/examples.css" media="screen" rel="stylesheet" type="text/css" /&gt;
+&lt;script src="http://assets.beta.micex.ru/widgets/assets/mx.widget.js" type="text/javascript"&gt;&lt;/script&gt;
+</pre>
+
+<p>
+    <b class="header">table</b>
+    <code>mx.widget.table(element, engine, market, params, [options]);</code>
+    <br />
+    <br />
+    <b>element</b> &mdash; jQuery object | jQuery selector | DOM Node
+    <br />
+    <b>engine</b> &mdash; Торговая система <i>(stock | futures | ...)</i>
+    <br />
+    <b>market</b> &mdash; Рынок <i>(index | forts | ...)</i>
+    <br />
+    <b>params</b> &mdash; Список инструментов для поиска
+    <br />
+    <br />
+    <b>options</b> &mdash; Дополнительные параметры:
+    <br />
+    <i>cache</i> &ndash; <i>(true | false)</i> Кешировать виджет между запросами
+    <br />
+    <i>chart</i> &ndash; <i>(true | false | String)</i> Показывать график внутри виджета.
+    В случае строки в формате "BOARDID:SECID" будет найден и открыт инструмент по-умолчанию.
+    <br />
+    <i>sortBy</i> &ndash; <i>function(params, record)</i> Вес записи для сортировки
+    <br />
+    <i>params_name</i> &ndash; Наименование параметра для запроса в ISS. По-умолчанию — securities
+    <br />
+    <i>nearest</i> &ndash; <i>(1 | 0)</i> Выбирать актуальные инструменты (для фьючерсов)
+    <br />
+    <i>leaders</i> &ndash; <i>(1 | 0)</i> Выбирать 5 первых инструментов (опционы)
+</p>
+
+<h2>Примеры</h2>
+
 <p>
     <div id="shares_1" class="widget">
     </div>
