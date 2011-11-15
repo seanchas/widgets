@@ -232,7 +232,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
         refresh_chart $('tr.chart:visible', table)
         
         # refresh table records
-        _.delay refresh, (options.refresh_timeout || 10 * 1000)
+        _.delay refresh, (options.refresh_timeout || 60 * 1000)
         
         # trigger after render callbacks
         element.trigger 'render:complete'
