@@ -1,5 +1,8 @@
 <%- content_for :right_content do -%>
-    <div id="test_container">
+    <div id="orderbook_1">
+    </div>
+
+    <div id="orderbook_2">
     </div>
 <%- end -%>
 
@@ -7,8 +10,10 @@
     
     jQuery(function() {
         
-        mx.widgets.orderbook($('#test_container'), 'stock', 'shares', 'AFLT');
-        
+        mx.widgets.orderbook($('#orderbook_1'), 'stock', 'shares', 'GAZP', {
+            refresh_timeout: 1000
+        });
+
     });
     
 </script>

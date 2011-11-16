@@ -52,13 +52,14 @@ orderbook_widget = (element, engine, market, param, options = {}) ->
     element = $ element
     return unless element.length > 0
     
+    refresh_timeout = options.refresh_timeout || 5 * 1000
     
     refresh = ->
         ods = mx.iss.orderbook(engine, market, param)
 
         $.when(ods).then (orderbook) ->
             render element, orderbook
-            _.delay refresh, 5 * 1000
+            _.delay refresh, refresh_timeout
 
     refresh()
 
