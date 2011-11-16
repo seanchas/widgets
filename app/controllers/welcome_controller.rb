@@ -1,11 +1,14 @@
 class WelcomeController < ApplicationController
 
-  layout 'examples', :only => :examples
-
   def index
   end
   
   def widget
+  end
+  
+  def examples
+    render :layout => "examples"
+    
   end
   
 end

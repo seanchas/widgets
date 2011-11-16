@@ -107,7 +107,25 @@ records = (engine, market, params, options = {}) ->
     deferred.promise()
 
 
+orderbook = (engine, market, param) ->
+    deferred = $.Deferred()
+    
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'orderbook'
+    
+    $.ajax
+        url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/orderbook.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.orderbook)
+    
+    deferred.promise()
+
+
 _.extend scope,
-    filters: filters
-    columns: columns
-    records: records
+    filters:    filters
+    columns:    columns
+    records:    records
+    orderbook:  orderbook

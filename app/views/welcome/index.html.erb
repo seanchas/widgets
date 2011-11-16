@@ -1,130 +1,14 @@
-<div id="test_container">
-    
-</div>
-
-
 <%- content_for :right_content do -%>
-
-    <div class="table_container">
-        <h2>Индексы</h2>
-        <div id="main_indices">
-        </div>
-        <div id="indices_chart">
-        </div>
-        <div id="other_indices">
-        </div>
-        <div id="state_indices">
-        </div>
+    <div id="test_container">
     </div>
-
-    <div class="table_container">
-        <h2>Валюты</h2>
-        <div id="currencies">
-        </div>
-    </div>
-    
-    <div id="currencies_chart">
-    </div>
-
-    <div class="table_container">
-        <h2>Акции</h2>
-        <div id="shares">
-        </div>
-    </div>
-
-    <div class="table_container">
-        <h2>Forts</h2>
-        <div id="forts">
-        </div>
-    </div>
-
-    <div class="table_container">
-        <h2>Опционы</h2>
-        <div id="options">
-        </div>
-    </div>
-
-    <script type="text/javascript" charset="utf-8">
-        jQuery(function() {
-    
-		function sortBy_BOARDID_SECID(params, record) {
-			return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
-		}
-
-		function sortBy_SECTYPE(params, record) {
-			return params.indexOf(record['SECTYPE']);
-		}
-
-        mx.widgets.table('#currencies', 'currency', 'selt', [
-            'CETS:USD000UTSTOM',
-            'CETS:USD000TODTOM',
-            'CETS:USD000000TOD',
-            'CETS:EUR000TODTOM'
-        ], {
-		});
-
-        mx.widgets.table('#main_indices', 'stock', 'index', [
-    		'SNDX:MICEXINDEXCF',
-    		'RTSI:RTSI'
-        ]);
-
-        mx.widgets.table('#other_indices', 'stock', 'index', [
-    		'SNDX:MICEXCBITR',
-    		'SNDX:MICEXMBITR',
-    		'RTSI:RTSVX',
-    		'SNDX:MICEXINNOV'
-        ], {
-		});
-
-        mx.widgets.table('#state_indices', 'state', 'index', [
-    		'GNDX:RGBI'
-        ]);
-
-        mx.widgets.table('#shares', 'stock', 'shares', [
-    		'EQNE:GAZP',
-    		'EQNL:ROSN',
-    		'EQBR:LKOH',
-    		'EQNL:VTBR',
-    		'EQBR:HYDR'
-        ], {
-			sortBy: sortBy_BOARDID_SECID
-        });
-
-
-        mx.widgets.table('#forts', 'futures', 'forts', [
-            'RI',
-    		'MX',
-    		'SR',
-    		'Si',
-    		'GD'
-        ], {
-            params_name: 'sectypes',
-            nearest: 1,
-			sortBy: sortBy_SECTYPE
-        });
-
-        mx.widgets.table('#options', 'futures', 'options', [
-        ], {
-            leaders: 1
-        });
-
-        /*
-
-        mx.widgets.chart('#currencies_chart', {
-            engine: 'currency',
-            market: 'selt', 
-            security: 'EUR000TODTOM'
-        });
-        
-        */
-
-        mx.widgets.chart('#indices_chart', {
-            engine: 'stock', 
-            market: 'index', 
-            security: 'MICEXINDEXCF'
-        });
-        
-        })
-    </script>
-
 <%- end -%>
+
+<script type="text/javascript" charset="utf-8">
+    
+    jQuery(function() {
+        
+        mx.widgets.orderbook($('#test_container'), 'stock', 'shares', 'AFLT');
+        
+    });
+    
+</script>
