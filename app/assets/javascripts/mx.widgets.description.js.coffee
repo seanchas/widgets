@@ -17,6 +17,11 @@ make_row = (title, value) ->
     $('<tr>')
         .html("<th>#{title}</th><td>#{value}</td>")
 
+make_divider_row = ->
+    $('<tr>')
+        .addClass('divider')
+        .html("<td colspan=\"2\"></td>")
+
 render = (element, description, security, columns, filters) ->
 
     table = create_table()
@@ -37,6 +42,8 @@ render = (element, description, security, columns, filters) ->
     
     for record in description
         table_body.append make_row record['title'], record['value']
+    
+    table_body.append make_divider_row
     
     for column in columns
         table_body.append make_row column.short_title, security[column.name], column

@@ -15,4 +15,12 @@ table.mx-widget-description {
         text-align: left;
     }
 
+    tr.divider {
+        
+        td {
+            border-bottom: 1px solid #ccc;
+        }
+        
+    }
+
 }
