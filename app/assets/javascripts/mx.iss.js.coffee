@@ -62,14 +62,14 @@ filters = (engine, market) ->
     deferred.promise()
 
 
-columns = (engine, market) ->
+columns = (engine, market, options = {}) ->
     deferred = $.Deferred();
 
     $.ajax
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/columns.jsonp?callback=?"
         data:
             'iss.meta': 'off'
-            'iss.only': 'securities,marketdata'
+            'iss.only': options.only || 'securities,marketdata'
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
@@ -123,12 +123,12 @@ orderbook = (engine, market, board, param) ->
     
     deferred.promise()
 
-security = (engine, market, board, param) ->
+security = (engine, market, board, param, options = {}) ->
     deferred = $.Deferred()
     
     data = 
         'iss.meta': 'off'
-        'iss.only': 'securities,marketdata'
+        'iss.only': options.only || 'securities,marketdata'
 
     $.ajax
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}.jsonp?callback=?"
