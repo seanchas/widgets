@@ -47,14 +47,20 @@ render = (element, orderbook) ->
     
     element.html table
 
+
 orderbook_widget = (element, engine, market, param, options = {}) ->
     element = $ element
     return unless element.length > 0
-
-    ods = mx.iss.orderbook(engine, market, param)
     
-    $.when(ods).then (orderbook) ->
-        render element, orderbook
+    
+    refresh = ->
+        ods = mx.iss.orderbook(engine, market, param)
+
+        $.when(ods).then (orderbook) ->
+            render element, orderbook
+            _.delay refresh, 5 * 1000
+
+    refresh()
 
 
 _.extend scope,
