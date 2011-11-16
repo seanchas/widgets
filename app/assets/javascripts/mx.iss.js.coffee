@@ -107,7 +107,7 @@ records = (engine, market, params, options = {}) ->
     deferred.promise()
 
 
-orderbook = (engine, market, param) ->
+orderbook = (engine, market, board, param) ->
     deferred = $.Deferred()
     
     data =
@@ -115,7 +115,7 @@ orderbook = (engine, market, param) ->
         'iss.only': 'orderbook'
     
     $.ajax
-        url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/orderbook.jsonp?callback=?"
+        url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}/orderbook.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
     .then (json) ->
@@ -123,9 +123,44 @@ orderbook = (engine, market, param) ->
     
     deferred.promise()
 
+security = (engine, market, board, param) ->
+    deferred = $.Deferred()
+    
+    data = 
+        'iss.meta': 'off'
+        'iss.only': 'securities,marketdata'
+
+    $.ajax
+        url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve _.first(iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata)))
+    
+    deferred.promise()
+
+
+description = (param) ->
+    deferred = $.Deferred()
+    
+    data = 
+        'iss.meta': 'off'
+        'iss.only': 'description'
+    
+    $.ajax
+        url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.description)
+    
+    deferred.promise()
+
 
 _.extend scope,
-    filters:    filters
-    columns:    columns
-    records:    records
-    orderbook:  orderbook
+    filters:        filters
+    columns:        columns
+    records:        records
+    security:       security
+    orderbook:      orderbook
+    description:    description

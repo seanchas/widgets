@@ -17,9 +17,9 @@ create_table_header = ->
     $('<tr>')
         .html('<td class="buy" colspan="2">Покупка</td><td></td><td class="sell" colspan="2">Продажа</td>')
 
-create_row = (record, max_quantity) ->
+create_row = (record, max_quantity, precision) ->
     row = $('<tr>')
-        .html("<td class=\"buy\"></td><td class=\"buy_bar\"><td class=\"price\">#{mx.utils.number_with_precision record['PRICE'], { precision: 2 }}</td><td class=\"sell_bar\"></td><td class=\"sell\"></td>")
+        .html("<td class=\"buy\"></td><td class=\"buy_bar\"><td class=\"price\">#{mx.utils.number_with_precision record['PRICE'], { precision: precision }}</td><td class=\"sell_bar\"></td><td class=\"sell\"></td>")
     
     quantity = record['QUANTITY']
     
@@ -34,7 +34,7 @@ create_row = (record, max_quantity) ->
     row
     
 
-render = (element, orderbook) ->
+render = (element, orderbook, security) ->
     table           = create_table()
     table_header    = create_table_header()
     
@@ -43,22 +43,24 @@ render = (element, orderbook) ->
     max_quantity = _.max(_.pluck(orderbook, 'QUANTITY'))
         
     for record in orderbook
-        $('tbody', table).append create_row record, max_quantity
+        $('tbody', table).append create_row record, max_quantity, security['DECIMALS']
     
     element.html table
 
 
-orderbook_widget = (element, engine, market, param, options = {}) ->
+orderbook_widget = (element, engine, market, board, param, options = {}) ->
     element = $ element
     return unless element.length > 0
+    
+    sds = mx.iss.security(engine, market, board, param)
     
     refresh_timeout = options.refresh_timeout || 5 * 1000
     
     refresh = ->
-        ods = mx.iss.orderbook(engine, market, param)
+        ods = mx.iss.orderbook(engine, market, board, param)
 
-        $.when(ods).then (orderbook) ->
-            render element, orderbook
+        $.when(sds, ods).then (security, orderbook) ->
+            render element, orderbook, security
             _.delay refresh, refresh_timeout
 
     refresh()

@@ -1,19 +1,29 @@
+<div id="description_1">
+    
+</div>
+
 <%- content_for :right_content do -%>
+
     <div id="orderbook_1">
     </div>
 
-    <div id="orderbook_2">
-    </div>
 <%- end -%>
 
-<script type="text/javascript" charset="utf-8">
-    
-    jQuery(function() {
-        
-        mx.widgets.orderbook($('#orderbook_1'), 'stock', 'shares', 'GAZP', {
-            refresh_timeout: 1000
-        });
+<%- content_for :javascripts do -%>
 
-    });
+    <script type="text/javascript" charset="utf-8">
     
-</script>
+        jQuery(function() {
+        
+            mx.widgets.orderbook($('#orderbook_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+
+            mx.widgets.description($('#description_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+        });
+    
+    </script>
+
+<%- end -%>
