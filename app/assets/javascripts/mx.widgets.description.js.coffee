@@ -31,7 +31,7 @@ render = (element, description, security, columns, filters) ->
     )
     
     columns = _.reduce columns, (memo, column) ->
-        memo.push column if column.is_system == 0 and !_.include(description_names, column.name)
+        memo.push column if column.is_system == 0 and columns.is_hidden == 0 and !_.include(description_names, column.name)
         memo
     , []
     
