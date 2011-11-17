@@ -14,6 +14,7 @@ scope = global.mx.iss
 
 iss_host = "http://www.beta.micex.ru/iss"
 
+cached_promises = {}
 
 iss_merge_columns_and_data = (json) ->
     return [] unless json?.data and json?.columns
@@ -63,7 +64,7 @@ filters = (engine, market) ->
 
 
 columns = (engine, market, options = {}) ->
-    deferred = $.Deferred();
+    deferred = $.Deferred()
 
     $.ajax
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/columns.jsonp?callback=?"
@@ -73,7 +74,7 @@ columns = (engine, market, options = {}) ->
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
-    
+
     deferred.promise()
 
 

@@ -52,6 +52,10 @@ parse_date = (value) ->
     value
 
 process_record = (record, columns) ->
+    return record unless record?
+    
+    
+    
     decimals = record['DECIMALS']
 
     f = (n) ->
@@ -63,6 +67,7 @@ process_record = (record, columns) ->
             when 'string'
                 value
             when 'number'
+                column.precision ?= decimals
                 if value? then parseFloat(new Number(value).toFixed(column.precision ? decimals)) else value
             when 'date'
                 parse_date value
@@ -77,6 +82,7 @@ process_record = (record, columns) ->
             trending_column = columns[column.trend_by]
             record.trends[column.name] = record[trending_column.name] if trending_column?
 
+    ###
     for id, column of columns
         # generate view
         field = record[column.name]
@@ -97,6 +103,7 @@ process_record = (record, columns) ->
                     field
             else
                 field
+    ###
 
     record
         
@@ -204,6 +211,7 @@ _.extend scope,
     number_with_precision:  number_with_precision
     extract_options:        extract_options
     process_record:         process_record
+    parse_date:             parse_date
     sha1:                   sha1
 
 

@@ -9,8 +9,9 @@ ul.mx-widget-security {
         margin: 0 40px 0 0;
         padding: 0;
         
-        span.title {
+        label {
             color: #666;
+            margin-right: 5px;
         }
     }
     
@@ -19,24 +20,22 @@ ul.mx-widget-security {
         margin-right: 5px;
     }
     
-    li.delta {
-        margin-right: 20px;
-        
-        span.delta {
-            font-size: 125%;
-        }
-        
-        span.up {
-            color: #090;
-        }
-        
-        span.down {
-            color: #c00;
-        }
-        
-        span.equal {
-            color: #666;
-        }
+    span.trend_up,
+    span.trend_down,
+    span.trend_none {
+        font-size: 125%;
+    }
+    
+    span.trend_up {
+        color: #090;
+    }
+    
+    span.trend_down {
+        color: #c00;
+    }
+    
+    span.trend_none {
+        color: #666;
     }
 
 }

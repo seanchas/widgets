@@ -19,19 +19,22 @@ make_LAST_field = (security) ->
         .html(security['WAPRICE'])
 
 
+make_field = (field, column, options = {}) ->
+    view = $('<span>').html(field)
+    view.prepend $('<label>').html(column.short_title).attr({ title: column.title }) if options.title
+    view
+
 make_DELTA_CURRENCY_field = (security) ->
     trend = security.trends['WAPTOPREVWAPRICEPRCNT']
+    trend = if trend > 0 then 'up' else if trend < 0 then 'down' else 'equal'
 
-    trend = if trend > 0
-        'up'
-    else if trend < 0
-        'down'
-    else
-        'equal'
-
-    $('<li>')
-        .addClass('delta')
-        .html("<span class=\"delta #{trend}\">#{security['WAPTOPREVWAPRICEPRCNT']}</span><br /><span class=\"currency\">#{security['FACEUNIT']}</span>")
+    view = $('<li>').addClass('delta')
+    
+    view.append make_field(security['WAPTOPREVWAPRICEPRCNT']).addClass("trend_#{trend}")
+    view.append $("<br>")
+    view.append make_field(security['FACEUNIT'])
+    
+    view
 
 
 make_BID_OFFER_field = (security, columns) ->
@@ -42,10 +45,13 @@ make_BID_OFFER_field = (security, columns) ->
     offer_column = _.detect columns, (column) ->
         column.name == 'OFFER'
 
-
-    $('<li>')
-        .html("<span><span class=\"title\">#{bid_column.short_title}</span> #{security['BID']}</span><br /><span><span class=\"title\">#{offer_column.short_title}</span> #{security['OFFER']}</span>")
-
+    view = $('<li>')
+    
+    view.append make_field(scope.utils.render_value(security['BID'], bid_column), bid_column, { title: true })
+    view.append $("<br>")
+    view.append make_field(security['OFFER'], offer_column, { title: true })
+    
+    view
 
 make_HIGH_LOW_field = (security, columns) ->
 
@@ -55,9 +61,13 @@ make_HIGH_LOW_field = (security, columns) ->
     low_column = _.detect columns, (column) ->
         column.name == 'LOW'
 
+    view = $('<li>')
 
-    $('<li>')
-        .html("<span><span class=\"title\">#{high_column.short_title}</span> #{security['HIGH']}</span><br /><span><span class=\"title\">#{low_column.short_title}</span> #{security['LOW']}</span>")
+    view.append make_field(security['HIGH'], high_column, { title: true })
+    view.append $("<br>")
+    view.append make_field(security['LOW'], low_column, { title: true })
+
+    view
 
 
 make_NUMTRADES_VOLUME_field = (security, columns) ->
@@ -69,8 +79,13 @@ make_NUMTRADES_VOLUME_field = (security, columns) ->
         column.name == 'VALTODAY'
 
 
-    $('<li>')
-        .html("<span><span class=\"title\">#{numtrades_column.short_title}</span> #{security['NUMTRADES']}</span><br /><span><span class=\"title\">#{volume_column.short_title}</span> #{security['VALTODAY']}</span>")
+    view = $('<li>')
+
+    view.append make_field(security['NUMTRADES'], numtrades_column, { title: true })
+    view.append $("<br>")
+    view.append make_field(security['VALTODAY'], volume_column, { title: true })
+
+    view
 
 
 render = (element, security, columns) ->
@@ -98,7 +113,8 @@ security_widget = (element, engine, market, board, param, options = {}) ->
 
     refresh = ->
         sds = mx.iss.security(engine, market, board, param)
-        $.when(sds, cds).then (security, columns) ->
+
+        $.when(cds, sds).then (columns, security) ->
             render element, security, columns
             _.delay refresh, refresh_timeout
 

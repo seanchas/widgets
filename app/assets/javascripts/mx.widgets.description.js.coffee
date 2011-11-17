@@ -30,6 +30,11 @@ render = (element, description, security, columns, filters) ->
     
     description_names = _.pluck description, 'name'
 
+
+    for field in description
+        field.value = mx.utils.parse_date(field.value) if field.type == 'date'
+
+
     mx.utils.process_record security, columns
     
     columns = _.compact(
@@ -43,12 +48,12 @@ render = (element, description, security, columns, filters) ->
     , []
     
     for record in description
-        table_body.append make_row record['title'], record['value']
+        table_body.append make_row record['title'], scope.utils.render_value(record['value'], record) if record.is_hidden == 0
     
     table_body.append make_divider_row
     
     for column in columns
-        table_body.append make_row column.short_title, security[column.name], column
+        table_body.append make_row column.short_title, scope.utils.render_value(security[column.name], column)
     
     element.html table
 
