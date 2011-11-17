@@ -25,6 +25,18 @@ ul.mx-widget-security {
         span.delta {
             font-size: 125%;
         }
+        
+        span.up {
+            color: #090;
+        }
+        
+        span.down {
+            color: #c00;
+        }
+        
+        span.equal {
+            color: #666;
+        }
     }
 
 }

@@ -32,6 +32,75 @@ extract_options = (args) ->
     if typeof options == 'object' then options else {}
 
 
+date_re = /^(\d{4})-(\d{2})-(\d{2})$/
+time_re = /^(\d{2}):(\d{2}):(\d{2})$/
+
+parse_date = (value) ->
+    if _.isString(value)
+        [date, time] = value.split(' ')
+        date_parts = date_re.exec(date)
+        time_parts = time_re.exec(time) ? []
+        if date_parts
+            value = new Date(
+                +date_parts[1],
+                +date_parts[2] - 1,
+                +date_parts[3],
+                +time_parts[1] || 0,
+                +time_parts[2] || 0,
+                +time_parts[3] || 0
+            )
+    value
+
+process_record = (record, columns) ->
+    decimals = record['DECIMALS']
+
+    f = (n) ->
+        if n > 10 then n else '0' + n
+    
+    for name, value of record
+        column = _.detect columns, (column) -> column.name == name
+        record[name] = switch column.type
+            when 'string'
+                value
+            when 'number'
+                if value? then parseFloat(new Number(value).toFixed(column.precision ? decimals)) else value
+            when 'date'
+                parse_date value
+            when 'time'
+                value
+    
+    record.trends = {}
+
+    for id, column of columns
+        # calculate trends
+        if column.trend_by
+            trending_column = columns[column.trend_by]
+            record.trends[column.name] = record[trending_column.name] if trending_column?
+
+    for id, column of columns
+        # generate view
+        field = record[column.name]
+
+        record[column.name] = switch column.type
+            when 'number'
+                if field?
+                    field_view = number_with_precision field, { precision: column.precision ? decimals }
+                    field_view = '+' + field_view if column.is_signed == 1 and field > 0
+                    field_view = field_view + '%' if column.has_percent == 1
+                    field_view
+                else
+                    field
+            when 'date'
+                if field
+                    "#{f field.getDate()}.#{f field.getMonth() + 1}.#{f field.getFullYear()}"
+                else
+                    field
+            else
+                field
+
+    record
+        
+
 
 sha1 = (string) ->
     
@@ -134,6 +203,7 @@ _.extend scope,
     number_with_delimiter:  number_with_delimiter
     number_with_precision:  number_with_precision
     extract_options:        extract_options
+    process_record:         process_record
     sha1:                   sha1
 
 

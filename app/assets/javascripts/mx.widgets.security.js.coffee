@@ -16,13 +16,22 @@ make_list = ->
 make_LAST_field = (security) ->
     $('<li>')
         .addClass('last')
-        .html(security['LAST'])
+        .html(security['WAPRICE'])
 
 
 make_DELTA_CURRENCY_field = (security) ->
+    trend = security.trends['WAPTOPREVWAPRICEPRCNT']
+
+    trend = if trend > 0
+        'up'
+    else if trend < 0
+        'down'
+    else
+        'equal'
+
     $('<li>')
         .addClass('delta')
-        .html("<span class=\"delta\">#{security['WAPTOPREVWAPRICEPRCNT']}</span><br /><span class=\"currency\">#{security['FACEUNIT']}</span>")
+        .html("<span class=\"delta #{trend}\">#{security['WAPTOPREVWAPRICEPRCNT']}</span><br /><span class=\"currency\">#{security['FACEUNIT']}</span>")
 
 
 make_BID_OFFER_field = (security, columns) ->
@@ -67,7 +76,7 @@ make_NUMTRADES_VOLUME_field = (security, columns) ->
 render = (element, security, columns) ->
     list = make_list()
     
-    console.log security
+    security = mx.utils.process_record security, columns
     
     list.append make_LAST_field security
     list.append make_DELTA_CURRENCY_field security
