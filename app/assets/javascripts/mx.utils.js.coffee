@@ -54,15 +54,12 @@ parse_date = (value) ->
 process_record = (record, columns) ->
     return record unless record?
     
-    
-    
     decimals = record['DECIMALS']
 
-    f = (n) ->
-        if n > 10 then n else '0' + n
-    
     for name, value of record
-        column = _.detect columns, (column) -> column.name == name
+
+        column = _.first(column for id, column of columns when column.name == name)
+        
         record[name] = switch column.type
             when 'string'
                 value
@@ -77,33 +74,9 @@ process_record = (record, columns) ->
     record.trends = {}
 
     for id, column of columns
-        # calculate trends
         if column.trend_by
             trending_column = columns[column.trend_by]
             record.trends[column.name] = record[trending_column.name] if trending_column?
-
-    ###
-    for id, column of columns
-        # generate view
-        field = record[column.name]
-
-        record[column.name] = switch column.type
-            when 'number'
-                if field?
-                    field_view = number_with_precision field, { precision: column.precision ? decimals }
-                    field_view = '+' + field_view if column.is_signed == 1 and field > 0
-                    field_view = field_view + '%' if column.has_percent == 1
-                    field_view
-                else
-                    field
-            when 'date'
-                if field
-                    "#{f field.getDate()}.#{f field.getMonth() + 1}.#{f field.getFullYear()}"
-                else
-                    field
-            else
-                field
-    ###
 
     record
         

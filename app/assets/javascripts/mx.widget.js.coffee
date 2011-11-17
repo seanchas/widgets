@@ -16,17 +16,17 @@ global.mx.widgets   ||= {}
 scope = global.mx.widgets
 
 
-render = (value, descriptor) ->
+render = (value, descriptor = {}) ->
     switch descriptor.type
         when 'number'   then render_number  value, descriptor
         when 'date'     then render_date    value
         else value
 
 
-render_number = (value, descriptor, options = {}) ->
-    return value unless value?
+render_number = (value, descriptor = {}) ->
+    return value unless value? and typeof value == 'number'
     
-    value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision ? options.precision }
+    value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
     
     if descriptor.is_singed == 1 and value > 0
         value_for_render = '+' + value_for_render
@@ -40,7 +40,7 @@ render_number = (value, descriptor, options = {}) ->
 render_date = (value) ->
     return value unless value? and value instanceof Date
     
-    f = (n) -> if n > 10 then n else '0' + n
+    f = (n) -> if n > 10 then '' + n else '0' + n
     
     "#{f value.getDate()}.#{f value.getMonth() + 1}.#{value.getFullYear()}"
 
