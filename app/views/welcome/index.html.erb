@@ -2,11 +2,18 @@
     
 </div>
 
+<%- content_for :top_content do -%>
+
+    <div id="security_1">
+    </div>
+
+<%- end -%>
+
 <%- content_for :right_content do -%>
 
     <div id="orderbook_1">
     </div>
-
+    
 <%- end -%>
 
 <%- content_for :javascripts do -%>
@@ -22,6 +29,11 @@
             mx.widgets.description($('#description_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
                 refresh_timeout: 10 * 1000
             });
+            
+            mx.widgets.security($('#security_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+            
         });
     
     </script>

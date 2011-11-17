@@ -34,7 +34,8 @@ calculate_dimensions = (element) ->
 
 make_url = (element, engine, market, security, options = {}) ->
     dimensions = calculate_dimensions(element)
-    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date}))
+    compare = 'stock:index:MICEXO&G'
+    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare }))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
@@ -49,20 +50,15 @@ make_image = (element, engine, market, security, width, height) ->
 
 
 class ChartWidget
-    constructor: (element, options = {}) ->
+    constructor: (element, @engine, @market, @param, options = {}) ->
         @state = undefined
         
         @element = $(element)
 
         return unless @element
-
-        @engine     = options['engine']
-        @market     = options['market']
-        @security   = options['security']
-        
         return unless @engine
         return unless @market
-        return unless @security
+        return unless @param
 
         @state = on
         
@@ -72,7 +68,7 @@ class ChartWidget
     
     render: =>
         return unless @state is on
-        make_image(@element, @engine, @market, @security).bind 'load', @onImageLoad
+        make_image(@element, @engine, @market, @param).bind 'load', @onImageLoad
 
     refresh: =>
         setTimeout @render, @refresh_timeout
@@ -88,8 +84,8 @@ class ChartWidget
         
 
 
-chart_widget = (element, options) ->
-    chart = new ChartWidget($(element), options)
+chart_widget = (element, engine, market, param, options = {}) ->
+    chart = new ChartWidget($(element), engine, market, param, options)
 
 
 scope.chart = chart_widget
