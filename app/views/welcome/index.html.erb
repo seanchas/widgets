@@ -8,6 +8,14 @@
 
 <%- end -%>
 
+<%- content_for :left_content do -%>
+
+    <div id="emitter_1">
+    </div>
+    
+<%- end -%>
+
+
 <%- content_for :right_content do -%>
 
     <div id="orderbook_1">
@@ -30,6 +38,10 @@
             });
             
             mx.widgets.security($('#security_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+            
+            mx.widgets.security_emitter($('#emitter_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
                 refresh_timeout: 10 * 1000
             });
             

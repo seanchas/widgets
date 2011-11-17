@@ -39,3 +39,30 @@ ul.mx-widget-digest {
     }
 
 }
+
+table.mx-widget-emitter {
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    margin: 0 5px;
+    
+    th,
+    td {
+        border-bottom: 1px solid #ccc;
+        padding: 5px;
+        text-align: left;
+    }
+    
+    thead {
+        td {
+            border: none;
+            font-weight: bold;
+        }
+    }
+    
+    tbody {
+        th {
+            font-weight: normal;
+        }
+    }
+}

@@ -158,6 +158,23 @@ description = (param) ->
     deferred.promise()
 
 
+emitter = (param) ->
+    deferred = $.Deferred()
+    
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'emitter'
+    
+    $.ajax
+        url: "#{iss_host}/emitters/#{param}.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve _.first(iss_merge_columns_and_data(json?.emitter))
+    
+    deferred.promise()
+
+
 _.extend scope,
     filters:        filters
     columns:        columns
@@ -165,3 +182,4 @@ _.extend scope,
     security:       security
     orderbook:      orderbook
     description:    description
+    emitter:        emitter

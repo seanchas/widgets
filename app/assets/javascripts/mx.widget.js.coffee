@@ -7,6 +7,7 @@
 ##= require mx.widgets.orderbook
 ##= require mx.widgets.description
 ##= require mx.widgets.security
+##= require mx.widgets.security.emitter
 
 global = module?.exports ? ( exports ? this )
 
