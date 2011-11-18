@@ -1,4 +1,12 @@
+<div id="turnovers_1">
+</div>
+
+<h3>Параметры инструмента</h3>
 <div id="description_1">
+</div>
+
+<h3>Информация об эмитенте</h3>
+<div id="emitter_1">
 </div>
 
 <%- content_for :top_content do -%>
@@ -10,14 +18,12 @@
 
 <%- content_for :left_content do -%>
 
-    <div id="emitter_1">
-    </div>
-    
 <%- end -%>
 
 
 <%- content_for :right_content do -%>
 
+    <h3>Котировки</h3>
     <div id="orderbook_1">
     </div>
     
@@ -42,6 +48,10 @@
             });
             
             mx.widgets.security_emitter($('#emitter_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+            
+            mx.widgets.turnovers($('#turnovers_1'), {
                 refresh_timeout: 10 * 1000
             });
             

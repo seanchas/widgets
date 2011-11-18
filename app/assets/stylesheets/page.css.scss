@@ -56,7 +56,9 @@ $footer-height: 64px;
         }
         
         .middle_column {
-            width: $middle_column_width;
+            padding-left: 10px;
+            padding-right: 10px;
+            width: $middle_column_width - 20px;
         }
         
         .right_column {

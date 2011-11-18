@@ -14,7 +14,7 @@ scope = global.mx.iss
 
 iss_host = "http://www.beta.micex.ru/iss"
 
-cached_promises = {}
+cached = {}
 
 iss_merge_columns_and_data = (json) ->
     return [] unless json?.data and json?.columns
@@ -175,6 +175,23 @@ emitter = (param) ->
     deferred.promise()
 
 
+turnovers = ->
+    deferred = new $.Deferred
+    
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'turnovers'
+    
+    $.ajax
+        url: "#{iss_host}/turnovers.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.turnovers)
+    
+    deferred.promise()
+
+
 _.extend scope,
     filters:        filters
     columns:        columns
@@ -183,3 +200,4 @@ _.extend scope,
     orderbook:      orderbook
     description:    description
     emitter:        emitter
+    turnovers:      turnovers
