@@ -73,6 +73,22 @@ table.mx-widget-emitter {
     }
 }
 
+table.mx-widget-emitter-securities {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    
+    th,
+    td {
+        font-weight: normal;
+        padding: 5px;
+        text-align: left;
+        vertical-align: top;
+    }
+    
+}
+
 table.mx-widget-turnovers {
     
     border-collapse: collapse;

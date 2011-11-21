@@ -9,6 +9,10 @@
 <div id="emitter_1">
 </div>
 
+<h3>Другие инструменты эмитента</h3>
+<div id="emitter_securities_1">
+</div>
+
 <%- content_for :top_content do -%>
 
     <div id="security_1">
@@ -51,6 +55,10 @@
                 refresh_timeout: 10 * 1000
             });
             
+            mx.widgets.security_emitter_securities($('#emitter_securities_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
+                refresh_timeout: 10 * 1000
+            });
+
             mx.widgets.turnovers($('#turnovers_1'), {
                 refresh_timeout: 10 * 1000
             });

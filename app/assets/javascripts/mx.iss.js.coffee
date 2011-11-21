@@ -158,6 +158,23 @@ description = (param) ->
     deferred.promise()
 
 
+boards = (param) ->
+    deferred = $.Deferred()
+
+    data = 
+        'iss.meta': 'off'
+        'iss.only': 'boards'
+
+    $.ajax
+        url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.boards)
+
+    deferred.promise()
+
+
 emitter = (param) ->
     deferred = $.Deferred()
     
@@ -171,6 +188,23 @@ emitter = (param) ->
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve _.first(iss_merge_columns_and_data(json?.emitter))
+    
+    deferred.promise()
+
+
+emitter_securities = (param) ->
+    deferred = $.Deferred()
+    
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'securities'
+    
+    $.ajax
+        url: "#{iss_host}/emitters/#{param}/securities.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.securities)
     
     deferred.promise()
 
@@ -193,11 +227,13 @@ turnovers = ->
 
 
 _.extend scope,
-    filters:        filters
-    columns:        columns
-    records:        records
-    security:       security
-    orderbook:      orderbook
-    description:    description
-    emitter:        emitter
-    turnovers:      turnovers
+    filters:            filters
+    columns:            columns
+    records:            records
+    security:           security
+    orderbook:          orderbook
+    description:        description
+    boards:             boards
+    emitter:            emitter
+    emitter_securities: emitter_securities
+    turnovers:          turnovers
