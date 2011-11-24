@@ -9,6 +9,7 @@
 ##= require mx.widgets.security
 ##= require mx.widgets.security.emitter
 ##= require mx.widgets.turnovers
+##= require mx.cs
 
 global = module?.exports ? ( exports ? this )
 

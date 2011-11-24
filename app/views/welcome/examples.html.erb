@@ -6,6 +6,19 @@
 &lt;script src="http://assets.beta.micex.ru/widgets/assets/mx.widget.js" type="text/javascript"&gt;&lt;/script&gt;
 </pre>
 
+
+<p>
+    <b class="header">chart</b>
+</p>
+
+
+<p>
+    <div id="chart_1" class="widget">
+        
+    </div>
+</p>
+
+
 <p>
     <b class="header">table</b>
     <code>mx.widget.table(element, engine, market, params, [options]);</code>
@@ -182,6 +195,10 @@ mx.widgets.table('#options_1', 'futures', 'options', [
         mx.widgets.table('#options_1', 'futures', 'options', [
         ], {
             leaders: 1
+        });
+        
+        mx.widgets.chart('#chart_1', 'stock', 'shares', 'GAZP', {
+            compare: 'stock:shares:AFLT'
         });
     })
 </script>

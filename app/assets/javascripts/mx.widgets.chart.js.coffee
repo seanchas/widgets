@@ -34,14 +34,17 @@ calculate_dimensions = (element) ->
 
 make_url = (element, engine, market, security, options = {}) ->
     dimensions = calculate_dimensions(element)
-    compare = 'stock:index:MICEXO&G'
-    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare }))
+
+    if options.compare?
+        compare = if _.isArray(options.compare) then options.compare.join(',') else options.compare
+    
+    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '' }))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
-make_image = (element, engine, market, security, width, height) ->
+make_image = (element, engine, market, security, options, width, height) ->
     $('<img>').attr
-        src:    make_url(element, engine, market, security)
+        src:    make_url(element, engine, market, security, options)
         width:  width
         height: height
 
@@ -50,7 +53,7 @@ make_image = (element, engine, market, security, width, height) ->
 
 
 class ChartWidget
-    constructor: (element, @engine, @market, @param, options = {}) ->
+    constructor: (element, @engine, @market, @param, @options = {}) ->
         @state = undefined
         
         @element = $(element)
@@ -68,7 +71,7 @@ class ChartWidget
     
     render: =>
         return unless @state is on
-        make_image(@element, @engine, @market, @param).bind 'load', @onImageLoad
+        make_image(@element, @engine, @market, @param, @options).bind 'load', @onImageLoad
 
     refresh: =>
         setTimeout @render, @refresh_timeout

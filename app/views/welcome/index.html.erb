@@ -18,6 +18,12 @@
     <div id="security_1">
     </div>
 
+    <div id="chart_1" style="height: 380px;">
+    </div>
+    
+    <input type="button" value="Range" id="range" />
+
+
 <%- end -%>
 
 <%- content_for :left_content do -%>
@@ -62,7 +68,138 @@
             mx.widgets.turnovers($('#turnovers_1'), {
                 refresh_timeout: 10 * 1000
             });
+
             
+            function l2u(milliseconds) {
+                return milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
+            }
+            
+            function u2l(milliseconds) {
+                return milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
+            }
+
+
+            mx.cs.data('stock', 'shares', 'GAZP', {
+                interval: '24',
+                from: '1990-01-01'
+            }).then(function(json) {
+                
+                
+                var line = _.reduce(json.zones[0].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
+                var bar = _.reduce(json.zones[1].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
+
+                var units = [[
+                    'week',
+                    [1]
+                ], [
+                    'month',
+                    [1, 2, 3, 4, 6]
+                ]]
+
+                Highcharts.setOptions({
+                    lang: {
+                        decimalPoint: '.',
+                        thousandsSep: ' ',
+                        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                        shortMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                        weekdays: ['Воскресение', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+                    }
+                });
+
+                var chart = new Highcharts.StockChart({
+                    
+
+                    chart: {
+                        renderTo: $('#chart_1')[0],
+                        alignTicks: false,
+                    },
+                    
+                    global: {
+                        useUTC: true
+                    },
+                    
+                    
+                    credits: {
+                        enabled: false
+                    },
+
+                    navigator: {
+                        height: 30,
+                        margin: 6
+                    },
+
+                    rangeSelector: {
+                        enabled: false
+                    },
+                    
+                    xAxis: {
+                        offset: 0
+                    },
+                    
+                    yAxis: [{
+                        height: 180,
+                        opposite: true,
+                        lineWidth: 1,
+                        
+                        labels: {
+                            formatter: function() {
+                                return mx.utils.number_with_delimiter(this.value);
+                            },
+                            
+                            style: { color: '#000' }
+                        }
+                        
+                    }, {
+                        top: 200,
+                        height: 105,
+                        opposite: true,
+                        lineWidth: 1,
+
+                        labels: {
+                            formatter: function() {
+                                return mx.utils.number_with_delimiter(this.value);
+                            },
+                            
+                            style: { color: '#000' }
+                        }
+                    }],
+                    
+                    scrollbar: {
+                        height: 10
+                    },
+                    
+                    series: [{
+                        yAxis: 0,
+                        data: line,
+                        type: 'line',
+                        name: 'Цена',
+                        tooltip: {
+                            yDecimals: 2
+                        }
+                    }, {
+                        yAxis: 1,
+                        data: bar,
+                        type: 'column',
+                        name: 'Объем'
+                    }]
+                    
+                });
+
+                $('#range').on('click', function() {
+                    //console.log(chart.xAxis[0].getExtremes())
+                    var from = l2u(mx.utils.parse_date('2011-11-24'));
+                    var till = l2u(mx.utils.parse_date('2011-11-24'));
+                    
+                    chart.xAxis[0].setExtremes(from, till);
+                });
+
+            })
+            
+            
+
+
+
+
         });
     
     </script>
