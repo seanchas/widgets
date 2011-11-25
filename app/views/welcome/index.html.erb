@@ -18,11 +18,8 @@
     <div id="security_1">
     </div>
 
-    <div id="chart_1" style="height: 380px;">
+    <div id="chart_1">
     </div>
-    
-    <input type="button" value="Range" id="range" />
-
 
 <%- end -%>
 
@@ -69,6 +66,9 @@
                 refresh_timeout: 10 * 1000
             });
 
+            mx.widgets.security_chart($('#chart_1'), 'stock', 'shares', 'EQNE', 'GAZP');
+
+            /*
             
             function l2u(milliseconds) {
                 return milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
@@ -80,21 +80,27 @@
 
 
             mx.cs.data('stock', 'shares', 'GAZP', {
-                interval: '24',
+                interval: '1',
                 from: '1990-01-01'
             }).then(function(json) {
                 
+                var intervals = {
+                    'day': 1,
+                    'week': 10,
+                    'month': 24,
+                    'year': 24,
+                    'all': 24
+                };
+                
+                var extremes = {
+                    'day':                24 * 60 * 60 * 1000,
+                    'week':           7 * 24 * 60 * 60 * 1000,
+                    'month':     3 * 31 * 24 * 60 * 60 * 1000,
+                    'year':     52 *  7 * 24 * 60 * 60 * 1000
+                };
                 
                 var line = _.reduce(json.zones[0].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
                 var bar = _.reduce(json.zones[1].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
-
-                var units = [[
-                    'week',
-                    [1]
-                ], [
-                    'month',
-                    [1, 2, 3, 4, 6]
-                ]]
 
                 Highcharts.setOptions({
                     lang: {
@@ -170,7 +176,7 @@
                     
                     series: [{
                         yAxis: 0,
-                        data: line,
+                        data: [],
                         type: 'line',
                         name: 'Цена',
                         tooltip: {
@@ -178,23 +184,65 @@
                         }
                     }, {
                         yAxis: 1,
-                        data: bar,
+                        data: [],
                         type: 'column',
                         name: 'Объем'
                     }]
                     
                 });
 
-                $('#range').on('click', function() {
-                    //console.log(chart.xAxis[0].getExtremes())
-                    var from = l2u(mx.utils.parse_date('2011-11-24'));
-                    var till = l2u(mx.utils.parse_date('2011-11-24'));
+                var chart_loading = false;
+                var old_interval = null;
+
+                // buttons
+                $('input[type=button].chart-period').on('click', function(event) {
+                    if (chart_loading) return;
+
+                    function set_extremes(key, min) {
+                        var extreme = extremes[key];
+                        
+                        var till = + new Date();
+                        var from = extreme ? till - extreme : 0;
+
+                        from = from > min ? from : min;
+                        
+                        chart.xAxis[0].setExtremes(l2u(from), l2u(till), true, true);
+                    }
+
+
+                    var min = u2l(chart.xAxis[0].getExtremes().dataMin);
+                    var key = $(event.currentTarget).data('key');
+                    var interval = intervals[key];
+
+                    if (old_interval == interval)
+                        return set_extremes(key, min);
                     
-                    chart.xAxis[0].setExtremes(from, till);
+                    chart_loading = true;
+                    old_interval = interval;
+
+                    var cds = mx.cs.data('stock', 'shares', 'GAZP', { interval: interval, from: '1970-01-01' });
+
+                    cds.then(function(json) {
+                        var l    = _.reduce(json.zones[0].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
+                        var b     = _.reduce(json.zones[1].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
+
+                        var min_date = _.min(l, function(i) {
+                            return i[0];
+                        })[0];
+
+                        chart.series[0].setData(l);
+                        chart.series[1].setData(b);
+                        
+                        set_extremes(key, min_date);
+                        
+                        chart_loading = false;
+                    });
+
+
                 });
 
             })
-            
+            */
             
 
 

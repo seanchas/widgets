@@ -1,6 +1,7 @@
 ##= require jquery
 ##= require json
 ##= require underscore
+##= require highstock
 ##= require_self
 ##= require mx.widgets.table
 ##= require mx.widgets.chart
@@ -8,6 +9,7 @@
 ##= require mx.widgets.description
 ##= require mx.widgets.security
 ##= require mx.widgets.security.emitter
+##= require mx.widgets.security.chart
 ##= require mx.widgets.turnovers
 ##= require mx.cs
 

@@ -225,6 +225,22 @@ turnovers = ->
     
     deferred.promise()
 
+candle_borders = (engine, market, param) ->
+    deferred = new $.Deferred
+    
+    data =
+        'iss.meta': 'off'
+        'iss.only': 'borders'
+    
+    $.ajax
+        url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/candleborders.jsonp?callback=?"
+        data: data
+        dataType: 'jsonp'
+    .then (json) ->
+        deferred.resolve iss_merge_columns_and_data(json?.borders)
+
+    deferred.promise()
+
 
 _.extend scope,
     filters:            filters
@@ -237,3 +253,4 @@ _.extend scope,
     emitter:            emitter
     emitter_securities: emitter_securities
     turnovers:          turnovers
+    candle_borders:     candle_borders
