@@ -7,6 +7,9 @@
 ##= require mx.security.digest
 ##= require mx.security.chart
 ##= require mx.security.orderbook
+##= require mx.security.emitter
+##= require mx.security.description
+
 
 global = module?.exports ? ( exports ? this )
 

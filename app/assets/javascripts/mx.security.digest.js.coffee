@@ -10,7 +10,7 @@ $ = jQuery
 
 make_container = ->
     $('<ul>')
-        .addClass('mx-widget-digest')
+        .addClass('mx-security-digest')
 
 make_field = (value, column, options = {}) ->
     field = $('<span>').html(mx.utils.render(value, column))

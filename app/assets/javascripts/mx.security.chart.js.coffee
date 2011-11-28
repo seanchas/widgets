@@ -140,7 +140,7 @@ tonight = ->
 
 make_periods = () ->
     list = $("<ul>")
-        .addClass('mx-widget-chart-periods')
+        .addClass('mx-security-chart-periods')
 
     for period in visible_periods
         item = $("<li>")
@@ -156,7 +156,7 @@ make_periods = () ->
 
 render_widget = (element) ->
     element.html(make_periods)
-    element.append($("<div>").addClass("chart-container"));
+    element.append($("<div>").addClass("mx-security-chart-container"));
 
 
 widget = (element, engine, market, board, param, options = {}) ->
@@ -175,7 +175,7 @@ widget = (element, engine, market, board, param, options = {}) ->
 
 
     make_chart = ->
-        chart_options.chart.renderTo = $(".chart-container", element)[0]
+        chart_options.chart.renderTo = $(".mx-security-chart-container", element)[0]
         new Highcharts.StockChart(chart_options);
     
 

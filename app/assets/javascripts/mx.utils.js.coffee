@@ -92,7 +92,7 @@ render_number = (value, descriptor = {}) ->
 
     value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
 
-    if descriptor.is_singed == 1 and value > 0
+    if descriptor.is_signed == 1 and value > 0
         value_for_render = '+' + value_for_render
 
     if descriptor.has_percent == 1
