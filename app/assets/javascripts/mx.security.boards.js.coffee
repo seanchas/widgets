@@ -37,7 +37,7 @@ widget = (element, engine, market, board, param, options = {}) ->
         table_body = $('tbody', table)
         
         for board in boards
-            table_body.append make_row(board)
+            table_body.append make_row(board) if board.is_traded == 1
         
         element.html(table)
     

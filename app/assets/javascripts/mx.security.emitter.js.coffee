@@ -58,7 +58,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
     
     links = (record) ->
         for b in record
-            "<a href=\"##{b.engine}:#{b.market}:#{b.boardid}:#{b.secid}\">#{b.title}</a>"
+            "<a href=\"##{b.engine}:#{b.market}:#{b.boardid}:#{b.secid}\">#{b.title}</a>" if b.is_traded == 1
     
     create_table = ->
         $("<table>")
