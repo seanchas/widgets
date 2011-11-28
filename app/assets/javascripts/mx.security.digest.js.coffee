@@ -66,6 +66,8 @@ widget = (element, engine, market, board, param, options = {}) ->
             _.delay refresh, refresh_timeout
 
     refresh()
+    
+    {}
 
 
 

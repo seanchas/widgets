@@ -70,6 +70,8 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     $.when(dds, sds, cds, fds).then (description, security, columns, filters) ->
         render element, description, security, columns, filters['full']
+    
+    {}
 
 
 _.extend scope,

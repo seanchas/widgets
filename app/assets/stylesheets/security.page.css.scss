@@ -77,6 +77,14 @@ h2 {
     padding-bottom: .25em;
 }
 
+a {
+    color: #235673;
+}
+
+a:hover {
+    color: #992323;
+}
+
 // widgets
 
 ul.mx-security-digest {
@@ -202,15 +210,6 @@ ul.mx-security-chart-periods {
         list-style: none;
         margin: 0;
         padding: 2px 5px 6px;
-        
-        a {
-            color: #235673;
-        }
-        
-        a:hover {
-            color: #992323;
-        }
-        
     }
 
     li.current {
@@ -298,3 +297,85 @@ ul.mx-security-chart-periods {
     }
     
 }
+
+
+.mx-security-boards {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+        
+        td {
+            padding-right: 10px;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+        }
+        
+        tr.current th a {
+            color: #4d4d4d;
+            cursor: text;
+            text-decoration: none;
+        }
+    }
+    
+}
+
+
+.mx-security-emitter-securities {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+            vertical-align: top;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+        
+        td {
+            padding-right: 10px;
+            padding-left: 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+        }
+        
+    }
+    
+}
+

@@ -67,6 +67,7 @@ widget = (element, engine, market, board, param, options = {}) ->
 
     refresh()
 
+    {}
 
 _.extend scope,
     orderbook: widget

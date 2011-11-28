@@ -104,7 +104,7 @@ render_number = (value, descriptor = {}) ->
 render_date = (value) ->
     return value unless value? and value instanceof Date
 
-    f = (n) -> if n > 10 then '' + n else '0' + n
+    f = (n) -> if n < 10 then '0' + n else '' + n
 
     "#{f value.getDate()}.#{f value.getMonth() + 1}.#{value.getFullYear()}"
 

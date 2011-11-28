@@ -19,6 +19,14 @@
     <div id="emitter_container">
     </div>
     
+    <h2>Другие инструменты эмитента</h2>
+    <div id="others_container">
+    </div>
+    
+    <h2>Режимы торгов</h2>
+    <div id="boards_container">
+    </div>
+    
 <%- end -%>
 
 <%- content_for :sidebar do -%>
@@ -33,20 +41,55 @@
     
     $(function() {
         
-        var engine  = 'stock';
-        var market  = 'shares';
-        var board   = 'EQNE';
-        var param   = 'GAZP';
+        var widgets = {
+
+            'digest': {
+                container: $('#digest_container'),
+                options: {}
+            },
+            
+            'chart': {
+                container: $('#chart_container'),
+                options: {}
+            },
+            
+            'orderbook': {
+                container: $('#orderbook_container'),
+                options: {}
+            },
+            
+            'description': {
+                container: $('#description_container'),
+                options: {}
+            },
+
+            'emitter': {
+                container: $('#emitter_container'),
+                options: {}
+            },
+
+            'emitter_securities': {
+                container: $('#others_container'),
+                options: {}
+            },
+
+            'boards': {
+                container: $('#boards_container'),
+                options: {}
+            }
+
+        }
         
-        mx.security.digest($('#digest_container'), engine, market, board, param);
-
-        mx.security.chart($('#chart_container'), engine, market, board, param);
-
-        mx.security.orderbook($('#orderbook_container'), engine, market, board, param);
-
-        mx.security.description($('#description_container'), engine, market, board, param);
-
-        mx.security.emitter($('#emitter_container'), engine, market, board, param);
+        var parts = window.location.hash.substr(1).split(":");
+        if (_.size(parts) == 4)
+            _.each(widgets, function(widget, key) {
+                mx.security[key](widget.container, parts[0], parts[1], parts[2], parts[3], widget.options)
+            });
+        
+        
+        $(window).on('hashchange', function(e) {
+            window.location.reload()
+        });
         
     });
     

@@ -1,5 +1,6 @@
 ##= require jquery
 ##= require underscore
+##= require json
 ##= require_self
 ##= require mx.utils
 ##= require mx.iss
@@ -9,6 +10,8 @@
 ##= require mx.security.orderbook
 ##= require mx.security.emitter
 ##= require mx.security.description
+##= require mx.security.boards
+
 
 
 global = module?.exports ? ( exports ? this )

@@ -163,6 +163,8 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     element = $(element); return if element.length == 0
 
+    chart = null
+
     render_widget(element)
     
     element.on 'click', 'a', (event) ->
@@ -233,6 +235,12 @@ widget = (element, engine, market, board, param, options = {}) ->
             return if period == periods[triggered_period]
             period = periods[triggered_period]
             load()
+    
+    {
+        destroy: ->
+            chart.destroy() if chart?
+            chart = null
+    }
 
 
 _.extend scope,
