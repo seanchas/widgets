@@ -44,6 +44,8 @@
     <br />
     <i>params_name</i> &ndash; Наименование параметра для запроса в ISS. По-умолчанию — securities
     <br />
+    <i>chart_options</i> &ndash; <i>hash</i> width - ширина виджета (по-умолчанию ширина контейнера); height - высота виджета (по-умолчанию половина ширины); proportions - ширина виджета к его высоте.
+    <br />
     <i>nearest</i> &ndash; <i>(1 | 0)</i> Выбирать актуальные инструменты (для фьючерсов)
     <br />
     <i>leaders</i> &ndash; <i>(1 | 0)</i> Выбирать 5 первых инструментов (опционы)
@@ -72,7 +74,7 @@ mx.widgets.table('#shares_1', 'stock', 'shares', [
 ], {
     chart: 'EQNL:ROSN',
     chart_options: {
-        proportions: 3 / 1
+        proportions: 4 / 1
     }
 });
 </pre>
