@@ -57,6 +57,7 @@ filters = (engine, market) ->
             'iss.meta': 'off'
             'iss.only': 'filters'
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_prepare_filters(iss_merge_columns_and_data(json?.filters))
     
@@ -72,6 +73,7 @@ columns = (engine, market, options = {}) ->
             'iss.meta': 'off'
             'iss.only': options.only || 'securities,marketdata'
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
 
@@ -102,6 +104,7 @@ records = (engine, market, params, options = {}) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
     
@@ -119,6 +122,7 @@ orderbook = (engine, market, board, param) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}/orderbook.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.orderbook)
     
@@ -135,6 +139,7 @@ security = (engine, market, board, param, options = {}) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve _.first(iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata)))
     
@@ -152,6 +157,7 @@ description = (param) ->
         url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.description)
     
@@ -169,6 +175,7 @@ boards = (param) ->
         url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.boards)
 
@@ -186,6 +193,7 @@ emitter = (param) ->
         url: "#{iss_host}/emitters/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve _.first(iss_merge_columns_and_data(json?.emitter))
     
@@ -203,6 +211,7 @@ emitter_securities = (param) ->
         url: "#{iss_host}/emitters/#{param}/securities.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.securities)
     
@@ -220,6 +229,7 @@ turnovers = ->
         url: "#{iss_host}/turnovers.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.turnovers)
     
@@ -236,6 +246,7 @@ candle_borders = (engine, market, param) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/candleborders.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.borders)
 
