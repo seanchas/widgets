@@ -1,0 +1,148 @@
+$width:         1000px;
+$content_width: 735px;
+$sidebar_width: 240px;
+$column_width:  354px;
+
+// page layout
+
+html {
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 0;
+}
+
+body {
+    @extend html;
+    font: {
+        family: tahoma, verdana, arial, sans-serif;
+        size: 12px;
+    }
+    width: $width;
+}
+
+// content layout
+
+#page {
+    
+    overflow: hidden;
+    
+    .digest {
+        margin: 10px 0;
+        padding: 5px 0;
+    }
+    
+    .content {
+
+        float: left;
+        overflow: hidden;
+        width: $content_width;
+
+        .chart {
+        }
+        
+        .left_column,
+        .right_column {
+            border-right: 1px solid #ccc;
+            margin-top: 20px;
+            margin-bottom: -1000px;
+            padding-bottom: 1000px;
+            width: $column_width;
+        }
+        
+        .left_column {
+            float: left;
+        }
+        
+        .right_column {
+            float: right;
+        }
+
+    }
+    
+    .sidebar {
+        float: right;
+        width: $sidebar_width;
+    }
+    
+    
+}
+
+// typographics
+
+h2 {
+    border-bottom: 3px solid #a0a0a0;
+    color: #4d4d4d;
+    font-size: 1.2em;
+    margin: .5em 0 .25em;
+    padding-bottom: .25em;
+}
+
+// widgets
+
+.mx-security-orderbook {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    
+    margin-bottom: 3em;
+    
+    width: 100%;
+
+    thead {
+        td {
+            color: #666;
+        }
+        
+        td.buy {
+            text-align: left;
+        }
+        
+        td.sell {
+            text-align: right;
+        }
+    }
+    
+    tbody td {
+        padding: 3px 0;
+        
+    }
+    
+    tr.buy td {
+        border-bottom: 1px solid #eeeeee;
+    }
+    
+    tr.sell td {
+        border-top: 1px solid #eeeeee;
+    }
+    
+    td.buy,
+    td.sell {
+        text-align: right;
+    }
+    
+    td.buy_bar,
+    td.sell_bar {
+        width: 25%;
+        
+        padding: 3px 5px;
+        
+        span {
+            background: #ccc;
+            display: block;
+            font-size: .5em;
+            padding: 0;
+        }
+        
+    }
+    
+    td.buy_bar span {
+        background: #ec2a04;
+        float: right;
+    }
+    
+    td.sell_bar span {
+        background: #01c525;
+        float: left;
+    }
+    
+}

@@ -8,7 +8,10 @@ class WelcomeController < ApplicationController
   
   def examples
     render :layout => "examples"
-    
+  end
+  
+  def security
+    render :layout => "security"
   end
   
 end

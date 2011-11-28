@@ -80,6 +80,33 @@ process_record = (record, columns) ->
 
     record
         
+render = (value, descriptor = {}) ->
+    switch descriptor.type
+        when 'number'   then render_number  value, descriptor
+        when 'date'     then render_date    value
+        else value
+
+
+render_number = (value, descriptor = {}) ->
+    return value unless value? and typeof value == 'number'
+
+    value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
+
+    if descriptor.is_singed == 1 and value > 0
+        value_for_render = '+' + value_for_render
+
+    if descriptor.has_percent == 1
+        value_for_render = value_for_render + '%'
+
+    value_for_render
+
+
+render_date = (value) ->
+    return value unless value? and value instanceof Date
+
+    f = (n) -> if n > 10 then '' + n else '0' + n
+
+    "#{f value.getDate()}.#{f value.getMonth() + 1}.#{value.getFullYear()}"
 
 
 sha1 = (string) ->
@@ -186,6 +213,7 @@ _.extend scope,
     process_record:         process_record
     parse_date:             parse_date
     sha1:                   sha1
+    render:                 render
 
 
 # console.log sha1('')

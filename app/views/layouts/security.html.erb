@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Security</title>
+		<%= javascript_include_tag "mx.security.js" %>
+		<%= stylesheet_link_tag "security.page.css" %>
+		<%= csrf_meta_tags %>
+	</head>
+	<body>
+	    
+	    <div id="page">
+	       <div class="digest">
+	           <%= yield :digest %>
+	       </div>
+	       <div class="content">
+	           <div class="chart">
+           		   <%= yield :chart %>
+	           </div>
+	           <div class="left_column">
+	               <%= yield :left_column %>
+	           </div>
+	           <div class="right_column">
+	               <%= yield :right_column %>
+	           </div>
+	       </div>
+	       <div class="sidebar">
+               <%= yield :sidebar %>
+	       </div>
+	    </div>
+	    
+	    <%= yield :script %>
+	    
+	</body>
+</html>

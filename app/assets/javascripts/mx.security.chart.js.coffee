@@ -1,11 +1,14 @@
+##= require highstock
+
 global = module?.exports ? ( exports ? this )
 
 global.mx           ||= {}
-global.mx.widgets   ||= {}
+global.mx.security  ||= {}
 
-scope = global.mx.widgets
+scope = global.mx.security
 
 $ = jQuery
+
 
 periods =
     day:
@@ -67,7 +70,7 @@ chart_options =
         enabled: false
     
     xAxis:
-        offset: 0
+        offset: -29
     
     yAxis: [
         {
@@ -129,9 +132,10 @@ u2l = (milliseconds) ->
     milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
 
 
-window.tonight = ->
+tonight = ->
     date = new Date
     new Date date.getFullYear(), date.getMonth(), date.getDate()
+
 
 
 make_periods = () ->
@@ -144,7 +148,7 @@ make_periods = () ->
             .html(
                 $("<a>").attr('href', "##{period}").html(periods[period].name)
             )
-        
+
         list.append(item)
 
     list
@@ -229,10 +233,10 @@ widget = (element, engine, market, board, param, options = {}) ->
             return if period == periods[triggered_period]
             period = periods[triggered_period]
             load()
-                
+
 
 _.extend scope,
-    security_chart: widget
+    chart: widget
 
 Highcharts.setOptions({
     lang: {

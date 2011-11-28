@@ -1,0 +1,48 @@
+<%- content_for :chart do -%>
+    <div id="chart_container">
+    </div>
+<%- end -%>
+
+<%- content_for :digest do -%>
+    <div id="digest_container">
+    </div>
+<%- end -%>
+
+<%- content_for :left_column do -%>
+    <h2>Параметры инструмента</h2>
+    <h2>История инструмента</h2>
+<%- end -%>
+
+<%- content_for :right_column do -%>
+    <h2>Информация об эмитенте</h2>
+    <h2>Режимы торгов</h2>
+<%- end -%>
+
+<%- content_for :sidebar do -%>
+    <h2>Котировки</h2>
+    <div id="orderbook_container">
+    </div>
+    
+    <h2>Ближайшие фьючерсные контракты</h2>
+<%- end -%>
+
+<%- content_for :script do -%>
+
+<script type="text/javascript" charset="utf-8">
+    
+    $(function() {
+        
+        var engine  = 'stock';
+        var market  = 'shares';
+        var board   = 'EQNE';
+        var param   = 'GAZP';
+        
+        mx.security.digest($('#digest_container'), engine, market, board, param);
+        mx.security.chart($('#chart_container'), engine, market, board, param);
+        mx.security.orderbook($('#orderbook_container'), engine, market, board, param);
+        
+    });
+    
+</script>
+
+<%- end -%>
