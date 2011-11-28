@@ -70,8 +70,10 @@ mx.widgets.table('#shares_1', 'stock', 'shares', [
 	'EQNL:VTBR',
 	'EQBR:HYDR'
 ], {
-    cache: true,
-    chart: 'EQNL:ROSN'
+    chart: 'EQNL:ROSN',
+    chart_options: {
+        proportions: 3 / 1
+    }
 });
 </pre>
 
@@ -166,8 +168,10 @@ mx.widgets.table('#options_1', 'futures', 'options', [
     		'EQNL:VTBR',
     		'EQBR:HYDR'
         ], {
-            cache: true,
-            chart: 'EQNL:ROSN'
+            chart: 'EQNL:ROSN',
+            chart_options: {
+                proportions: 4 / 1
+            }
         });
 
         mx.widgets.table('#shares_2', 'stock', 'shares', [

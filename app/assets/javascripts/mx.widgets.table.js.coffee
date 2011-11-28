@@ -165,7 +165,7 @@ table_widget = (element, engine, market, securities, options = {}) ->
         return unless row.exists()
 
         cell    = $('td', row)
-        source  = mx.widgets.chart_url(cell, engine, market, row.data('security'))
+        source  = mx.widgets.chart_url(cell, engine, market, row.data('security'), options.chart_options)
         image   = $("<img>").attr({ src: source })
 
         image.on 'load', ->
@@ -182,9 +182,12 @@ table_widget = (element, engine, market, securities, options = {}) ->
             if row.is(':visible') then row.hide() else row.show()
         row.removeClass('new')
 
+        $('tr.row', table).removeClass('current')
+
         $('tr.chart', table).not(row).hide()
 
         if row.is(":visible")
+            console.log row.prev('tr.row').addClass('current')
             refresh_chart(row)
     
     # on row click

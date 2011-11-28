@@ -20,9 +20,9 @@ extend = (obj, mixin) ->
     obj[name] = method for name, method of mixin
     obj
 
-calculate_dimensions = (element) ->
-    width   = element.width()
-    height  = width / 2
+calculate_dimensions = (element, options = {}) ->
+    width   = options.width || element.width()
+    height  = if options.proportions then width / options.proportions else options.height || width / 2
 
     'c.width':      width
     'z1_c.width':   width
@@ -33,7 +33,7 @@ calculate_dimensions = (element) ->
 
 
 make_url = (element, engine, market, security, options = {}) ->
-    dimensions = calculate_dimensions(element)
+    dimensions = calculate_dimensions(element, options)
 
     if options.compare?
         compare = if _.isArray(options.compare) then options.compare.join(',') else options.compare
