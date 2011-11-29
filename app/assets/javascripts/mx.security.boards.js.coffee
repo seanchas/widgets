@@ -8,6 +8,9 @@ scope = global.mx.security
 $ = jQuery
 
 
+cache = kizzy('security.boards')
+
+
 format_date = (date) ->
     return '&mdash;' unless date
     date = if date instanceof Date then date else mx.utils.parse_date(date)
@@ -17,6 +20,10 @@ format_date = (date) ->
 widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    
+    element.html cache.get(cache_key) if options.cache
+
     make_container = ->
         $("<table>")
             .addClass("mx-security-boards")
@@ -42,11 +49,21 @@ widget = (element, engine, market, board, param, options = {}) ->
         element.html(table)
     
     refresh = ->
-        mx.iss.boards(param).then render
+        mx.iss.boards(param).then (boards) ->
+            if boards and _.size(boards) > 0
+                render boards
+                cache.set cache_key, element.html() if options.cache
+
+                element.trigger('render:success')
+            else
+                element.trigger('render:failure')
     
     refresh()
     
-    {}
+    {
+        destroy: ->
+            element.children().remove()
+    }
 
 
 _.extend scope,

@@ -69,9 +69,17 @@ widget = (element, engine, market, board, param, options = {}) ->
     dds = mx.iss.description(param)
     
     $.when(dds, sds, cds, fds).then (description, security, columns, filters) ->
-        render element, description, security, columns, filters['full']
+        if security and description
+            render element, description, security, columns, filters['full']
+            element.trigger('render:success')
+        else
+            element.trigger('render:failure')
     
-    {}
+    {
+        destroy: ->
+            clearTimeout timeout if timeout?
+            element.children().remove()
+    }
 
 
 _.extend scope,

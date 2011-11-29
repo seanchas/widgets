@@ -173,7 +173,7 @@ ul.mx-security-digest {
     
     td.buy_bar,
     td.sell_bar {
-        width: 25%;
+        width: 50%;
         
         padding: 7px 5px;
         
@@ -256,6 +256,12 @@ ul.mx-security-chart-periods {
             color: #666;
             font-weight: normal;
             text-align: left;
+        }
+        
+        tr.divider td {
+            background: #ccc;
+            height: 2px;
+            padding: 0;
         }
     }
     

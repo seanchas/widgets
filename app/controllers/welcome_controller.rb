@@ -14,4 +14,8 @@ class WelcomeController < ApplicationController
     render :layout => "security"
   end
   
+  def security_docs
+    render :layout => "docs"
+  end
+  
 end

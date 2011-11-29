@@ -1,0 +1,118 @@
+body {
+    font-family: 'Trebuchet MS', Verdana, Helvetica, Arial, sans-serif;
+    font-size: 62.5%;
+    line-height: 1.4;
+    width: 800px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    border-bottom: 1px solid #bbb;
+    font-size: 3.2em;
+    padding: 0 10px .1em;
+}
+
+h2 {
+    background: #0d5995;
+    color: #fff;
+    font-size: 1.7em;
+    margin: 1em 0 0;
+    padding: 6px 20px;
+}
+
+p {
+    font-size: 1.2em;
+    margin: .5em 0;
+    padding: 0;
+}
+
+div.details {
+    background: #fafafa;
+    border: 1px solid #aaa;
+    padding: 5px 20px;
+    
+    p.description {
+        color: #777;
+        font-size: 1.7em;
+        font-style: italic;
+        
+        strong {
+            color: #333;
+        }
+    }
+    
+    ul.signatures {
+        background: #eee;
+        list-style: none;
+        margin: 1em 19px 1.5em;
+        padding: 10px;
+        
+        li {
+            font-size: 1.1em;
+            margin: 0 0 1.5em;
+            
+            h4 {
+                border-bottom: 1px solid #b1b1b1;
+                color: #444;
+                font-size: 1.4em;
+                margin: .2em 0 0;
+                padding: 0 0 2px;
+            }
+            
+            p {
+                strong {
+                    margin-right: 5px;
+                }
+            }
+
+            code {
+                font-size: 1.2em;
+            }
+        }
+    }
+    
+    .options {
+        padding: 4px 0 0 10px;
+        
+        h5 {
+            border-top: 1px solid #ddd;
+            color: #222;
+            font-size: 1.3em;
+            line-height: 1;
+            margin: 10px 0 0;
+            padding: 10px 0 0;
+            
+            span.type {
+                color: #666;
+                float: right;
+                font-size: .8em;
+                margin-left: 3px;
+            }
+        }
+        
+        .default {
+            strong {
+                color: #666;
+            }
+        }
+    }
+    
+    .about {
+        margin: 0 0 3em;
+        padding: 0 20px;
+        
+        p {
+            font-size: 1.2em;
+            line-height: 1.7em;
+            margin: 1em 0;
+            padding: 0 1px;
+        }
+        
+    }
+    
+}

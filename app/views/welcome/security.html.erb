@@ -1,36 +1,36 @@
 <%- content_for :chart do -%>
-    <div id="chart_container">
+    <div id="chart_container" class="widget">
     </div>
 <%- end -%>
 
 <%- content_for :digest do -%>
-    <div id="digest_container">
+    <div id="digest_container" class="widget">
     </div>
 <%- end -%>
 
 <%- content_for :left_column do -%>
-    <h2>Параметры инструмента</h2>
-    <div id="description_container">
+    <h2 data-target="description_container" style="display: none;">Параметры инструмента</h2>
+    <div id="description_container" class="widget">
     </div>
 <%- end -%>
 
 <%- content_for :right_column do -%>
     <h2>Информация об эмитенте</h2>
-    <div id="emitter_container">
-    </div>
-    
-    <h2>Другие инструменты эмитента</h2>
-    <div id="others_container">
+    <div id="emitter_container" class="widget">
     </div>
     
     <h2>Режимы торгов</h2>
-    <div id="boards_container">
+    <div id="boards_container" class="widget">
+    </div>
+    
+    <h2>Другие инструменты эмитента</h2>
+    <div id="others_container" class="widget">
     </div>
     
 <%- end -%>
 
 <%- content_for :sidebar do -%>
-    <h2>Котировки</h2>
+    <h2 data-target="orderbook_container" style="display: none;">Котировки</h2>
     <div id="orderbook_container">
     </div>
 <%- end -%>
@@ -45,51 +45,81 @@
 
             'digest': {
                 container: $('#digest_container'),
-                options: {}
+                options: {
+                    refresh_timeout: 5 * 1000,
+                    cache: true
+                }
             },
-            
+            /*
             'chart': {
                 container: $('#chart_container'),
                 options: {}
             },
-            
+            */
             'orderbook': {
                 container: $('#orderbook_container'),
-                options: {}
+                options: {
+                    refresh_timeout: 5 * 1000,
+                    cache: true
+                }
             },
             
             'description': {
                 container: $('#description_container'),
                 options: {}
             },
-
+            
             'emitter': {
                 container: $('#emitter_container'),
                 options: {}
             },
-
+            
             'emitter_securities': {
                 container: $('#others_container'),
                 options: {}
             },
-
+            
             'boards': {
                 container: $('#boards_container'),
-                options: {}
+                options: {
+                    cache: true
+                }
             }
 
         }
         
-        var parts = window.location.hash.substr(1).split(":");
-        if (_.size(parts) == 4)
-            _.each(widgets, function(widget, key) {
-                mx.security[key](widget.container, parts[0], parts[1], parts[2], parts[3], widget.options)
-            });
+        function render() {
+            var parts = window.location.hash.substr(1).split(":");
+
+            if (_.size(parts) == 4)
+                _.each(widgets, function(widget, key) {
+                    if (widget.instance && widget.instance.destroy)
+                        widget.instance.destroy();
+
+                    widget.instance = mx.security[key](widget.container, parts[0], parts[1], parts[2], parts[3], widget.options)
+                });
+        }
+        
+        render();
         
         
-        $(window).on('hashchange', function(e) {
-            window.location.reload()
-        });
+        $(window).on('hashchange', render);
+        
+
+        $(window).on('render:success', function(event) {
+            element = $(event.target);
+            title = $('h2[data-target=' + element[0].id + ']');
+            if (title)
+                title.show()
+        })
+
+
+        $(window).on('render:failure', function(event) {
+            element = $(event.target);
+            title = $('h2[data-target=' + element[0].id + ']');
+            if (title)
+                title.hide()
+        })
         
     });
     

@@ -7,6 +7,10 @@ scope = global.mx.security
 
 $ = jQuery
 
+cache = kizzy('security.digest')
+
+filter = 'status'
+
 
 make_container = ->
     $('<ul>')
@@ -53,22 +57,39 @@ render = (element, security, columns, filters) ->
 widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    
+    element.html cache.get(cache_key) if options.cache
+    
     cds = mx.iss.columns(engine, market)
     fds = mx.iss.filters(engine, market)
 
     refresh_timeout = options.refresh_timeout || 60 * 1000
+    
+    timeout = null
 
     refresh = ->
         sds = mx.iss.security(engine, market, board, param)
 
         $.when(cds, fds, sds).then (columns, filters, security) ->
-            render element, security, columns, filters['status']
-            _.delay refresh, refresh_timeout
+            if security? and columns and filters and filters[filter]
+                render element, security, columns, filters[filter] 
+                cache.set cache_key, element.html() if options.cache
+                
+                element.trigger('render:success')
+            else
+                element.trigger('render:failure')
+            
+
+            timeout = _.delay refresh, refresh_timeout
 
     refresh()
     
-    {}
-
+    {
+        destroy: ->
+            clearTimeout timeout
+            element.children().remove()
+    }
 
 
 _.extend scope,
