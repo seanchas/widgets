@@ -1,0 +1,39 @@
+.mx-widgets-ticker {
+    background: #ccc;
+    height: 3em;
+    overflow: hidden;
+    position: relative;
+    
+    ul {
+        line-height: 1em;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        
+        li {
+            float: left;
+            margin: 0;
+            padding: 1em 10px;
+            
+            .last {
+                color: #669;
+                padding-left: 5px;
+            }
+            
+            .change {
+                color: #666;
+                padding-left: 5px;
+            }
+            
+            .up {
+                color: #060;
+            }
+
+            .down {
+                color: #900;
+            }
+        }
+    }
+    
+}

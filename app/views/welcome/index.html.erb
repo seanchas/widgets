@@ -1,6 +1,6 @@
 <div id="turnovers_1">
 </div>
-
+<!--
 <h3>Параметры инструмента</h3>
 <div id="description_1">
 </div>
@@ -12,8 +12,12 @@
 <h3>Другие инструменты эмитента</h3>
 <div id="emitter_securities_1">
 </div>
+-->
 
 <%- content_for :top_content do -%>
+
+    <div id="ticker">
+    </div>
 
     <div id="security_1">
     </div>
@@ -30,9 +34,11 @@
 
 <%- content_for :right_content do -%>
 
+    <!--
     <h3>Котировки</h3>
     <div id="orderbook_1">
     </div>
+    -->
     
 <%- end -%>
 
@@ -41,6 +47,20 @@
     <script type="text/javascript" charset="utf-8">
     
         $(function() {
+        
+            mx.widgets.ticker('#ticker', [
+                'stock:index:SNDX:MICEXINDEXCF',
+                'stock:index:RTSI:RTSI',
+                'stock:shares:EQNE:GAZP',
+                'stock:shares:EQBR:AFLT',
+            	'stock:shares:EQBR:LKOH',
+            	'stock:shares:EQNL:VTBR',
+            	'stock:shares:EQBR:HYDR'
+            ], {
+                speed: 50
+            });
+        
+            /*
         
             mx.widgets.orderbook($('#orderbook_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
                 refresh_timeout: 10 * 1000
@@ -68,8 +88,6 @@
 
             mx.widgets.security_chart($('#chart_1'), 'stock', 'shares', 'EQNE', 'GAZP');
 
-            /*
-            
             function l2u(milliseconds) {
                 return milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
             }
