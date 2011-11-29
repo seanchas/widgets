@@ -10,6 +10,9 @@ scope = global.mx.security
 $ = jQuery
 
 
+cache = kizzy('security/chart')
+
+
 periods =
     day:
         name: 'День'
@@ -46,7 +49,7 @@ cs2hs =
     candles:    'candlestick'
 
 
-chart_options =
+chart_options = ->
     
     chart:
         alignTicks: false
@@ -163,6 +166,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     element = $(element); return if element.length == 0
 
+
     chart = null
 
     render_widget(element)
@@ -177,8 +181,9 @@ widget = (element, engine, market, board, param, options = {}) ->
 
 
     make_chart = ->
-        chart_options.chart.renderTo = $(".mx-security-chart-container", element)[0]
-        new Highcharts.StockChart(chart_options);
+        co = chart_options()
+        co.chart.renderTo = $(".mx-security-chart-container", element)[0]
+        new Highcharts.StockChart(co);
     
 
     mx.iss.candle_borders(engine, market, param).then (borders) ->
@@ -229,17 +234,26 @@ widget = (element, engine, market, board, param, options = {}) ->
                 
                 render series
                 
-        load()
+        if borders[period.interval]
+            load()
+        else
+            destroy()
+
+        
         
         element.on "period:changed", (event, triggered_period) ->
             return if period == periods[triggered_period]
             period = periods[triggered_period]
             load()
     
+    destroy = ->
+        chart.destroy() if chart?
+        chart = null
+        element.children().remove()
+        
+    
     {
-        destroy: ->
-            chart.destroy() if chart?
-            chart = null
+        destroy: destroy
     }
 
 
