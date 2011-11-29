@@ -73,8 +73,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             if security and orderbook and _.size(orderbook) > 0
                 render element, orderbook, security
                 cache.set cache_key, element.html() if options.cache
-
-                element.trigger('render:success')
+                element.trigger('render:success', { last: _.first(orderbook)['UPDATETIME'] })
             else
                 element.trigger('render:failure')
 

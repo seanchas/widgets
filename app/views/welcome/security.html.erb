@@ -30,7 +30,10 @@
 <%- end -%>
 
 <%- content_for :sidebar do -%>
-    <h2 data-target="orderbook_container" style="display: none;">Котировки</h2>
+    <h2 data-target="orderbook_container" style="display: none; vertical-align: baseline;">
+        Котировки
+        <span class="update" style=" color: #666; float: right; font-size: .75em; margin-top: .25em; font-weight: normal;"></span>
+    </h2>
     <div id="orderbook_container">
     </div>
 <%- end -%>
@@ -118,6 +121,15 @@
             if (title)
                 title.hide()
         })
+        
+        $('#orderbook_container').on('render:failure', function(event) {
+            $('h2[data-target=orderbook_container] span').html('');
+        });     
+
+        $('#orderbook_container').on('render:success', function(event, memo) {
+            if(memo.last)
+                $('h2[data-target=orderbook_container] span').html(memo.last);
+        });     
         
     });
     
