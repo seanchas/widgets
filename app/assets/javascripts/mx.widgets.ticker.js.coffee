@@ -29,7 +29,7 @@ load = (queries) ->
 
 widget = (element, instruments, options = {}) ->
     element = $(element); return if _.size(element) == 0
-    element.html($("<div>").addClass("mx-widgets-ticker")); element = $('.mx-widgets-ticker', element)
+    element.html($("<div>").addClass("mx-widget-ticker")); element = $('.mx-widget-ticker', element)
     
 
     queries = _.reduce instruments, (memo, instrument) ->

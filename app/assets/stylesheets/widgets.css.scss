@@ -1,5 +1,6 @@
-.mx-widgets-ticker {
+.mx-widget-ticker {
     background: #ccc;
+    font-size: 11px;
     height: 3em;
     overflow: hidden;
     position: relative;
@@ -40,4 +41,38 @@
 
 .toggleable {
     cursor: pointer;
+}
+
+.mx-widget-turnovers {
+    border-collapse: collapse;
+    border-spacing: 0;
+    
+    font-size: 11px;
+    
+    margin: 2em 0 0;
+    width: 100%;
+    
+    td {
+        padding: 5px;
+        white-space: nowrap;
+    }
+    
+    td.title {
+        width: 100%;
+    }
+    
+    td.number {
+        padding-left: 25px;
+        text-align: right;
+    }
+    
+    thead {
+        
+        td {
+            background-color: #ccc;
+            font-weight: bold;
+        }
+        
+    }
+
 }

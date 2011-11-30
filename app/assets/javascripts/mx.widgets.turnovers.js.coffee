@@ -17,7 +17,6 @@ create_table_head = ->
     $('<tr>')
         .append($('<td>').html('Объемы торгов'))
         .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [РУБ]'))
-        .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [USD]'))
 
 create_row = (record) ->
     $('<tr>')
@@ -30,11 +29,6 @@ create_row = (record) ->
             $('<td>')
                 .addClass('number')
                 .html(mx.widgets.utils.render_value(record['VALTODAY'] * 1000000, { type: 'number', precision: '0' }))
-        )
-        .append(
-            $('<td>')
-                .addClass('number')
-                .html(mx.widgets.utils.render_value(record['VALTODAY_USD'] * 1000000, { type: 'number', precision: '0' }))
         )
 
 render = (element, turnovers) ->
