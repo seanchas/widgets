@@ -48,9 +48,18 @@ widget = (element, engine, market, board, param, options = {}) ->
         emitter_id = _.first(field.value for field in description when field.name == 'EMITTER_ID')
         if emitter_id?
             mx.iss.emitter(emitter_id).then (emitter) ->
-                render element, emitter
+                if emitter
+                    element.trigger('render:success')
+                    render element, emitter
+                else
+                    element.trigger('render:failure')
+        else
+            element.trigger('render:failure')
     
-    {}
+    {
+        destroy: ->
+            element.children().remove()
+    }
 
 
 securities_widget = (element, engine, market, board, param, options = {}) ->
@@ -94,8 +103,12 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                 ids = _.pluck securities, 'SECID'
 
                 complete    = _.after securities.length, (records) ->
-                    render _.sortBy records, (record) ->
-                        _.indexOf(ids, _.first(record).secid) if record? and record.length > 0
+                    if _.size(records) > 0
+                        element.trigger('render:success')
+                        render _.sortBy records, (record) ->
+                            _.indexOf(ids, _.first(record).secid) if record? and record.length > 0
+                    else
+                        element.trigger('render:failure')
 
                 records     = []
 
@@ -103,8 +116,13 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                     mx.iss.boards(id).then (json) ->
                         records.push (record for record in json when record.is_traded == 1)
                         complete records
+        else
+            element.trigger('render:failure')
     
-    {}
+    {
+        destroy: ->
+            element.children().remove()
+    }
 
 _.extend scope,
     emitter: widget

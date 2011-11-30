@@ -12,6 +12,27 @@ cache = kizzy('security.digest')
 filter = 'digest'
 
 
+
+class Widget
+    
+    constructor: (@element, @engine, @market, @board, @param, @options = {}) ->
+        mx.iss.boards(@param).then @check
+    
+    check: (json) =>
+        @state = on if _.first(record for record in json when record.boardid == @board and record.market == @market and record.engine == @engine)
+        @start()
+    
+    start: ->
+        return unless @state == on
+        #console.log 'started'
+    
+    destroy: ->
+        @element.children().remove()
+    
+    stop: ->
+        clearTimeout @timeout if @timeout?
+
+
 make_container = ->
     $('<ul>')
         .addClass('mx-security-digest')
@@ -56,6 +77,8 @@ render = (element, security, columns, filters) ->
 
 widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
+    
+    new Widget arguments...
     
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
     
