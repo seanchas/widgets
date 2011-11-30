@@ -82,8 +82,6 @@ request = (name, args...) ->
     
     cache[key] = new $.Deferred
     
-    console.log "request for #{name}"
-
     $.ajax
         url: meta.url(args...)
         data: meta.data(args...)
