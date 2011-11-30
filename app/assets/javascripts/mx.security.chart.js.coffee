@@ -57,7 +57,7 @@ chart_options = ->
         marginTop: 0
         marginRight: 1
         marginBottom: 0
-        marginLeft: 0
+        marginLeft: 1
     
     global:
         useUTC: false

@@ -66,7 +66,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     timeout = null
     
     refresh = ->
-        ods = mx.iss.orderbook(engine, market, board, param)
+        ods = mx.iss.orderbook(engine, market, board, param, { force: true })
 
         $.when(sds, ods).then (security, orderbook) ->
             

@@ -9,7 +9,7 @@ $ = jQuery
 
 cache = kizzy('security.digest')
 
-filter = 'status'
+filter = 'digest'
 
 
 make_container = ->
@@ -69,7 +69,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     timeout = null
 
     refresh = ->
-        sds = mx.iss.security(engine, market, board, param)
+        sds = mx.iss.security(engine, market, board, param, { force: true })
 
         $.when(cds, fds, sds).then (columns, filters, security) ->
             if security? and columns and filters and filters[filter]

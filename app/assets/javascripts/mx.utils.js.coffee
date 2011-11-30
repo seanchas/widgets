@@ -59,7 +59,9 @@ process_record = (record, columns) ->
     for name, value of record
 
         column = _.first(column for id, column of columns when column.name == name)
-        
+
+        continue unless column?
+
         record[name] = switch column.type
             when 'string'
                 value
