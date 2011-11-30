@@ -47,18 +47,20 @@ widget = (element, instruments, options = {}) ->
     cancelled = false
     
     containers = []
-        
+    
+    element.toggleClass('toggleable', options.toggleable == true)
 
-    element.on 'click', (e) ->
-        for el in $('ul', element) when $(el).data('animating')?
-            el = $(el)
-            if cancelled
-                el.removeData('animating')
-                animate(el)
-            else
-                $(el).data('animating').cancel()
+    if (options.toggleable == true)
+        element.on 'click', (e) ->
+            for el in $('ul', element) when $(el).data('animating')?
+                el = $(el)
+                if cancelled
+                    el.removeData('animating')
+                    animate(el)
+                else
+                    $(el).data('animating').cancel()
 
-        cancelled = !cancelled
+            cancelled = !cancelled
             
             
 
@@ -78,8 +80,8 @@ widget = (element, instruments, options = {}) ->
         value = + (record['LASTCHANGEPRCNT'] || record['LASTCHANGEPRC'] || 0).toFixed(2)
         $("<span>")
             .addClass("change")
-            .toggleClass('up', value > 0)
-            .toggleClass('down', value < 0)
+            .toggleClass('trend_up', value > 0)
+            .toggleClass('trend_down', value < 0)
             .html(mx.utils.render(value, { type: 'number', decimals: 2, is_signed: 1, has_percent: 1 }))
     
     render_record = (record) ->

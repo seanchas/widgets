@@ -18,13 +18,14 @@ request_meta =
     filters:
         url: (engine, market) ->
             "#{iss_host}/engines/#{engine}/markets/#{market}/securities/columns/filters.jsonp?callback=?"
-        data: ->
-            'iss.meta': 'off'
-            'iss.only': 'filters'
+        data: (engine, market, options = {}) ->
+            'iss.meta':     'off'
+            'iss.only':     'filters'
+            'filter_name':  options.only if options.only?
         parse: (json) ->
             iss_prepare_filters(iss_merge_columns_and_data(json?.filters))
-        key: (engine, market) ->
-            [engine, market]
+        key: (engine, market, options = {}) ->
+            [engine, market, options.only]
 
     columns:
         url: (engine, market) ->

@@ -6,6 +6,10 @@ class WelcomeController < ApplicationController
   def widget
   end
   
+  def widget_docs
+    render :layout => "docs"
+  end
+  
   def examples
     render :layout => "examples"
   end

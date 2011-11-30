@@ -53,6 +53,8 @@ Widgets::Application.routes.draw do
   scope "widgets" do
     root :to => 'welcome#index'
 
+    get 'docs' => 'welcome#widget_docs'
+
     get 'widget' => 'welcome#widget'
     get 'examples' => 'welcome#examples'
     

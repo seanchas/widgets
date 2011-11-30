@@ -26,14 +26,18 @@
                 padding-left: 5px;
             }
             
-            .up {
+            .trend_up {
                 color: #060;
             }
 
-            .down {
+            .trend_down {
                 color: #900;
             }
         }
     }
     
+}
+
+.toggleable {
+    cursor: pointer;
 }

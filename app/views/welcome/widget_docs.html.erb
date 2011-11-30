@@ -1,0 +1,141 @@
+<h1>mx.widget</h1>
+
+<h2>.ticker()</h2>
+
+<div class="details">
+    <p class="description">
+        <strong>Описание:</strong>
+        Выводит виджет с тикером.
+    </p>
+
+    <ul class="signatures">
+        <li>
+            <h4>
+               .digest( element, instruments, options ) 
+            </h4>
+            <p>
+                <strong>element</strong>
+                DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+            </p>
+            <p>
+                <strong>instruments</strong>
+                Массив строк в формате 'engine:market:board:param'
+            </p>
+            <p>
+                <strong>options</strong>
+                Дополнительные параметры
+            </p>
+            <div class="options">
+                <h5>
+                    speed
+                    <span class="type">Number</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    25
+                </div>
+                <p>
+                    Скорость передвижения инструментов по экрану в <i>пикселях в секунду</i>.
+                </p>
+                <h5>
+                    toggleable
+                    <span class="type">Boolean</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    false
+                </div>
+                <p>
+                    Если <i>True</i>, то нажатию на виджет, движение инструментов прекращается/возобновляется.
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <div class="about">
+        <h3>
+            Пример кода для стилизации:
+        </h3>
+
+<pre><code>&lt;div class="mx-widget-ticker"&gt;
+    &lt;ul class="tickers"&gt;
+        &lt;li&gt;
+            &lt;span class="name"&gt;Micex&lt;/span&gt;
+            &lt;span class="last"&gt;1 454,67&lt;/span&gt;
+            &lt;span class="change trend_up"&gt;+1.70%&lt;/span&gt;
+        &lt;/li&gt;
+        &lt;li&gt;
+            &lt;span class="name"&gt;RTSI&lt;/span&gt;
+            &lt;span class="last"&gt;1 466,36&lt;/span&gt;
+            &lt;span class="change trend_up"&gt;+1.99%&lt;/span&gt;
+        &lt;/li&gt;
+    &lt;/ul&gt;
+&lt;/div&gt;</code></pre>
+
+        <h3>Пример работы:</h3>
+
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="ticker_widget_1"&gt;
+        &lt;/div&gt;
+        
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.ticker('#ticker_widget_1', [
+                    'stock:index:SNDX:MICEXINDEXCF',
+                    'stock:index:RTSI:RTSI',
+                    'stock:shares:EQNE:GAZP',
+                    'stock:shares:EQBR:AFLT',
+                    'stock:shares:EQBR:LKOH',
+                    'stock:shares:EQNL:VTBR',
+                    'stock:shares:EQBR:HYDR'
+                ], {
+                    speed: 25,
+                    toggleable: true
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        
+        <p>
+            <h4>Демо:</h4>
+            <div id="ticker_widget_1">
+            </div>
+        </p>
+        
+    </div>
+</div>
+
+<%- content_for :javascript do -%>
+
+<%= stylesheet_link_tag "widgets.css" %>
+<%= javascript_include_tag 'mx.widget.js' %>
+
+<script type="text/javascript" charset="utf-8">
+    
+    $(function() {
+        
+        mx.widgets.ticker('#ticker_widget_1', [
+            'stock:index:SNDX:MICEXINDEXCF',
+            'stock:index:RTSI:RTSI',
+            'stock:shares:EQNE:GAZP',
+            'stock:shares:EQBR:AFLT',
+        	'stock:shares:EQBR:LKOH',
+        	'stock:shares:EQNL:VTBR',
+        	'stock:shares:EQBR:HYDR'
+        ], {
+            speed: 25,
+            toggleable: true
+        });
+        
+    });
+    
+</script>
+
+<%- end -%>

@@ -11,6 +11,14 @@ cache = kizzy('security.digest')
 
 filter = 'digest'
 
+default_delay   = 60 * 1000
+min_delay       =  5 * 1000
+
+
+calculate_delay = (delay) ->
+    delay = + delay
+    delay = default_delay if _.isNaN delay
+    delay = _.max [delay, min_delay] unless delay == 0
 
 
 class Widget
@@ -18,20 +26,38 @@ class Widget
     constructor: (@element, @engine, @market, @board, @param, @options = {}) ->
         mx.iss.boards(@param).then @check
     
-    check: (json) =>
-        @state = on if _.first(record for record in json when record.boardid == @board and record.market == @market and record.engine == @engine)
-        @start()
-    
-    start: ->
-        return unless @state == on
-        #console.log 'started'
-    
     destroy: ->
         @element.children().remove()
+
+    start: ->
+        return unless @state == on
+
+        @delay = calculate_delay @options.refresh_timeout
+        
+        @columns_data_source = mx.iss.columns @engine, @market
+        @filters_data_source = mx.iss.filters @engine, @market, { only: filter }
+        
+        @refresh()
     
     stop: ->
         clearTimeout @timeout if @timeout?
 
+    check: (json) =>
+        @state = on if _.first(record for record in json when record.boardid == @board and record.market == @market and record.engine == @engine)
+        @start()
+    
+    refresh: =>
+        $.when(
+            @columns_data_source,
+            @filters_data_source,
+            mx.iss.security @engine, @market, @board, @param, { force: true }
+        ).then (columns, filters, record) =>
+            @render columns, filters[filter], mx.utils.process_record record, columns
+
+        # _.delay @refresh, @delay if @delay > 0
+    
+    render: (columns, filter, record) ->
+        #
 
 make_container = ->
     $('<ul>')

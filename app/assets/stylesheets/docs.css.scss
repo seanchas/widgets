@@ -36,6 +36,12 @@ div.details {
     border: 1px solid #aaa;
     padding: 5px 20px;
     
+    h3 {
+        color: #333;
+        font-size: 1.9em;
+        margin: .5em 0 0;
+    }
+    
     p.description {
         color: #777;
         font-size: 1.7em;
@@ -106,11 +112,34 @@ div.details {
         margin: 0 0 3em;
         padding: 0 20px;
         
+        h4 {
+            color: #555;
+            font-size: 1.8em;
+            font-style: italic;
+            font-weight: normal;
+            margin: .2em 0;
+        }
+        
         p {
             font-size: 1.2em;
             line-height: 1.7em;
             margin: 1em 0;
             padding: 0 1px;
+        }
+        
+        pre {
+            background: #fbf9ea;
+            border: 1px solid #e2e1d5;
+            font-family: monaco, monospace;
+            font-size: 1.1em;
+            margin: 0 0 1em;
+            padding: 10px;
+            
+            code {
+                font-size: 1.3em;
+                margin: 0;
+                padding: 0;
+            }
         }
         
     }
