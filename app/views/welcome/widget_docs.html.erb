@@ -57,7 +57,7 @@
             Пример кода для стилизации:
         </h3>
 
-<pre><code>&lt;div class="mx-widget-ticker"&gt;
+<pre class="prettyprint"><code>&lt;div class="mx-widget-ticker"&gt;
     &lt;ul class="tickers"&gt;
         &lt;li&gt;
             &lt;span class="name"&gt;Micex&lt;/span&gt;
@@ -74,7 +74,7 @@
 
         <h3>Пример работы:</h3>
 
-<pre><code>&lt;!DOCTYPE html&gt;
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
     &lt;head&gt;
         &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
@@ -153,7 +153,7 @@
             Пример кода для стилизации:
         </h3>
 
-<pre><code>&lt;table class="mx-widget-turnovers"&gt;
+<pre class="prettyprint"><code>&lt;table class="mx-widget-turnovers"&gt;
     &lt;thead&gt;
         &lt;tr&gt;
             &lt;td&gt;Объемы торгов&lt;/td&gt;
@@ -174,7 +174,7 @@
 
         <h3>Пример работы:</h3>
 
-<pre><code>&lt;!DOCTYPE html&gt;
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
     &lt;head&gt;
         &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
@@ -203,10 +203,13 @@
 
 <%= stylesheet_link_tag "widgets.css" %>
 <%= javascript_include_tag 'mx.widget.js' %>
+<%= javascript_include_tag 'prettify.js' %>
 
 <script type="text/javascript" charset="utf-8">
     
     $(function() {
+        
+        prettyPrint();
         
         mx.widgets.ticker('#ticker_widget_1', [
             'stock:index:SNDX:MICEXINDEXCF',

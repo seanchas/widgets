@@ -25,11 +25,12 @@ calculate_dimensions = (element, options = {}) ->
     height  = if options.proportions then width / options.proportions else options.height || width / 2
 
     'c.width':      width
-    'z1_c.width':   width
     'z1.width':     width
+    'z1_c.width':   width
+
     'c.height':     height
-    'z1_c.height':  height
     'z1.height':    height
+    'z1_c.height':  height
 
 
 make_url = (element, engine, market, security, options = {}) ->
