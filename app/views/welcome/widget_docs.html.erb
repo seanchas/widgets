@@ -1,5 +1,8 @@
 <h1>mx.widget</h1>
 
+<%= render "widget.table" %>
+<%= render "widget.chart" %>
+
 <h2 data-target="ticker_details">.ticker()</h2>
 
 <div id="ticker_details" class="details">
@@ -19,7 +22,7 @@
             </p>
             <p>
                 <strong>instruments</strong>
-                Массив строк в формате 'engine:market:board:param'
+                Массив строк в формате 'engine:market:boardid:secid'
             </p>
             <p>
                 <strong>options</strong>
