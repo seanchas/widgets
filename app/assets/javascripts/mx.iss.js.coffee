@@ -82,6 +82,17 @@ request_meta =
         key: (param) ->
             [param]
 
+    index_securities:
+        url: (param) ->
+            "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'securities'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.securities)
+        key: (param) ->
+            [param]
+
 
 request = (name, args...) ->
     meta    = request_meta[name]

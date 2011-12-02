@@ -92,6 +92,19 @@
         function render() {
             var parts = window.location.hash.substr(1).split(":");
 
+            if (_.size(parts) == 1) {
+                var param = parts[0];
+
+                mx.iss.boards(param).then(function(json) {
+                    if (_.size(json) > 0) {
+                        var board = _.first(json);
+                        window.location.hash = board.engine + ":" + board.market + ":" + board.boardid + ":" + board.secid;
+                    }
+                });
+                
+                return;
+            }
+
             if (_.size(parts) == 4)
                 _.each(widgets, function(widget, key) {
                     if (widget.instance && widget.instance.destroy)
