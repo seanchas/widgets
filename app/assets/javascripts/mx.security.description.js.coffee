@@ -36,7 +36,6 @@ render = (element, description, security, columns, filters) ->
 
     mx.utils.process_record security, columns
     
-    
     columns = _.compact(
         for filter in filters
             columns[filter.id]

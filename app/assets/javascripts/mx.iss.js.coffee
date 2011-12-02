@@ -87,7 +87,7 @@ request = (name, args...) ->
         url: meta.url(args...)
         data: meta.data(args...)
         dataType: 'jsonp'
-    .then (json) ->
+    .done (json) ->
         cache[key].resolve meta.parse(json)
     
     cache[key].promise()
@@ -104,7 +104,7 @@ iss_merge_columns_and_data = (json) ->
 
 iss_prepare_filters = (data) ->
     _.reduce data, (memo, record) ->
-        (memo[record.filter_name] ||= []).push({ id: record.id, name: record.name }); memo
+        (memo[record.filter_name] ||= []).push(record); memo
     , {}
 
 iss_prepare_columns = (securities, marketdata) ->

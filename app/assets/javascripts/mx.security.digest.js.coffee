@@ -7,12 +7,23 @@ scope = global.mx.security
 
 $ = jQuery
 
-cache = kizzy('security.digest')
-
-filter = 'digest'
+cache       = kizzy('security.digest')
+cacheable   = false
 
 default_delay   = 60 * 1000
 min_delay       =  5 * 1000
+
+
+
+read_cache = (element, key) ->
+    element.html cache.get key
+
+write_cache = (element, key) ->
+    cache.set key, element.html()
+
+remove_cache = (key) ->
+    cache.remove key
+
 
 
 calculate_delay = (delay) ->
@@ -21,123 +32,106 @@ calculate_delay = (delay) ->
     delay = _.max [delay, min_delay] unless delay == 0
 
 
-class Widget
-    
-    constructor: (@element, @engine, @market, @board, @param, @options = {}) ->
-        mx.iss.boards(@param).then @check
-    
-    destroy: ->
-        @element.children().remove()
-
-    start: ->
-        return unless @state == on
-
-        @delay = calculate_delay @options.refresh_timeout
-        
-        @columns_data_source = mx.iss.columns @engine, @market
-        @filters_data_source = mx.iss.filters @engine, @market, { only: filter }
-        
-        @refresh()
-    
-    stop: ->
-        clearTimeout @timeout if @timeout?
-
-    check: (json) =>
-        @state = on if _.first(record for record in json when record.boardid == @board and record.market == @market and record.engine == @engine)
-        @start()
-    
-    refresh: =>
-        $.when(
-            @columns_data_source,
-            @filters_data_source,
-            mx.iss.security @engine, @market, @board, @param, { force: true }
-        ).then (columns, filters, record) =>
-            @render columns, filters[filter], mx.utils.process_record record, columns
-
-        # _.delay @refresh, @delay if @delay > 0
-    
-    render: (columns, filter, record) ->
-        #
 
 make_container = ->
-    $('<ul>')
-        .addClass('mx-security-digest')
-
-make_field = (value, column, options = {}) ->
-    field = $('<span>').html(mx.utils.render(value, column))
-
-    field.prepend $('<label>').html(column.short_title).attr({ title: column.title }) if options.title
-
-    field
-
-make_trend_field = (value, column, options = {}) ->
-    field = make_field(arguments...)
-
-    field.toggleClass('trend_up',       options.trend >  0)
-    field.toggleClass('trend_down',     options.trend <  0)
-    field.toggleClass('trend_equal',    options.trend == 0)
-
-    field
+    $("<ul>")
+        .addClass("mx-security-digest")
 
 
-render = (element, security, columns, filters) ->
-    container = make_container()
+make_last_cell = (value, column) ->
+    $("<li>")
+        .addClass("last")
+        .html($("<span>").html(mx.utils.render(value, column)))
+
+
+make_change_cell = (value, unit, column, trend) ->
+    trend_field = $("<span>")
+        .toggleClass('trend_up', trend > 0)
+        .toggleClass('trend_down', trend < 0)
+        .toggleClass('trend_none', trend == 0 || not trend)
+        .html(mx.utils.render(value, column) || '&mdash;')
     
-    security = mx.utils.process_record security, columns
+    unit_field = $("<span>")
+        .html(unit || '&mdash;')
+    
+    $("<li>")
+        .addClass("change")
+        .append(trend_field)
+        .append("<br />")
+        .append(unit_field)
 
-    container.append $("<li>").addClass('last').html(make_field(security[filters[0].name], columns[filters[0].id]))
+make_cell = (record, columns) ->
+    cell = $("<li>")
 
-    container.append $("<li>")
-        .append(make_trend_field(security[filters[1].name], columns[filters[1].id], { trend: security.trends[filters[1].name] }))
+    for column in columns
+        cell.append(
+            $("<span>")
+                .attr('title', column.title)
+                .html(mx.utils.render(record[column.name], column) || '&mdash;')
+                .prepend($("<label>").html(column.short_title + ':'))
+        )
         .append($("<br />"))
-        .append(make_field(security['FACEUNIT']))
-    
-    for index in [2...filters.length] by 2
-        container.append $("<li>")
-            .append(make_field(security[filters[index + 0].name], columns[filters[index + 0].id], { title: true }))
-            .append($("<br />"))
-            .append(make_field(security[filters[index + 1].name], columns[filters[index + 1].id], { title: true }))
-    
-    element.html container
-
+        
+    cell
 
 widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
-    new Widget arguments...
-    
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
     
-    element.html cache.get(cache_key) if options.cache
+    read_cache element, cache.key if cacheable == true and options.cache == true
     
-    cds = mx.iss.columns(engine, market)
-    fds = mx.iss.filters(engine, market)
-
-    refresh_timeout = options.refresh_timeout || 60 * 1000
-    
+    delay   = calculate_delay(options.refresh_timeout)
     timeout = null
-
-    refresh = ->
-        sds = mx.iss.security(engine, market, board, param, { force: true })
-
-        $.when(cds, fds, sds).then (columns, filters, security) ->
-            if security? and columns and filters and filters[filter]
-                render element, security, columns, filters[filter] 
-                cache.set cache_key, element.html() if options.cache
-                
-                element.trigger('render:success')
-            else
-                element.trigger('render:failure')
-            
-
-            timeout = _.delay refresh, refresh_timeout
-
-    refresh()
     
+    
+    destroy = ->
+        clearTimeout(timeout)
+        element.children().remove()
+        element.trigger('destroy');
+
+
+    ready = (-> $.when(mx.iss.columns(engine, market), mx.iss.filters(engine, market)))()
+    
+
+    $.when(ready).then (columns, filters) ->
+    
+        consistent = not _.isEmpty(columns) and (_.size(filters['widget']) > 0 || _.size(filters['digest']) > 0)
+    
+
+        render = (record) ->
+            return destroy() if _.isEmpty(record)
+            
+            record = mx.utils.process_record(record, columns)
+            
+            container = make_container()
+            
+            if filters['widget']
+                column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'LAST')
+                container.append make_last_cell(record[column.name], column) if column
+            
+                column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
+                container.append make_change_cell(record[column.name], record['FACEUNIT'], column, record.trends[column.name]) if column
+            
+            filter  = filters['digest']
+            count   = 2
+            if filter
+                for index in [0 ... _.size(filter)] by count
+                    container.append make_cell record, (columns[field.id] for field in filter[index ... index + count])
+                    
+            
+            element.html(container)
+            
+    
+        refresh = ->
+            mx.iss.security(engine, market, board, param, { force: true }).then render
+
+
+        if consistent then refresh() else destroy()
+
+
     {
-        destroy: ->
-            clearTimeout timeout
-            element.children().remove()
+        destroy: destroy
     }
 
 
