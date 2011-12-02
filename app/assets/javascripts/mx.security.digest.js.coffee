@@ -90,7 +90,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     destroy = (options = {}) ->
         clearTimeout(timeout)
         element.children().remove()
-        clear_cache cache_key if options.clear_cache == true
+        remove_cache cache_key if options.force == true
         element.trigger('destroy');
 
 
@@ -103,7 +103,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
 
         render = (record) ->
-            return destroy({ clear_cache: true }) if _.isEmpty(record)
+            return destroy({ force: true }) if _.isEmpty(record)
             
             record = mx.utils.process_record(record, columns)
             
@@ -133,7 +133,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             timeout = _.delay refresh, delay if delay > 0
 
 
-        if consistent then refresh() else destroy({ clear_cache: true })
+        if consistent then refresh() else destroy({ force: true })
 
 
     {
