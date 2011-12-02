@@ -70,6 +70,17 @@ request_meta =
             iss_merge_columns_and_data(json?.orderbook)
         key: (engine, market, board, param) ->
             [engine, market, board, param]
+    
+    security_indices:
+        url: (param) ->
+            "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'indices'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.indices)
+        key: (param) ->
+            [param]
 
 
 request = (name, args...) ->
@@ -87,7 +98,7 @@ request = (name, args...) ->
         url: meta.url(args...)
         data: meta.data(args...)
         dataType: 'jsonp'
-    .done (json) ->
+    .done (json, state, xhr) ->
         cache[key].resolve meta.parse(json)
     
     cache[key].promise()
@@ -245,6 +256,7 @@ _.extend scope,
     columns:            (args...) -> request('columns', args...)
     records:            records
     security:           (args...) -> request('security', args...)
+    security_indices:   (args...) -> request('security_indices', args...)
     orderbook:          (args...) -> request('orderbook', args...)
     description:        (args...) -> request('description', args...)
     boards:             boards

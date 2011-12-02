@@ -248,6 +248,11 @@ ul.mx-security-chart-periods {
         th {
             border-bottom: 1px solid #eee;
             padding: 7px 0;
+            vertical-align: top;
+        }
+        
+        td {
+            padding-right: 10px;
         }
 
         tr:last-child td,

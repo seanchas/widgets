@@ -21,7 +21,7 @@ make_divider_row = ->
         .addClass('divider')
         .html("<td colspan=\"2\"></td>")
 
-render = (element, description, security, columns, filters) ->
+render = (element, description, security, columns, filters, indices) ->
 
     table = create_table()
     
@@ -54,6 +54,8 @@ render = (element, description, security, columns, filters) ->
     for column in columns
         table_body.append make_row column.short_title, mx.utils.render(security[column.name], column)
     
+    table_body.append make_row "Входит в индексы", ("<a href=\"#stock:index:SNDX:#{index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
+    
     element.html table
 
 
@@ -66,10 +68,11 @@ widget = (element, engine, market, board, param, options = {}) ->
     fds = mx.iss.filters(engine, market)
     sds = mx.iss.security(engine, market, board, param, { only: 'securities' })
     dds = mx.iss.description(param)
+    ids = mx.iss.security_indices(param)
     
-    $.when(dds, sds, cds, fds).then (description, security, columns, filters) ->
+    $.when(dds, sds, cds, fds, ids).then (description, security, columns, filters, indices) ->
         if security and description
-            render element, description, security, columns, filters['full']
+            render element, description, security, columns, filters['full'], indices
             element.trigger('render:success')
         else
             element.trigger('render:failure')

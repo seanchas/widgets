@@ -8,7 +8,7 @@ scope = global.mx.security
 $ = jQuery
 
 cache       = kizzy('security.digest')
-cacheable   = false
+cacheable   = true
 
 default_delay   = 60 * 1000
 min_delay       =  5 * 1000
@@ -81,15 +81,16 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
     
-    read_cache element, cache.key if cacheable == true and options.cache == true
+    read_cache element, cache_key if cacheable == true and options.cache == true
     
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
     
     
-    destroy = ->
+    destroy = (options = {}) ->
         clearTimeout(timeout)
         element.children().remove()
+        clear_cache cache_key if options.clear_cache == true
         element.trigger('destroy');
 
 
@@ -102,7 +103,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
 
         render = (record) ->
-            return destroy() if _.isEmpty(record)
+            return destroy({ clear_cache: true }) if _.isEmpty(record)
             
             record = mx.utils.process_record(record, columns)
             
@@ -123,13 +124,16 @@ widget = (element, engine, market, board, param, options = {}) ->
                     
             
             element.html(container)
+
+            write_cache element, cache_key if cacheable == true and options.cache == true
             
     
         refresh = ->
             mx.iss.security(engine, market, board, param, { force: true }).then render
+            timeout = _.delay refresh, delay if delay > 0
 
 
-        if consistent then refresh() else destroy()
+        if consistent then refresh() else destroy({ clear_cache: true })
 
 
     {
