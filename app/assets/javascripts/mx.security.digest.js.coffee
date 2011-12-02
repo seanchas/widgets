@@ -41,11 +41,13 @@ make_container = ->
 make_last_cell = (value, column) ->
     $("<li>")
         .addClass("last")
-        .html($("<span>").html(mx.utils.render(value, column)))
+        .attr('title', column.title)
+        .html($("<span>").html(mx.utils.render(value, column) || '&mdash;'))
 
 
 make_change_cell = (value, unit, column, trend) ->
     trend_field = $("<span>")
+        .attr('title', column.title)
         .toggleClass('trend_up', trend > 0)
         .toggleClass('trend_down', trend < 0)
         .toggleClass('trend_none', trend == 0 || not trend)
@@ -109,7 +111,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             if filters['widget']
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'LAST')
                 container.append make_last_cell(record[column.name], column) if column
-            
+                
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
                 container.append make_change_cell(record[column.name], record['FACEUNIT'], column, record.trends[column.name]) if column
             
