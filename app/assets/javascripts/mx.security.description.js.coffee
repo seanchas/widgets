@@ -14,7 +14,7 @@ create_table = ->
 
 make_row = (title, value) ->
     $('<tr>')
-        .html("<th>#{title}</th><td>#{value}</td>")
+        .html("<th>#{title}</th><td>#{value || '&mdash;'}</td>")
 
 make_divider_row = ->
     $('<tr>')
@@ -52,7 +52,7 @@ render = (element, description, security, columns, filters, indices) ->
     table_body.append make_divider_row
     
     for column in columns
-        table_body.append make_row column.short_title, mx.utils.render(security[column.name], column)
+        table_body.append make_row column.short_title, mx.utils.render(security[column.name], column) unless _.isEmpty(security)
     
     table_body.append make_row "Входит в индексы", ("<a href=\"#stock:index:SNDX:#{index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
     
@@ -71,7 +71,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     ids = mx.iss.security_indices(param)
     
     $.when(dds, sds, cds, fds, ids).then (description, security, columns, filters, indices) ->
-        if security and description
+        if security or description
             render element, description, security, columns, filters['full'], indices
             element.trigger('render:success')
         else
