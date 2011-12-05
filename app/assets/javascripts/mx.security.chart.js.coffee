@@ -250,6 +250,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     destroy = ->
         chart.destroy() if chart?
         chart = null
+        element.off('click', 'a')
         element.off('period:changed')
         element.children().remove()
         
