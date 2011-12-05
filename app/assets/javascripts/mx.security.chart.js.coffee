@@ -192,6 +192,7 @@ widget = (element, engine, market, board, param, options = {}) ->
         
         period = periods[default_period]
         
+        
         render = (series) ->
 
             {begin, end} = borders[period.interval]
@@ -249,6 +250,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     destroy = ->
         chart.destroy() if chart?
         chart = null
+        element.off('period:changed')
         element.children().remove()
         
     
