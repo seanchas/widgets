@@ -83,13 +83,14 @@ request_meta =
             [param]
 
     index_securities:
-        url: (param) ->
-            "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
+        url: (engine, market, param) ->
+            "#{iss_host}/statistics/engines/#{engine}/markets/#{market}/analytics/#{param}/indices.jsonp?callback=?"
         data: ->
             'iss.meta': 'off'
-            'iss.only': 'securities'
+            'limit': 100
+            'iss.only': 'analytics'
         parse: (json) ->
-            iss_merge_columns_and_data(json?.securities)
+            iss_merge_columns_and_data(json?.analytics)
         key: (param) ->
             [param]
 
@@ -268,6 +269,7 @@ _.extend scope,
     records:            records
     security:           (args...) -> request('security', args...)
     security_indices:   (args...) -> request('security_indices', args...)
+    index_securities:   (args...) -> request('index_securities', args...)
     orderbook:          (args...) -> request('orderbook', args...)
     description:        (args...) -> request('description', args...)
     boards:             boards

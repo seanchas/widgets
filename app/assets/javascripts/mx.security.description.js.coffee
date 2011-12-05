@@ -21,7 +21,7 @@ make_divider_row = ->
         .addClass('divider')
         .html("<td colspan=\"2\"></td>")
 
-render = (element, description, security, columns, filters, indices) ->
+render = (element, description, security, columns, filters, indices, index_securities) ->
 
     table = create_table()
     
@@ -56,6 +56,13 @@ render = (element, description, security, columns, filters, indices) ->
     
     table_body.append make_row "Входит в индексы", ("<a href=\"#stock:index:SNDX:#{index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
     
+    index_securities = _.reduce index_securities, (memo, ticker) ->
+        memo.push ticker.secids.split(',')...
+        memo
+    , []
+
+    table_body.append make_row "База расчета", ("<a href=\"##{ticker}\">#{ticker}</a>" for ticker in index_securities).join(", ") if _.size(index_securities) > 0
+    
     element.html table
 
 
@@ -69,10 +76,11 @@ widget = (element, engine, market, board, param, options = {}) ->
     sds = mx.iss.security(engine, market, board, param, { only: 'securities' })
     dds = mx.iss.description(param)
     ids = mx.iss.security_indices(param)
+    isds = if engine == 'stock' and market == 'index' then mx.iss.index_securities(engine, market, param) else []
     
-    $.when(dds, sds, cds, fds, ids).then (description, security, columns, filters, indices) ->
+    $.when(dds, sds, cds, fds, ids, isds).then (description, security, columns, filters, indices, index_securities) ->
         if security or description
-            render element, description, security, columns, filters['full'], indices
+            render element, description, security, columns, filters['full'], indices, index_securities
             element.trigger('render:success')
         else
             element.trigger('render:failure')
