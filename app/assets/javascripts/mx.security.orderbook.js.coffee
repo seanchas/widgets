@@ -68,14 +68,18 @@ widget = (element, engine, market, board, param, options = {}) ->
     refresh = ->
         ods = mx.iss.orderbook(engine, market, board, param, { force: true })
 
-        $.when(sds, ods).then (security, orderbook) ->
+        $.when(sds, ods).done (security, orderbook) ->
+            
+            if _.size(orderbook) == 0
+                element.children().remove()
+                cache.remove(cache_key)
             
             if security and orderbook and _.size(orderbook) > 0
                 render element, orderbook, security
                 cache.set cache_key, element.html() if options.cache
-                element.trigger('render:success', { last: _.first(orderbook)['UPDATETIME'] })
+                element.trigger('render:success', { last: _.first(orderbook)['UPDATETIME'], status: orderbook.iss  })
             else
-                element.trigger('render:failure')
+                element.trigger('render:failure', { status: orderbook.iss })
 
             timeout = _.delay refresh, refresh_timeout
 

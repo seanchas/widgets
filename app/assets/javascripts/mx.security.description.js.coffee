@@ -79,6 +79,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     isds = if engine == 'stock' and market == 'index' then mx.iss.index_securities(engine, market, param) else []
     
     $.when(dds, sds, cds, fds, ids, isds).then (description, security, columns, filters, indices, index_securities) ->
+        
         if security or description
             render element, description, security, columns, filters['full'], indices, index_securities
             element.trigger('render:success')

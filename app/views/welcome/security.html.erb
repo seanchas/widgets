@@ -15,7 +15,7 @@
 <%- end -%>
 
 <%- content_for :right_column do -%>
-    <h2 data-target="emitter_container" style="display: none;">Информация об эмитенте</h2>
+    <h2 data-target="emitter_container" style="display: none;">Информация об эмитенте базового актива</h2>
     <div id="emitter_container" class="widget">
     </div>
     
@@ -35,6 +35,14 @@
         <span class="update" style=" color: #666; float: right; font-size: .75em; margin-top: .25em; font-weight: normal;"></span>
     </h2>
     <div id="orderbook_container">
+    </div>
+    <div data-forbidden="orderbook_container" style="display: none;">
+        <p class="watch">
+            Данные хода торгов предоставляются с задержкой в 15 минут.
+        </p>
+        <p>
+            Регистрация и авторизованный доступ к платным информационным услугам осуществляется через <a href="http://passport.beta.micex.ru/services">passport.beta.micex.ru/services</a>
+        </p>
     </div>
 <%- end -%>
 
@@ -122,24 +130,34 @@
 
         $(window).on('render:success', function(event) {
             element = $(event.target);
-            title = $('h2[data-target=' + element[0].id + ']');
+            var title = $('h2[data-target=' + element[0].id + ']');
             if (title)
                 title.show()
+            var forbidden = $('div[data-forbidden=' + element[0].id + ']');
+            if (forbidden)
+                forbidden.show();
         })
 
 
-        $(window).on('render:failure', function(event) {
+        $(window).on('render:failure', function(event, memo) {
             element = $(event.target);
-            title = $('h2[data-target=' + element[0].id + ']');
+            var title = $('h2[data-target=' + element[0].id + ']');
             if (title)
                 title.hide()
         })
         
-        $('#orderbook_container').on('render:failure', function(event) {
+        $('#orderbook_container').on('render:failure', function(event, memo) {
+            var element = $(event.target);
             $('h2[data-target=orderbook_container] span').html('');
+            var forbidden = $('div[data-forbidden=' + element[0].id + ']');
+            if (forbidden && memo.status.HTTP_STATUS == 403)
+                forbidden.show();
+            else
+                forbidden.hide();
         });     
 
         $('#orderbook_container').on('render:success', function(event, memo) {
+            var element = $(event.target);
             if(memo.last)
                 $('h2[data-target=orderbook_container] span').html(memo.last);
         });     

@@ -110,8 +110,10 @@ request = (name, args...) ->
         url: meta.url(args...)
         data: meta.data(args...)
         dataType: 'jsonp'
-    .done (json, state, xhr) ->
-        cache[key].resolve meta.parse(json)
+    .done (json) ->
+        result      = meta.parse(json) ? {}
+        result.iss  = json['iss.status']
+        cache[key].resolve result
     
     cache[key].promise()
 
