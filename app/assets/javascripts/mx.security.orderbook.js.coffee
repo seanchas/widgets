@@ -52,6 +52,10 @@ render = (element, orderbook, security) ->
     element.html table
 
 
+trigger_render_event = (element, status, iss, options = {}) ->
+    element.trigger('render', _.extend({ iss: iss, status: status }, options))
+
+
 widget = (element, engine, market, board, param, options = {}) ->
     element = $ element; return if element.length == 0
     
@@ -65,31 +69,36 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     timeout = null
     
+    destroy = (options = {}) ->
+        clearTimeout timeout
+        element.children().remove()
+        cache.remove(cache_key) if options.force == true
+    
     refresh = ->
         ods = mx.iss.orderbook(engine, market, board, param, { force: true })
 
-        $.when(sds, ods).done (security, orderbook) ->
+        $.when(sds, ods).done (security, data) ->
             
-            if _.size(orderbook) == 0
-                element.children().remove()
-                cache.remove(cache_key)
+            orderbook = _.first(data)
+            iss = _.last(data)
             
-            if security and orderbook and _.size(orderbook) > 0
+            if status && status['HTTP_STATUS'] && status['HTTP_STATUS'] != 200
+                trigger_render_event(element, 'failure', iss)
+                return destroy({ force: true })
+            
+            if _.size(orderbook) > 0
                 render element, orderbook, security
                 cache.set cache_key, element.html() if options.cache
-                element.trigger('render:success', { last: _.first(orderbook)['UPDATETIME'], status: orderbook.iss  })
+                trigger_render_event(element, 'success', iss, { last: _.first(orderbook)['UPDATETIME'] })
             else
-                element.trigger('render:failure', { status: orderbook.iss })
+                destroy({ force: true })
+                trigger_render_event(element, 'failure', iss)
 
             timeout = _.delay refresh, refresh_timeout
 
     refresh()
 
-    {
-        destroy: ->
-            clearTimeout timeout
-            element.children().remove()
-    }
+    destroy: destroy
 
 _.extend scope,
     orderbook: widget

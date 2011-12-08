@@ -67,7 +67,7 @@ request_meta =
             'iss.meta': 'off'
             'iss.only': 'orderbook'
         parse: (json) ->
-            iss_merge_columns_and_data(json?.orderbook)
+            [iss_merge_columns_and_data(json?.orderbook), json['iss.status']]
         key: (engine, market, board, param) ->
             [engine, market, board, param]
     
@@ -111,9 +111,7 @@ request = (name, args...) ->
         data: meta.data(args...)
         dataType: 'jsonp'
     .done (json) ->
-        result      = meta.parse(json) ? {}
-        result.iss  = json['iss.status']
-        cache[key].resolve result
+        cache[key].resolve meta.parse(json)
     
     cache[key].promise()
 

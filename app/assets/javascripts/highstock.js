@@ -12832,7 +12832,7 @@ var commonOptions = {
 		MINUTE, ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
 		HOUR, ['%A, %b %e, %H:%M', '%A, %b %e, %H:%M', '-%H:%M'],
 		DAY, ['%A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
-		WEEK, ['Week from %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
+		WEEK, ['Неделя с %A, %b %e, %Y', '%A, %b %e', '-%A, %b %e, %Y'],
 		MONTH, ['%B %Y', '%B', '-%B %Y'],
 		YEAR, ['%Y', '%Y', '-%Y']
 	),

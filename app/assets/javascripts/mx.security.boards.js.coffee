@@ -54,9 +54,9 @@ widget = (element, engine, market, board, param, options = {}) ->
                 render boards
                 cache.set cache_key, element.html() if options.cache
 
-                element.trigger('render:success')
+                element.trigger('render', { status: 'success' })
             else
-                element.trigger('render:failure')
+                element.trigger('render', { status: 'failure' })
     
     refresh()
     

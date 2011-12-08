@@ -82,9 +82,9 @@ widget = (element, engine, market, board, param, options = {}) ->
         
         if security or description
             render element, description, security, columns, filters['full'], indices, index_securities
-            element.trigger('render:success')
+            element.trigger('render', { status: 'success' })
         else
-            element.trigger('render:failure')
+            element.trigger('render', { status: 'failure' })
     
     {
         destroy: ->

@@ -49,10 +49,10 @@ widget = (element, engine, market, board, param, options = {}) ->
         if emitter_id?
             mx.iss.emitter(emitter_id).then (emitter) ->
                 if emitter
-                    element.trigger('render:success')
+                    element.trigger('render', { status: 'success' })
                     render element, emitter
                 else
-                    element.trigger('render:failure')
+                    element.trigger('render', { status: 'failure' })
         else
             element.trigger('render:failure')
     
@@ -104,11 +104,11 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
 
                 complete    = _.after securities.length, (records) ->
                     if _.size(records) > 0
-                        element.trigger('render:success')
+                        element.trigger('render', { status: 'success' })
                         render _.sortBy records, (record) ->
                             _.indexOf(ids, _.first(record).secid) if record? and record.length > 0
                     else
-                        element.trigger('render:failure')
+                        element.trigger('render', { status: 'failure' })
 
                 records     = []
 
@@ -117,7 +117,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                         records.push (record for record in json when record.is_traded == 1)
                         complete records
         else
-            element.trigger('render:failure')
+            element.trigger('render', { status: 'failure' })
     
     {
         destroy: ->
