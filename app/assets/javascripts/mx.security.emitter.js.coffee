@@ -65,21 +65,21 @@ widget = (element, engine, market, board, param, options = {}) ->
 securities_widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
-    links = (secids) ->
+    links = (secids, e) ->
         for secid in secids
-            "<a href=\"##{secid}\">#{secid}</a>"
+            if secid == param and e.name == engine then secid else "<a href=\"##{secid}\">#{secid}</a>"
     
     create_table = ->
         $("<table>")
             .addClass('mx-security-emitter-securities')
             .html("<thead></thead><tbody></tbody>")
     
-    create_row = (title, records) ->
+    create_row = (title, records, engine) ->
         row = $("<tr>")
             .html("<th>#{title}</th><td></td>")
         
         $('td', row)
-            .html(links(records).join(", "))
+            .html(links(records, engine).join(", "))
         
         row
     
@@ -92,7 +92,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
             records = _.sortBy _.uniq(data[engine.name]), (secid) ->
                 _.indexOf secids, secid
             
-            table_body.append create_row(engine.title, records) if _.size(records) > 0
+            table_body.append create_row(engine.title, records, engine) if _.size(records) > 0
         
         element.html table
         
