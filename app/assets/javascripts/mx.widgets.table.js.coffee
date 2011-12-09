@@ -176,18 +176,19 @@ table_widget = (element, engine, market, securities, options = {}) ->
     render_chart_for_row = (row) ->
         return unless row.exists()
         
-        row = find_or_create_chart_row(row)
+        chart_row = find_or_create_chart_row(row)
 
-        unless row.hasClass('new')
-            if row.is(':visible') then row.hide() else row.show()
-        row.removeClass('new')
+        unless chart_row.hasClass('new')
+            if chart_row.is(':visible') then chart_row.hide() else chart_row.show()
+        chart_row.removeClass('new')
 
         $('tr.row', table).removeClass('current')
 
-        $('tr.chart', table).not(row).hide()
+        $('tr.chart', table).not(chart_row).hide()
 
-        if row.is(":visible")
-            refresh_chart(row)
+        if chart_row.is(":visible")
+            row.addClass('current')
+            refresh_chart(chart_row)
     
     # on row click
     
