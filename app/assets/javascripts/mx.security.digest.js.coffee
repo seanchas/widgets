@@ -81,7 +81,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
     
-    read_cache element, cache_key if cacheable == true and options.cache == true
+    read_cache(element, cache_key) if options.cache == true
     
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
@@ -100,7 +100,6 @@ widget = (element, engine, market, board, param, options = {}) ->
     $.when(ready).then (columns, filters) ->
     
         consistent = not _.isEmpty(columns) and (_.size(filters['widget']) > 0 || _.size(filters['digest']) > 0)
-    
 
         render = (record) ->
             return destroy({ force: true }) if _.isEmpty(record)
@@ -122,10 +121,9 @@ widget = (element, engine, market, board, param, options = {}) ->
                 for index in [0 ... _.size(filter)] by count
                     container.append make_cell record, (columns[field.id] for field in filter[index ... index + count])
                     
-            
             element.html(container)
 
-            write_cache element, cache_key if cacheable == true and options.cache == true
+            write_cache(element, cache_key) if options.cache == true
             
     
         refresh = ->

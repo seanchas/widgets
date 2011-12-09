@@ -80,11 +80,13 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     $.when(dds, sds, cds, fds, ids, isds).then (description, security, columns, filters, indices, index_securities) ->
         
-        if security or description
-            render element, description, security, columns, filters['full'], indices, index_securities
-            element.trigger('render', { status: 'success' })
-        else
-            element.trigger('render', { status: 'failure' })
+        unless _.isEmpty(filters)
+        
+            if security or description
+                render element, description, security, columns, filters['full'], indices, index_securities
+                element.trigger('render', { status: 'success' })
+            else
+                element.trigger('render', { status: 'failure' })
     
     {
         destroy: ->
