@@ -15,6 +15,19 @@ iss_host = "http://www.beta.micex.ru/iss"
 cache = {}
 
 request_meta =
+    defaults:
+        url: ->
+            "#{iss_host}.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            _.reduce json, (memo, data, key) ->
+                memo[key] = iss_merge_columns_and_data(data)
+                memo
+            , {}
+        key: ->
+            []
+    
     filters:
         url: (engine, market) ->
             "#{iss_host}/engines/#{engine}/markets/#{market}/securities/columns/filters.jsonp?callback=?"
@@ -265,6 +278,7 @@ candle_borders = (engine, market, param) ->
 
 
 _.extend scope,
+    defaults:           (args...) -> request('defaults', args...)
     columns:            (args...) -> request('columns', args...)
     records:            records
     security:           (args...) -> request('security', args...)

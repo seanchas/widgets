@@ -76,6 +76,8 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     refresh = ->
         ods = mx.iss.orderbook(engine, market, board, param, { force: true })
+        
+        clearTimeout timeout
 
         $.when(sds, ods).done (security, data) ->
             
