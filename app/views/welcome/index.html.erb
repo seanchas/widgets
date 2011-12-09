@@ -1,28 +1,7 @@
-<div id="turnovers_1">
-</div>
-<!--
-<h3>Параметры инструмента</h3>
-<div id="description_1">
-</div>
-
-<h3>Информация об эмитенте</h3>
-<div id="emitter_1">
-</div>
-
-<h3>Другие инструменты эмитента</h3>
-<div id="emitter_securities_1">
-</div>
--->
 
 <%- content_for :top_content do -%>
 
     <div id="ticker">
-    </div>
-
-    <div id="security_1">
-    </div>
-
-    <div id="chart_1">
     </div>
 
 <%- end -%>
@@ -34,12 +13,53 @@
 
 <%- content_for :right_content do -%>
 
-    <!--
-    <h3>Котировки</h3>
-    <div id="orderbook_1">
+    <h3>Индексы</h3>
+
+    <div id="index_1">
     </div>
-    -->
     
+    <div id="chart_1">
+        
+    </div>
+    
+    <div id="index_2">
+    </div>
+    
+    <div id="index_3">
+    </div>
+    
+    <h3>Курсы валют</h3>
+
+    <div id="currency_1">
+    </div>
+    
+    <h3>Фондовый рынок</h3>
+
+    <div id="stock_1">
+    </div>
+    
+    <h3>Срочный рынок</h3>
+    
+    <h4>Фондовая секция</h4>
+    
+    <div id="futures_1">
+    </div>
+
+    <h4>Товарная секция</h4>
+    
+    <div id="futures_2">
+    </div>
+
+    <h4>Денежная секция</h4>
+    
+    <div id="futures_3">
+    </div>
+
+    <h3>Объемы торгов</h3>
+
+    <div id="turnovers">
+    </div>
+
 <%- end -%>
 
 <%- content_for :javascripts do -%>
@@ -48,6 +68,14 @@
     
         $(function() {
         
+            function sortBy_BOARDID_SECID(params, record) {
+            	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+            }
+
+    		function sortBy_SECTYPE(params, record) {
+    			return params.indexOf(record['SECTYPE']);
+    		}
+
             mx.widgets.ticker('#ticker', [
                 'stock:index:SNDX:MICEXINDEXCF',
                 'stock:index:RTSI:RTSI',
@@ -61,216 +89,95 @@
                 toggleable: true
             });
             
-            mx.widgets.chart('#chart_1', 'stock', 'shares', 'GAZP', {
-                width: 400,
-                proportions: 16 / 9
-            });
-        
-            /*
-        
-            mx.widgets.orderbook($('#orderbook_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
-                refresh_timeout: 10 * 1000
+
+            mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
+                compare: 'stock:index:RTSI'
             });
 
-            mx.widgets.description($('#description_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
-                refresh_timeout: 10 * 1000
-            });
-            
-            mx.widgets.security($('#security_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
-                refresh_timeout: 10 * 1000
-            });
-            
-            mx.widgets.security_emitter($('#emitter_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
-                refresh_timeout: 10 * 1000
-            });
-            
-            mx.widgets.security_emitter_securities($('#emitter_securities_1'), 'stock', 'shares', 'EQNE', 'GAZP', {
-                refresh_timeout: 10 * 1000
+            mx.widgets.table('#index_1', 'stock', 'index', [
+                'SNDX:MICEXINDEXCF',
+                'RTSI:RTSI'
+            ], {
+                sortBy: sortBy_BOARDID_SECID
             });
 
-            mx.widgets.turnovers($('#turnovers_1'), {
-                refresh_timeout: 10 * 1000
+
+            mx.widgets.table('#index_2', 'stock', 'index', [
+                'SNDX:MICEXCBITR',
+                'SNDX:MICEXMBITR',
+                'SNDX:MICEXINNOV',
+                'SNDX:RTSVX'
+            ], {
+                sortBy: sortBy_BOARDID_SECID
             });
 
-            mx.widgets.security_chart($('#chart_1'), 'stock', 'shares', 'EQNE', 'GAZP');
 
-            function l2u(milliseconds) {
-                return milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
-            }
-            
-            function u2l(milliseconds) {
-                return milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
-            }
+            mx.widgets.table('#index_3', 'state', 'index', [
+                'GNDX:RGBI',
+            ]);
 
-
-            mx.cs.data('stock', 'shares', 'GAZP', {
-                interval: '1',
-                from: '1990-01-01'
-            }).then(function(json) {
-                
-                var intervals = {
-                    'day': 1,
-                    'week': 10,
-                    'month': 24,
-                    'year': 24,
-                    'all': 24
-                };
-                
-                var extremes = {
-                    'day':                24 * 60 * 60 * 1000,
-                    'week':           7 * 24 * 60 * 60 * 1000,
-                    'month':     3 * 31 * 24 * 60 * 60 * 1000,
-                    'year':     52 *  7 * 24 * 60 * 60 * 1000
-                };
-                
-                var line = _.reduce(json.zones[0].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
-                var bar = _.reduce(json.zones[1].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
-
-                Highcharts.setOptions({
-                    lang: {
-                        decimalPoint: '.',
-                        thousandsSep: ' ',
-                        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-                        shortMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-                        weekdays: ['Воскресение', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
-                    }
-                });
-
-                var chart = new Highcharts.StockChart({
-                    
-
-                    chart: {
-                        renderTo: $('#chart_1')[0],
-                        alignTicks: false,
-                    },
-                    
-                    global: {
-                        useUTC: true
-                    },
-                    
-                    
-                    credits: {
-                        enabled: false
-                    },
-
-                    navigator: {
-                        height: 30,
-                        margin: 6
-                    },
-
-                    rangeSelector: {
-                        enabled: false
-                    },
-                    
-                    xAxis: {
-                        offset: 0
-                    },
-                    
-                    yAxis: [{
-                        height: 180,
-                        opposite: true,
-                        lineWidth: 1,
-                        
-                        labels: {
-                            formatter: function() {
-                                return mx.utils.number_with_delimiter(this.value);
-                            },
-                            
-                            style: { color: '#000' }
-                        }
-                        
-                    }, {
-                        top: 200,
-                        height: 105,
-                        opposite: true,
-                        lineWidth: 1,
-
-                        labels: {
-                            formatter: function() {
-                                return mx.utils.number_with_delimiter(this.value);
-                            },
-                            
-                            style: { color: '#000' }
-                        }
-                    }],
-                    
-                    scrollbar: {
-                        height: 10
-                    },
-                    
-                    series: [{
-                        yAxis: 0,
-                        data: [],
-                        type: 'line',
-                        name: 'Цена',
-                        tooltip: {
-                            yDecimals: 2
-                        }
-                    }, {
-                        yAxis: 1,
-                        data: [],
-                        type: 'column',
-                        name: 'Объем'
-                    }]
-                    
-                });
-
-                var chart_loading = false;
-                var old_interval = null;
-
-                // buttons
-                $('input[type=button].chart-period').on('click', function(event) {
-                    if (chart_loading) return;
-
-                    function set_extremes(key, min) {
-                        var extreme = extremes[key];
-                        
-                        var till = + new Date();
-                        var from = extreme ? till - extreme : 0;
-
-                        from = from > min ? from : min;
-                        
-                        chart.xAxis[0].setExtremes(l2u(from), l2u(till), true, true);
-                    }
+            mx.widgets.table('#currency_1', 'currency', 'selt', [
+                'CETS:USD000UTSTOM',
+                'CETS:EUR_RUB__TOM',
+                'CETS:EURUSD000TOM',
+                'BKT:USDEUR_BKT'
+            ], {
+                sortBy: sortBy_BOARDID_SECID
+            });
 
 
-                    var min = u2l(chart.xAxis[0].getExtremes().dataMin);
-                    var key = $(event.currentTarget).data('key');
-                    var interval = intervals[key];
-
-                    if (old_interval == interval)
-                        return set_extremes(key, min);
-                    
-                    chart_loading = true;
-                    old_interval = interval;
-
-                    var cds = mx.cs.data('stock', 'shares', 'GAZP', { interval: interval, from: '1970-01-01' });
-
-                    cds.then(function(json) {
-                        var l    = _.reduce(json.zones[0].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
-                        var b     = _.reduce(json.zones[1].series[0].candles, function(memo, candle) { return memo.push([l2u(candle.open_time), candle.value]), memo; }, []);
-
-                        var min_date = _.min(l, function(i) {
-                            return i[0];
-                        })[0];
-
-                        chart.series[0].setData(l);
-                        chart.series[1].setData(b);
-                        
-                        set_extremes(key, min_date);
-                        
-                        chart_loading = false;
-                    });
+            mx.widgets.table('#stock_1', 'stock', 'shares', [
+                'EQBR:SBER',
+                'EQNE:GAZP',
+                'EQBR:LKOH',
+                'EQBS:GMNK',
+                'EQNL:VTBR'
+            ], {
+                sortBy: sortBy_BOARDID_SECID,
+                chart: 'EQBR:SBER'
+            });
 
 
-                });
+            mx.widgets.table('#futures_1', 'futures', 'forts', [
+                'RI',
+                'MX',
+                'VX',
+                'SR',
+                'GZ'
+            ], {
+                sortBy: sortBy_SECTYPE,
+                params_name: 'sectypes',
+                nearest: 1
+            });
 
-            })
-            */
-            
+
+            mx.widgets.table('#futures_2', 'futures', 'forts', [
+                'GD',
+                'BR',
+                'SV',
+                'CU',
+                'SA'
+            ], {
+                sortBy: sortBy_SECTYPE,
+                params_name: 'sectypes',
+                nearest: 1
+            });
 
 
+            mx.widgets.table('#futures_3', 'futures', 'forts', [
+                'Si',
+                'ED',
+                'Eu',
+                'O4',
+                'O2'
+            ], {
+                sortBy: sortBy_SECTYPE,
+                params_name: 'sectypes',
+                nearest: 1
+            });
 
+
+            mx.widgets.turnovers('#turnovers');
 
         });
     

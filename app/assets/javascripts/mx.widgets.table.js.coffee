@@ -18,7 +18,7 @@ $ = jQuery
 
 cache = kizzy('widgets')
 
-default_filter_name = 'small'
+default_filter_name = 'widget'
 
 
 $.fn.exists = ->
@@ -187,7 +187,6 @@ table_widget = (element, engine, market, securities, options = {}) ->
         $('tr.chart', table).not(row).hide()
 
         if row.is(":visible")
-            console.log row.prev('tr.row').addClass('current')
             refresh_chart(row)
     
     # on row click
