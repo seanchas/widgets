@@ -54,7 +54,7 @@ make_change_cell = (value, unit, column, trend) ->
         .html(mx.utils.render(value, column) || '&mdash;')
     
     unit_field = $("<span>")
-        .html(unit || '&mdash;')
+        .html(unit ? '&nbsp;')
     
     $("<li>")
         .addClass("change")
