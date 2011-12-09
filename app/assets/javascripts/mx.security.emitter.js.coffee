@@ -65,9 +65,9 @@ widget = (element, engine, market, board, param, options = {}) ->
 securities_widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
-    links = (secids, e) ->
+    links = (secids) ->
         for secid in secids
-            if secid == param and e.name == engine then secid else "<a href=\"##{secid}\">#{secid}</a>"
+            "<a href=\"##{secid}\">#{secid}</a>"
     
     create_table = ->
         $("<table>")
@@ -79,7 +79,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
             .html("<th>#{title}</th><td></td>")
         
         $('td', row)
-            .html(links(records, engine).join(", "))
+            .html(links(records).join(", "))
         
         row
     
@@ -92,7 +92,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
             records = _.sortBy _.uniq(data[engine.name]), (secid) ->
                 _.indexOf secids, secid
             
-            table_body.append create_row(engine.title, records, engine) if _.size(records) > 0
+            table_body.append create_row(engine.title, records) if _.size(records) > 0
         
         element.html table
         
@@ -110,8 +110,8 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                         element.trigger('render', { status: 'success' })
                         
                         data = _.reduce _.flatten(records), (memo, record) ->
-                            if record.is_traded == 1
-                                (memo[record.engine] ?= []).push(record.secid) 
+                            if record.is_traded == 1 and record.secid != param
+                                (memo[record.engine] ?= []).push(record.secid)
                             memo
                         , {}
                         
