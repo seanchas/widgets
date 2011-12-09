@@ -30,6 +30,13 @@
 <%- end -%>
 
 <%- content_for :sidebar do -%>
+    <h2 data-target="orderbook_container" style="display: none; vertical-align: baseline;">
+        Котировки
+        <span class="update" style=" color: #666; float: right; font-size: .75em; margin-top: .25em; font-weight: normal;"></span>
+    </h2>
+    <div id="orderbook_container">
+    </div>
+
     <div id="delay" style="display: none;">
         <p class="watch">
             Данные хода торгов предоставляются с задержкой в 15 минут.
@@ -37,12 +44,6 @@
         <p>
             Регистрация и авторизованный доступ к платным информационным услугам осуществляется через <a href="http://passport.beta.micex.ru/services">passport.beta.micex.ru/services</a>
         </p>
-    </div>
-    <h2 data-target="orderbook_container" style="display: none; vertical-align: baseline;">
-        Котировки
-        <span class="update" style=" color: #666; float: right; font-size: .75em; margin-top: .25em; font-weight: normal;"></span>
-    </h2>
-    <div id="orderbook_container">
     </div>
 <%- end -%>
 
@@ -97,6 +98,8 @@
 
         }
         
+        var markers = {};
+        
         function render() {
             var parts = window.location.hash.substr(1).split(":");
             
@@ -140,6 +143,10 @@
             title(element).hide();
         }
         
+        function checkMarkers() {
+            $('#delay')[_.include(_.values(markers), 'denied') ? 'show' : 'hide']();
+        }
+        
         
         $(window).on('hashchange', render);
         
@@ -149,8 +156,10 @@
 
             memo.status == 'success' ? show_title(element) : hide_title(element);
 
-            if (memo.iss && memo.iss.headers && memo.iss.headers['X-MicexPassport-Marker'] == 'denied')
-                $('#delay').show();
+            if (memo.iss && memo.iss.headers)
+                markers[element.attr('id')] = memo.iss.headers['X-MicexPassport-Marker']
+                
+            checkMarkers();
         });
 
 

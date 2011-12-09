@@ -45,7 +45,7 @@ request_meta =
             'iss.meta': 'off'
             'iss.only': options.only || 'securities,marketdata'
         parse: (json) ->
-            _.first(iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata)))
+            [_.first(iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))), json['iss.status']]
         key: (engine, market, board, param, options = {}) ->
             [engine, market, board, param, options.only]
     

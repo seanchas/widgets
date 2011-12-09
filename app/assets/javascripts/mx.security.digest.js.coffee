@@ -76,6 +76,11 @@ make_cell = (record, columns) ->
         
     cell
 
+
+trigger_render_event = (element, status, iss, options = {}) ->
+    element.trigger('render', _.extend({ iss: iss, status: status }, options))
+
+
 widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
@@ -101,8 +106,14 @@ widget = (element, engine, market, board, param, options = {}) ->
     
         consistent = not _.isEmpty(columns) and (_.size(filters['widget']) > 0 || _.size(filters['digest']) > 0)
 
-        render = (record) ->
-            return destroy({ force: true }) if _.isEmpty(record)
+        render = (data) ->
+            
+            record  = _.first(data)
+            iss     = _.last(data)
+            
+            if _.isEmpty(record)
+                trigger_render_event(element, 'failure', iss)
+                return destroy({ force: true })
             
             record = mx.utils.process_record(record, columns)
             
@@ -121,6 +132,8 @@ widget = (element, engine, market, board, param, options = {}) ->
                 for index in [0 ... _.size(filter)] by count
                     container.append make_cell record, (columns[field.id] for field in filter[index ... index + count])
                     
+            trigger_render_event(element, 'success', iss)
+
             element.html(container)
 
             write_cache(element, cache_key) if options.cache == true
