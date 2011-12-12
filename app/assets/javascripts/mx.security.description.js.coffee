@@ -21,7 +21,7 @@ make_divider_row = ->
         .addClass('divider')
         .html("<td colspan=\"2\"></td>")
 
-render = (element, description, security, columns, filters, indices, index_securities) ->
+render = (element, description, security, columns, filters, indices, index_securities, options = {}) ->
 
     table = create_table()
     
@@ -29,6 +29,12 @@ render = (element, description, security, columns, filters, indices, index_secur
     
     description_names = _.pluck description, 'name'
 
+
+    make_url = (id) ->
+        if options.url? and _.isFunction(options.url)
+            options.url undefined, undefined, undefined, id
+        else
+            "##{id}"
 
     for field in description
         field.value = mx.utils.parse_date(field.value) if field.type == 'date'
@@ -54,14 +60,14 @@ render = (element, description, security, columns, filters, indices, index_secur
     for column in columns
         table_body.append make_row column.short_title, mx.utils.render(security[column.name], column) unless _.isEmpty(security)
     
-    table_body.append make_row "Входит в индексы", ("<a href=\"#stock:index:SNDX:#{index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
+    table_body.append make_row "Входит в индексы", ("<a href=\"#{make_url index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
     
     index_securities = _.reduce index_securities, (memo, ticker) ->
         memo.push ticker.secids.split(',')...
         memo
     , []
 
-    table_body.append make_row "База расчета", ("<a href=\"##{ticker}\">#{ticker}</a>" for ticker in index_securities).join(", ") if _.size(index_securities) > 0
+    table_body.append make_row "База расчета", ("<a href=\"#{make_url ticker}\">#{ticker}</a>" for ticker in index_securities).join(", ") if _.size(index_securities) > 0
     
     element.html table
 
@@ -83,7 +89,7 @@ widget = (element, engine, market, board, param, options = {}) ->
         unless _.isEmpty(filters)
         
             if security or description
-                render element, description, security, columns, filters['full'], indices, index_securities
+                render element, description, security, columns, filters['full'], indices, index_securities, options
                 element.trigger('render', { status: 'success' })
             else
                 element.trigger('render', { status: 'failure' })
