@@ -65,16 +65,26 @@ widget = (element, engine, market, board, param, options = {}) ->
 securities_widget = (element, engine, market, board, param, options = {}) ->
     element = $(element); return if element.length == 0
     
-    links = (secids) ->
-        for secid in secids
-            "<a href=\"##{secid}\">#{secid}</a>"
+    make_url = (r) ->
+        if options.url? and _.isFunction(options.url)
+            options.url r.engine, r.market, r.boardid, r.secid
+        else
+            "##{r.engine}:#{r.market}:#{r.boardid}:#{r.secid}"
+    
+    links = (records) ->
+        ids = []
+        _.compact (for record in records
+            unless _.include ids, record.secid
+                ids.push record.secid
+                "<a href=\"#{make_url record}\">#{record.secid}</a>"
+        )
     
     create_table = ->
         $("<table>")
             .addClass('mx-security-emitter-securities')
             .html("<thead></thead><tbody></tbody>")
     
-    create_row = (title, records, engine) ->
+    create_row = (title, records) ->
         row = $("<tr>")
             .html("<th>#{title}</th><td></td>")
         
@@ -89,8 +99,8 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
         table_body = $('tbody', table)
         
         for engine in engines
-            records = _.sortBy _.uniq(data[engine.name]), (secid) ->
-                _.indexOf secids, secid
+            records = _.sortBy _.uniq(data[engine.name]), (record) ->
+                _.indexOf secids, record.secid
             
             table_body.append create_row(engine.title, records) if _.size(records) > 0
         
@@ -111,7 +121,7 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                         
                         data = _.reduce _.flatten(records), (memo, record) ->
                             if record.is_traded == 1 and record.secid != param
-                                (memo[record.engine] ?= []).push(record.secid)
+                                (memo[record.engine] ?= []).push(record)
                             memo
                         , {}
                         
