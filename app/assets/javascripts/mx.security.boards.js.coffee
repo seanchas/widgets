@@ -23,15 +23,21 @@ widget = (element, engine, market, board, param, options = {}) ->
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
     
     element.html cache.get(cache_key) if options.cache
-
+    
     make_container = ->
         $("<table>")
             .addClass("mx-security-boards")
             .html("<thead></thead><tbody></tbody>")
 
+    make_url = (b) ->
+        if options.url? and _.isFunction(options.url)
+            options.url b.engine, b.market, b.boardid, param
+        else
+            "##{b.engine}:#{b.market}:#{b.boardid}:#{param}"
+
     make_row = (b) ->
         row = $("<tr>")
-            .html("<th><a href=\"##{b.engine}:#{b.market}:#{b.boardid}:#{param}\">#{b.title}</a></th><td>#{format_date b.history_from} &ndash; По н. вр.</td>")
+            .html("<th><a href=\"#{make_url b}\">#{b.title}</a></th><td>#{format_date b.history_from} &ndash; По н. вр.</td>")
         
         cell = $('th', row)
         row.toggleClass('current', b.boardid == board)
