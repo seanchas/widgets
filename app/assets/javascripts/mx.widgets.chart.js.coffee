@@ -11,6 +11,7 @@ scope = global.mx.widgets
 cs_host         = "http://www.beta.micex.ru"
 cs_extension    = "png"
 cs_template     = "adv_no_volume"
+cs_compare_template = "#{cs_template}_comp"
 
 
 $ = jQuery
@@ -39,7 +40,7 @@ make_url = (element, engine, market, security, options = {}) ->
     if options.compare?
         compare = if _.isArray(options.compare) then options.compare.join(',') else options.compare
     
-    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '' }))
+    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '', compare_template: cs_compare_template, interval: 1 }))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 

@@ -71,7 +71,7 @@ process_record = (record, columns) ->
             when 'date'
                 parse_date value
             when 'time'
-                value
+                _.first(value.split(':'), 2).join(':')
     
     record.trends = {}
 

@@ -111,6 +111,22 @@ table.mx-widget-turnovers {
         text-align: right;
     }
     
+    td.trend_up {
+        color: #090;
+    }
+    
+    td.trend_down {
+        color: #c00;
+    }
+    
+    td.trend_none {
+        color: #666;
+    }
+    
+    tr.current td {
+        background-color: #fcc;
+    }
+    
     thead {
         
         td {
@@ -120,6 +136,12 @@ table.mx-widget-turnovers {
         
     }
     
+}
+
+table.chart {
+    tr td {
+        cursor: pointer;
+    }
 }
 
 

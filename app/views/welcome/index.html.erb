@@ -19,8 +19,9 @@
     </div>
     
     <div id="chart_1">
-        
     </div>
+    
+    <hr />
     
     <div id="index_2">
     </div>
@@ -68,10 +69,6 @@
     
         $(function() {
         
-            function sortBy_BOARDID_SECID(params, record) {
-            	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
-            }
-
     		function sortBy_SECTYPE(params, record) {
     			return params.indexOf(record['SECTYPE']);
     		}
@@ -98,23 +95,23 @@
                 'SNDX:MICEXINDEXCF',
                 'RTSI:RTSI'
             ], {
-                sortBy: sortBy_BOARDID_SECID
+                cache: true
             });
-
 
             mx.widgets.table('#index_2', 'stock', 'index', [
                 'SNDX:MICEXCBITR',
                 'SNDX:MICEXMBITR',
                 'SNDX:MICEXINNOV',
-                'SNDX:RTSVX'
+                'state:index:GNDX:RGBI'
             ], {
-                sortBy: sortBy_BOARDID_SECID
+                chart: 0,
+                refresh_timeout: 5 * 1000,
+                url: function(engine, market, board, security) {
+                    return '#' + engine + ':' + market + ':' + board + ':' + security;
+                },
+                cache: true
             });
 
-
-            mx.widgets.table('#index_3', 'state', 'index', [
-                'GNDX:RGBI',
-            ]);
 
             mx.widgets.table('#currency_1', 'currency', 'selt', [
                 'CETS:USD000UTSTOM',
@@ -122,7 +119,6 @@
                 'CETS:EURUSD000TOM',
                 'BKT:USDEUR_BKT'
             ], {
-                sortBy: sortBy_BOARDID_SECID
             });
 
 
@@ -133,11 +129,9 @@
                 'EQBS:GMNK',
                 'EQNL:VTBR'
             ], {
-                sortBy: sortBy_BOARDID_SECID,
                 chart: 'EQBR:SBER'
             });
-
-
+            
             mx.widgets.table('#futures_1', 'futures', 'forts', [
                 'RI',
                 'MX',
@@ -147,10 +141,10 @@
             ], {
                 sortBy: sortBy_SECTYPE,
                 params_name: 'sectypes',
-                nearest: 1
+                nearest: 1,
+                chart: true
             });
-
-
+            
             mx.widgets.table('#futures_2', 'futures', 'forts', [
                 'GD',
                 'BR',
