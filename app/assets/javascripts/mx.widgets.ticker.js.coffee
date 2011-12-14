@@ -1,5 +1,3 @@
-##= require emile
-
 global = module?.exports ? ( exports ? this )
 
 global.mx           ||= {}
