@@ -5,36 +5,34 @@
     overflow: hidden;
     position: relative;
     
-    ul {
+    * {
+        cursor: pointer;
+    }
+    
+    div.tick {
         line-height: 1em;
-        list-style: none;
-        margin: 0;
-        padding: 0;
+        padding: 1em 10px;
         position: absolute;
+        white-space: nowrap;
         
-        li {
-            float: left;
-            margin: 0;
-            padding: 1em 10px;
-            
-            .last {
-                color: #669;
-                padding-left: 5px;
-            }
-            
-            .change {
-                color: #666;
-                padding-left: 5px;
-            }
-            
-            .trend_up {
-                color: #060;
-            }
-
-            .trend_down {
-                color: #900;
-            }
+        .last {
+            color: #669;
+            padding-left: 5px;
         }
+
+        .change {
+            color: #666;
+            padding-left: 5px;
+        }
+        
+        .trend_up {
+            color: #060;
+        }
+
+        .trend_down {
+            color: #900;
+        }
+
     }
     
 }

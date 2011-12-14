@@ -10,140 +10,156 @@ scope = global.mx.widgets
 $ = jQuery
 
 
-load = (queries) ->
-    deferred = new $.Deferred
-    
-    records = []
-    
-    complete = _.after _.size(queries), ->
-        deferred.resolve(records)
+escape_selector = (string) ->
+    string.replace /([\W])/g, "\\$1"
 
-    for key, params of queries
-        [engine, market] = key.split(":")
-        mx.iss.records(engine, market, params).then (json) ->
-            records.push(json...)
-            complete()
-    
-    deferred.promise()
-    
 
-widget = (element, instruments, options = {}) ->
+widget = (element, params, options = {}) ->
     element = $(element); return if _.size(element) == 0
-    element.html($("<div>").addClass("mx-widget-ticker")); element = $('.mx-widget-ticker', element)
-    
+    element.html($("<div>").addClass("mx-widget-ticker"))
+    element = $(".mx-widget-ticker", element)
 
-    queries = _.reduce instruments, (memo, instrument) ->
-        [engine, market, board, param] = instrument.split(":")
-        (memo[[engine, market].join(":")] ||= []).push([board, param].join(":"))
+
+    queries = _.reduce params, (memo, param) ->
+        parts = param.split(":")
+        (memo[_.first(parts, 2).join(":")] ?= []).push _.last(parts, 2).join(":")
         memo
     , {}
     
-    sort = _.map instruments, (instrument) ->
-        [engine, market, board, param] = instrument.split(":")
-        [board, param].join(":")
-    
-    speed = + options.speed || 25
 
-    cancelled = false
-    
-    containers = []
-    
-    element.toggleClass('toggleable', options.toggleable == true)
-
-    if (options.toggleable == true)
-        element.on 'click', (e) ->
-            for el in $('ul', element) when $(el).data('animating')?
-                el = $(el)
-                if cancelled
-                    el.removeData('animating')
-                    animate(el)
-                else
-                    $(el).data('animating').cancel()
-
-            cancelled = !cancelled
+    fetch = ->
+        deferred = new $.Deferred
+        
+        records = []
+        
+        complete = _.after _.size(queries), ->
+            deferred.resolve _.sortBy records, (record) ->
+                _.indexOf params, [record['ENGINE'], record['MARKET'], record['BOARDID'], record['SECID']].join(":")
             
+        _.each queries, (params, key) ->
+            [engine, market] = key.split(":")
+            mx.iss.records(engine, market, params, { force: true }).then (json) ->
+                for record in json
+                    record['ENGINE'] = engine
+                    record['MARKET'] = market
+                records.push json...
+                complete()
+        
+        deferred.promise()
+    
+
+    fetch_filters = ->
+        deferred = new $.Deferred
+        
+        filters = {}
+        
+        complete = _.after _.size(queries), ->
+            deferred.resolve filters
+        
+        _.each queries, (params, key) ->
+            mx.iss.filters(key.split(":")...).then (json) ->
+                filters[key] = json
+                complete()
+        
+        deferred.promise()
+    
+
+    fetch_columns = ->
+        deferred = new $.Deferred
+
+        columns = {}
+
+        complete = _.after _.size(queries), ->
+            deferred.resolve columns
+
+        _.each queries, (params, key) ->
+            mx.iss.columns(key.split(":")...).then (json) ->
+                columns[key] = json
+                complete()
+
+        deferred.promise()
+    
+    insert_after_last_tick = (view) ->
+        tick = $(".tick:last", element)
+        left = if _.size(tick) > 0 then tick.position().left + tick.outerWidth() else 0
+        view.css({ left: left })
+        element.append view
+    
+    animate = (view) ->
+        view.stop()
+        
+        length = view.position().left + view.outerWidth()
+        
+        view.animate { left: - view.outerWidth() }, length / 25 * 1000, 'linear', () ->
+            insert_after_last_tick view
+            animate view
+    
+    toggle_animation = ->
+        $(".tick", element).each (index, tick) ->
+            tick = $(tick)
+            if tick.is(":animated") then tick.stop() else animate tick
+    
+    element.on 'click', toggle_animation
+
+
+    $.when(fetch_filters(), fetch_columns()).then (filters, columns) ->
+        
+        for id, filter of filters
+            filter = _.reduce filter.widget, (memo, field) ->
+                memo[field.alias] = field
+                memo
+            , {}
+            filters[id] = filter
+        
+        render = (records) ->
+            return if _.size(records) == 0
             
+            for record in records
+                
+                key = "#{record['ENGINE']}:#{record['MARKET']}"
+                
+                _filters = filters[key]
+                _columns = columns[key]
+                
+                record = mx.utils.process_record record, _columns
+                
+                tick = $(".tick:last", element)
+                
+                record_key = "#{record['BOARDID']}:#{record['SECID']}"
+                
+                view = $("div[data-key=#{escape_selector record_key}]", element)
 
-    render_name = (record) ->
-        value = record['SHORTNAME']
-        $("<span>")
-            .addClass("name")
-            .html(value)
-    
-    render_last = (record) ->
-        value = + (record['LAST'] || record['LASTVALUE'] || 0).toFixed(2)
-        $("<span>")
-            .addClass("last")
-            .html(mx.utils.render(value, { type: 'number', decimals: 2 }))
-    
-    render_change = (record) ->
-        value = + (record['LASTCHANGEPRCNT'] || record['LASTCHANGEPRC'] || 0).toFixed(2)
-        $("<span>")
-            .addClass("change")
-            .toggleClass('trend_up', value > 0)
-            .toggleClass('trend_down', value < 0)
-            .html(mx.utils.render(value, { type: 'number', decimals: 2, is_signed: 1, has_percent: 1 }))
-    
-    render_record = (record) ->
-        $("<li>")
-            .append(render_name(record))
-            .append(render_last(record))
-            .append(render_change(record))
-    
-    animate = (container) ->
-        container ?= _.first containers
-        
-        return if container.data('animating')?
-        
-        duration = (container.position().left + container.outerWidth()) / speed
-        
-        container.data 'animating', emile container[0], "left: -#{container.outerWidth()}px;", { duration: duration * 1000, easing: _.bind easing, container }, ->
-            cleanup container
-        
-    render = (records) ->
-        container = $("<ul>")
-            .addClass("tickers")
-        
-        for record in records
-            container.append render_record record
-        
-        element.append container
-        
-        container.width _.reduce $("li", container), (sum, el) ->
-            sum + $(el).outerWidth()
-        , 0
-        
-        container.css('left', element.outerWidth())
-        
-        containers.push container
-        
-        animate()
-    
-    easing = (position) ->
-        
-        unless this.data('refresh-sent')
-            last = this.children('li').last()
-            if element.offset().left + element.innerWidth() >= last.offset().left
-                refresh()
-                this.data('refresh-sent', true)
-        
-        unless this.data('animate-sent')
-            if this.position().left + this.outerWidth() < element.innerWidth()
-                containers.shift()
-                animate()
-                this.data('animate-sent', true)
-        
-        position
+                if _.size(view) == 0
+                     view = $("<div>").addClass('tick').attr({ 'data-key': record_key })
+                     insert_after_last_tick view
 
-    cleanup = (container) ->
-        container.remove()
-    
-    refresh = ->
-        load(queries).then (records) ->
-            render _.sortBy records, (instrument) ->
-                _.indexOf sort, [instrument['BOARDID'], instrument['SECID']].join(":")
-    
-    refresh()
+
+                for name in ['SHORTNAME', 'LAST', 'CHANGE']
+                    field = $("span.#{name.toLowerCase()}", view)
+
+                    if _.size(field) == 0
+                        field = $("<span>").addClass(name.toLowerCase())
+                        view.append field
+
+                    field.html(mx.utils.render record[_filters[name].name], _columns[_filters[name].id])
+                
+                if trend = record.trends[_filters['CHANGE'].name]
+                    cell = $("span.change", view)
+                    cell.toggleClass('trend_up',    trend > 0)
+                    cell.toggleClass('trend_down',  trend < 0)
+                
+                animate view
+                
+                
+
+        refresh = ->
+            fetch().then (records) ->
+                console.log 'refresh'
+                render records
+                _.delay refresh, 5 * 1000
+
+        refresh()
+
 
 
 _.extend scope,
