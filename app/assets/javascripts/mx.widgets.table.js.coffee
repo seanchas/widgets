@@ -101,8 +101,9 @@ widget = (element, engine, market, params, options = {}) ->
 
 
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cacheable = options.cache == true
     
-    read_cache(element, cache_key) if options.cache == true
+    read_cache(element, cache_key) if cacheable
 
 
     delay   = calculate_delay(options.refresh_timeout)
@@ -115,7 +116,8 @@ widget = (element, engine, market, params, options = {}) ->
     
     order = []
     
-    has_chart = options.chart? and options.chart != false
+    has_chart   = options.chart? and options.chart != false
+    chart_width = 0
     
     params = _.reduce params, (memo, param) ->
         parts = param.split(":")
@@ -144,11 +146,12 @@ widget = (element, engine, market, params, options = {}) ->
         
         parts   = chart_row.data('key').split(":")
         cell    = $("td", chart_row)
-        url     = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], options.chart_option || {})
+        
+        url     = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
         
         chart_row.hide() unless _.size($("img", cell)) > 0
         
-        write_cache(element, cache_key)
+        write_cache(element, cache_key) if cacheable
 
         image   = $("<img>").attr('src', url)
         
@@ -159,7 +162,7 @@ widget = (element, engine, market, params, options = {}) ->
             cell.html($("<img>").attr('src', url))
             charts_times[key] = + new Date
 
-            write_cache(element, cache_key)
+            write_cache(element, cache_key) if cacheable
         
     
     activate_row = (row) ->
@@ -242,15 +245,17 @@ widget = (element, engine, market, params, options = {}) ->
                         .attr
                             'data-key': record_key
                         .html($("<td>").attr({ 'colspan': _.size(row.children()) }))
-                        .hide()
                     row.after chart_row
-                    
+
                     if _.size(old_chart_row = $("tr.chart[data-key=#{escape_selector record_key}]")) > 0
                         if url = $("img", old_chart_row).attr('src')
                             $("td", chart_row).html($("<img>").attr('src', url))
             
             element.children().remove()
             element.html table
+
+            chart_width = $("tr.chart td", table).width()
+            $("tr.chart", table).hide()
             
             activate_row $("tr.row[data-key=#{escape_selector current_row_key}]") if current_row_key
             current_row_key = undefined
@@ -258,7 +263,7 @@ widget = (element, engine, market, params, options = {}) ->
             if has_chart
                 observe()
             
-            write_cache(element, cache_key)
+            write_cache(element, cache_key) if cacheable
                 
         
         refresh = ->
