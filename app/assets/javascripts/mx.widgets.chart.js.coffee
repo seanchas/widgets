@@ -40,7 +40,7 @@ make_url = (element, engine, market, security, options = {}) ->
     if options.compare?
         compare = if _.isArray(options.compare) then options.compare.join(',') else options.compare
     
-    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '', compare_template: cs_compare_template, interval: 1 }))
+    query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '', compare_template: cs_compare_template, period: '1d' }))
     "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
