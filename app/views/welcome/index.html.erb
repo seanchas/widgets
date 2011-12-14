@@ -129,7 +129,8 @@
                 'EQBS:GMNK',
                 'EQNL:VTBR'
             ], {
-                chart: 'EQBR:SBER'
+                chart: 0,
+                refresh_timeout: 5 * 1000
             });
             
             mx.widgets.table('#futures_1', 'futures', 'forts', [
@@ -171,7 +172,10 @@
             });
 
 
-            mx.widgets.turnovers('#turnovers');
+            mx.widgets.turnovers('#turnovers', {
+                afterRefresh: function(time) {
+                }
+            });
 
         });
     

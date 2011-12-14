@@ -49,10 +49,13 @@ widget = (element, options = {}) ->
     element = $(element); return if element.length == 0
     
     refresh_timeout = options.refresh_timeout || 60 * 1000
+    
+    refresh_callback = if options.afterRefresh and _.isFunction(options.afterRefresh) then options.afterRefresh else undefined
 
     refresh = ->
         mx.iss.turnovers().then (turnovers) ->
             render element, turnovers
+            refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
             _.delay refresh, refresh_timeout
 
     refresh()
