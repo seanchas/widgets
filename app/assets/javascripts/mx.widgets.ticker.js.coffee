@@ -14,10 +14,16 @@ escape_selector = (string) ->
 
 widget = (element, params, options = {}) ->
     element = $(element); return if _.size(element) == 0
-    element.html($("<div>").addClass("mx-widget-ticker"))
+    element.html($("<div>").addClass("mx-widget-ticker loading"))
     element = $(".mx-widget-ticker", element)
+    
+    speed       = options.speed ? 25
+    toggleable  = options.toggleable == true
+    animated    = true
 
-    element.toggleClass('toggleable', options.toggleable == true)
+    _.times 2, (index) -> element.append $("<ul>").css({ left: element.width() * index })
+        
+    element.toggleClass('toggleable', toggleable)
 
     queries = _.reduce params, (memo, param) ->
         parts = param.split(":")
@@ -78,30 +84,54 @@ widget = (element, params, options = {}) ->
 
         deferred.promise()
     
-    insert_after_last_tick = (view) ->
-        tick = $(".tick:last", element)
-        left = if _.size(tick) > 0 then tick.position().left + tick.outerWidth() else 0
-        view.css({ left: left })
-        element.append view
+    insert_after_last_tick = (screen, tick) ->
+        last_tick = $(".tick:last", element)
+        left = if _.size(last_tick) > 0 then last_tick.position().left + last_tick.outerWidth() else 0
+        tick.css({ left: left })
+        screen.append tick
     
-    animate = (view) ->
-        view.stop()
+    animate = ->
+        return unless animated
         
-        length = view.position().left + view.outerWidth()
+        screens = $("ul", element)
+
+        screens.stop()
+
+        [first, last] = [$(_.first screens), $(_.last screens)]
         
-        view.animate { left: - view.outerWidth() }, length / 30 * 1000, 'linear', () ->
-            insert_after_last_tick view
-            animate view
+        return if first.outerWidth() <= element.width()
+        
+        first_length = first.position().left + first.outerWidth()
+        
+        last.css({ left: first_length })
+        
+        last_length = last.position().left + last.outerWidth()
+        
+        first.animate({ left: - first.outerWidth() }, { easing: 'linear', duration: first_length / speed * 1000, complete: reanimate })
+        last.animate({ left: - last.outerWidth() }, { easing: 'linear', duration: last_length / speed * 1000 })        
     
+    
+    reanimate = ->
+        screens = $("ul", element)
+
+        screens.stop()
+        
+        [first, last] = [$(_.first screens), $(_.last screens)]
+        
+        last.after first
+        
+        animate()
+    
+
     toggle_animation = ->
-        $(".tick", element).each (index, tick) ->
-            tick = $(tick)
-            if tick.is(":animated") then tick.stop() else animate tick
-    
-    element.on 'click', toggle_animation if options.toggleable == true
+        screens = $("ul", element)
+        animated = not screens.is(":animated")
+        if screens.is(":animated") then screens.stop() else animate()
 
 
     $.when(fetch_filters(), fetch_columns()).then (filters, columns) ->
+        
+        element.on "click", toggle_animation
         
         for id, filter of filters
             filter = _.reduce filter.widget, (memo, field) ->
@@ -112,6 +142,8 @@ widget = (element, params, options = {}) ->
         
         render = (records) ->
             return if _.size(records) == 0
+            
+            screens = $("ul", element)
             
             for record in records
                 
@@ -126,35 +158,42 @@ widget = (element, params, options = {}) ->
                 
                 record_key = "#{record['BOARDID']}:#{record['SECID']}"
                 
-                view = $("ul[data-key=#{escape_selector record_key}]", element)
+                views = $("li[data-key=#{escape_selector record_key}]", element)
 
-                if _.size(view) == 0
-                     view = $("<ul>").addClass('tick').attr({ 'data-key': record_key })
-                     insert_after_last_tick view
+                if _.size(views) == 0
+                     for screen in screens
+                         $(screen).append $("<li>").addClass('tick').attr({ 'data-key': record_key })
 
+
+                views = $("li[data-key=#{escape_selector record_key}]", element)
 
                 for name in ['SHORTNAME', 'LAST', 'CHANGE']
-                    field = $("li.#{name.toLowerCase()}", view)
+                    fields = $("span.#{name.toLowerCase()}", views)
 
-                    if _.size(field) == 0
-                        field = $("<li>").addClass(name.toLowerCase())
-                        view.append field
-
-                    field.html(mx.utils.render record[_filters[name].name], _columns[_filters[name].id])
+                    if _.size(fields) == 0
+                        for view in views
+                            $(view).append $("<span>").addClass(name.toLowerCase())
+                    
+                    fields = $("span.#{name.toLowerCase()}", views)
+                    
+                    fields.html(mx.utils.render record[_filters[name].name], _columns[_filters[name].id])
                 
                 if trend = record.trends[_filters['CHANGE'].name]
-                    cell = $("li.change", view)
+                    cell = $("span.change", views)
                     cell.toggleClass('trend_up',    trend > 0)
                     cell.toggleClass('trend_down',  trend < 0)
                 
-                animate view
+            animate()
                 
                 
 
         refresh = ->
             fetch().then (records) ->
+                element.removeClass("loading")
+                
                 render records
-                _.delay refresh, 60 * 1000
+                
+                _.delay refresh, 10 * 1000
 
         refresh()
 

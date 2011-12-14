@@ -4,16 +4,21 @@
     height: 3em;
     overflow: hidden;
     position: relative;
+	width: auto;
     
     ul {
         line-height: 1em;
+		list-style: none;
         margin: 0;
-        padding: 1em 10px;
+        padding: 1em 0;
         position: absolute;
         white-space: nowrap;
         
         li {
             display: inline;
+			float: left;
+			margin: 0 10px;
+			padding: 0
         }
         
         .last {
@@ -36,6 +41,12 @@
 
     }
     
+}
+
+.mx-widget-ticker.loading {
+	background-image: image-url('facebook-ajax-loader.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
 }
 
 .toggleable,
