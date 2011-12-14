@@ -8,7 +8,7 @@ global.mx.widgets   ||= {}
 scope = global.mx.widgets
 
 
-cs_host         = "http://www.beta.micex.ru"
+cs_host         = "<%= Rails.application.config.cs_host %>"
 cs_extension    = "png"
 cs_template     = "adv_no_volume"
 cs_compare_template = "#{cs_template}_comp"
@@ -41,7 +41,7 @@ make_url = (element, engine, market, security, options = {}) ->
         compare = if _.isArray(options.compare) then options.compare.join(',') else options.compare
     
     query = $.param(extend(dimensions, { template: cs_template, rnd: +new Date, compare: compare ? '', compare_template: cs_compare_template, period: '1d', indterval: 1 }))
-    "#{cs_host}/cs/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
+    "#{cs_host}/engines/#{engine}/markets/#{market}/securities/#{security}.#{cs_extension}?#{query}"
 
 
 make_image = (element, engine, market, security, options, width, height) ->
