@@ -56,7 +56,7 @@ render = (element, description, security, columns, filters, indices, index_secur
         table_body.append make_row record['title'], mx.utils.render(record['value'], record) if record.is_hidden == 0
     
     table_body.append make_divider_row
-    
+
     for column in columns
         table_body.append make_row column.short_title, mx.utils.render(security[column.name], column) unless _.isEmpty(security)
     
@@ -87,6 +87,8 @@ widget = (element, engine, market, board, param, options = {}) ->
     $.when(dds, sds, cds, fds, ids, isds).then (description, security, columns, filters, indices, index_securities) ->
         
         unless _.isEmpty(filters)
+
+            security = _.first(security)
         
             if security or description
                 render element, description, security, columns, filters['full'], indices, index_securities, options
