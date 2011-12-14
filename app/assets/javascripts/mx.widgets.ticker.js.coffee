@@ -17,6 +17,7 @@ widget = (element, params, options = {}) ->
     element.html($("<div>").addClass("mx-widget-ticker"))
     element = $(".mx-widget-ticker", element)
 
+    element.toggleClass('toggleable', options.toggleable == true)
 
     queries = _.reduce params, (memo, param) ->
         parts = param.split(":")
@@ -88,7 +89,7 @@ widget = (element, params, options = {}) ->
         
         length = view.position().left + view.outerWidth()
         
-        view.animate { left: - view.outerWidth() }, length / 25 * 1000, 'linear', () ->
+        view.animate { left: - view.outerWidth() }, length / 30 * 1000, 'linear', () ->
             insert_after_last_tick view
             animate view
     
@@ -97,7 +98,7 @@ widget = (element, params, options = {}) ->
             tick = $(tick)
             if tick.is(":animated") then tick.stop() else animate tick
     
-    element.on 'click', toggle_animation
+    element.on 'click', toggle_animation if options.toggleable == true
 
 
     $.when(fetch_filters(), fetch_columns()).then (filters, columns) ->
@@ -152,9 +153,8 @@ widget = (element, params, options = {}) ->
 
         refresh = ->
             fetch().then (records) ->
-                console.log 'refresh'
                 render records
-                _.delay refresh, 5 * 1000
+                _.delay refresh, 60 * 1000
 
         refresh()
 
