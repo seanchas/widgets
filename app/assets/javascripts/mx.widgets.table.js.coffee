@@ -130,6 +130,15 @@ widget = (element, engine, market, params, options = {}) ->
     fds = filters_data_source(_.keys params)
     cds = columns_data_source(_.keys params)
     
+    options.params_name ||= 'securities'
+
+    make_record_order_key = (record) ->
+        switch options.params_name
+            when 'securities'
+                [record['ENGINE'], record['MARKET'], record['BOARDID'], record['SECID']].join(':')
+            when 'sectypes'
+                [record['ENGINE'], record['MARKET'], record['SECTYPE']].join(':')
+    
     
     charts_times = {}
     records_urls = {}
@@ -189,6 +198,8 @@ widget = (element, engine, market, params, options = {}) ->
             current_row_key = order[options.chart] || _.first(order)
         
         render = (data) ->
+            return if _.size(data) == 0
+			
             old_table = $('table', element)
             
             table = $("<table>")
@@ -278,7 +289,7 @@ widget = (element, engine, market, params, options = {}) ->
                 , []
                 
                 data = _.sortBy data, (record) ->
-                    _.indexOf order, [record['ENGINE'], record['MARKET'], record['BOARDID'], record['SECID']].join(':')
+                    _.indexOf order, make_record_order_key(record)
                 
                 render data if _.size(data) > 0
             

@@ -126,24 +126,24 @@ widget = (element, params, options = {}) ->
                 
                 record_key = "#{record['BOARDID']}:#{record['SECID']}"
                 
-                view = $("div[data-key=#{escape_selector record_key}]", element)
+                view = $("ul[data-key=#{escape_selector record_key}]", element)
 
                 if _.size(view) == 0
-                     view = $("<div>").addClass('tick').attr({ 'data-key': record_key })
+                     view = $("<ul>").addClass('tick').attr({ 'data-key': record_key })
                      insert_after_last_tick view
 
 
                 for name in ['SHORTNAME', 'LAST', 'CHANGE']
-                    field = $("span.#{name.toLowerCase()}", view)
+                    field = $("li.#{name.toLowerCase()}", view)
 
                     if _.size(field) == 0
-                        field = $("<span>").addClass(name.toLowerCase())
+                        field = $("<li>").addClass(name.toLowerCase())
                         view.append field
 
                     field.html(mx.utils.render record[_filters[name].name], _columns[_filters[name].id])
                 
                 if trend = record.trends[_filters['CHANGE'].name]
-                    cell = $("span.change", view)
+                    cell = $("li.change", view)
                     cell.toggleClass('trend_up',    trend > 0)
                     cell.toggleClass('trend_down',  trend < 0)
                 

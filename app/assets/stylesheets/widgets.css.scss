@@ -5,15 +5,16 @@
     overflow: hidden;
     position: relative;
     
-    .toggleable * {
-        cursor: pointer;
-    }
-    
-    div.tick {
+    ul {
         line-height: 1em;
+        margin: 0;
         padding: 1em 10px;
         position: absolute;
         white-space: nowrap;
+        
+        li {
+            display: inline;
+        }
         
         .last {
             color: #669;
@@ -37,7 +38,8 @@
     
 }
 
-.toggleable {
+.toggleable,
+.toggleable * {
     cursor: pointer;
 }
 
