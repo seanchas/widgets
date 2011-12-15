@@ -208,7 +208,7 @@ widget = (element, engine, market, params, options = {}) ->
         
         render = (data) ->
             return if _.size(data) == 0
-			
+            
             old_table = $('table', element)
             
             table = $("<table>")
@@ -237,6 +237,7 @@ widget = (element, engine, market, params, options = {}) ->
                         'data-key': record_key
                 
                 for field, index in _filters
+
                     column  = _columns[field.id]
 
                     trend   = record.trends[column.name]
@@ -246,7 +247,7 @@ widget = (element, engine, market, params, options = {}) ->
                             'data-name':    column.name
                             'title':        column.title
                         .addClass(column.type)
-                        .html($("<span>").html(mx.utils.render record[column.name], column))
+                        .html($("<span>").html(mx.utils.render(record[column.name], column) || '&mdash;'))
                     
                     if column.trend_by == field.id
                         cell.toggleClass('trend_up',    trend  > 0)
