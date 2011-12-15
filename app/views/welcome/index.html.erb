@@ -13,6 +13,8 @@
 
 <%- content_for :right_content do -%>
 
+    <h3>Капитализация: <span id="capitalization">&mdash;</span> Руб.</h3>
+
     <h3>Индексы</h3>
 
     <div id="index_1">
@@ -211,6 +213,29 @@
             mx.widgets.turnovers('#turnovers', {
                 afterRefresh: function(time) {
                 }
+            });
+            
+            var amounts = {
+                3:      'Тыс.',
+                6:      'Млн.',
+                9:      'Млрд.',
+                12:     'Трлн.'
+            };
+            
+            mx.iss.capitalization().then(function(value) {
+                var digits      = Math.ceil(Math.log(value) / Math.LN10);
+                var max_amount  = 0;
+
+                for (amount in amounts) {
+                    amount = parseInt(amount)
+                    if (max_amount < amount && amount <= digits) {
+                        max_amount = amount;
+                    }
+                }
+
+                value = value / Math.pow(10, max_amount)
+                
+                $("#capitalization").html(mx.utils.render(value, { type: 'number', precision: 2 }) + ' ' + amounts[max_amount]);
             });
 
         });

@@ -106,6 +106,16 @@ request_meta =
             iss_merge_columns_and_data(json?.analytics)
         key: (param) ->
             [param]
+    
+    capitalization:
+        url: ->
+            "#{iss_host}/statistics/engines/stock/capitalization.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            _.first(iss_merge_columns_and_data(json?.capitalization))?['CAPITALIZATION']
+        key: ->
+            []
 
 
 request = (name, args...) ->
@@ -292,3 +302,4 @@ _.extend scope,
     turnovers:          turnovers
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
+    capitalization:     (args...) -> request('capitalization', args...)
