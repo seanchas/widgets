@@ -191,6 +191,9 @@ widget = (element, engine, market, params, options = {}) ->
         element.on 'click', 'tr.row', (event) ->
             activate_row $(event.currentTarget)
         
+        element.on 'click', 'a', (event) ->
+            event.stopPropagation()
+        
     
     $.when(fds, cds).then (filters, columns) ->
         
