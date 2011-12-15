@@ -39,6 +39,16 @@
     <div id="stock_1">
     </div>
     
+    <h3>Standard</h3>
+
+    <div id="stock_2">
+    </div>
+    
+    <h3>Classica</h3>
+
+    <div id="stock_3">
+    </div>
+    
     <h3>Срочный рынок</h3>
     
     <h4>Фондовая секция</h4>
@@ -132,6 +142,28 @@
                 'EQBR:LKOH',
                 'EQBS:GMNK',
                 'EQNL:VTBR'
+            ], {
+                chart: 0,
+                refresh_timeout: 5 * 1000
+            });
+            
+            mx.widgets.table('#stock_2', 'stock', 'standard', [
+                'STMR:SBER',
+                'STMR:GAZP',
+                'STMR:LKOH',
+                'STMR:GMNK',
+                'STMR:VTBR'
+            ], {
+                chart: 0,
+                refresh_timeout: 5 * 1000
+            });
+            
+            mx.widgets.table('#stock_3', 'stock', 'classica', [
+                'CLMR:SBER',
+                'CLMR:GAZP',
+                'CLMR:LKOH',
+                'CLMR:GMNK',
+                'CLMR:VTBR'
             ], {
                 chart: 0,
                 refresh_timeout: 5 * 1000

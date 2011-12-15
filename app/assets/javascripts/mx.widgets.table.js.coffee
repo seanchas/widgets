@@ -169,13 +169,20 @@ widget = (element, engine, market, params, options = {}) ->
             cell.children().remove()
             cell.html($("<img>").attr('src', url))
             charts_times[key] = + new Date
-
             write_cache(element, cache_key) if cacheable
+        
+        image.on 'error', ->
+            chart_row.prev("tr.row").removeClass("current")
+            chart_row.data('defunct', true).hide()
+            cell.removeClass('loading')
+            cell.children().remove()
+            write_cache(element, cache_key) if cacheable
+
         
     
     activate_row = (row) ->
         chart_row   = row.next("tr.chart")
-
+        
         $("tr.row", element).not(row).removeClass("current")
         $("tr.chart", element).not(chart_row).hide()
 
@@ -263,6 +270,7 @@ widget = (element, engine, market, params, options = {}) ->
                     if _.size(old_chart_row = $("tr.chart[data-key=#{escape_selector record_key}]")) > 0
                         if url = $("img", old_chart_row).attr('src')
                             $("td", chart_row).html($("<img>").attr('src', url))
+                        chart_row.data('defunct', old_chart_row.data('defunct'))
             
             element.children().remove()
             element.html table
