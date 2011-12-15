@@ -59,7 +59,7 @@ Widgets::Application.routes.draw do
     get 'examples' => 'welcome#examples'
     
     scope "security" do
-      root :to => 'welcome#security'
+      root :to => 'welcome#security', :as => "security"
       get "docs" => "welcome#security_docs"
     end
   end

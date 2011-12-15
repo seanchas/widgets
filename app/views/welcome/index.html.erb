@@ -81,10 +81,14 @@
             	'stock:shares:EQBR:LKOH',
             	'stock:shares:EQNL:VTBR',
             	'stock:shares:EQBR:HYDR',
-            	'stock:index:SNDX:MICEXO&G'
+            	'stock:index:SNDX:MICEXO&G',
+                'state:index:GNDX:RGBI'
             ], {
                 speed: 25,
-                toggleable: true
+                toggleable: true,
+                url: function(engine, market, board, security) {
+                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
+                }
             });
             
             mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {

@@ -20,6 +20,8 @@ widget = (element, params, options = {}) ->
     speed       = options.speed ? 25
     toggleable  = options.toggleable == true
     animated    = true
+    
+    url_constructor = options.url if options.url and _.isFunction(options.url)
 
     _.times 2, (index) -> element.append $("<ul>").css({ left: element.width() * index })
         
@@ -176,12 +178,16 @@ widget = (element, params, options = {}) ->
                     
                     fields = $("span.#{name.toLowerCase()}", views)
                     
-                    fields.html(mx.utils.render record[_filters[name].name], _columns[_filters[name].id])
+                    fields.html(mx.utils.render(record[_filters[name].name], _columns[_filters[name].id]) ? '&mdash;')
                 
                 if trend = record.trends[_filters['CHANGE'].name]
                     cell = $("span.change", views)
                     cell.toggleClass('trend_up',    trend > 0)
                     cell.toggleClass('trend_down',  trend < 0)
+                
+                if url_constructor
+                    cell= $("span.shortname", views)
+                    cell.html($("<a>").attr({ href: url_constructor(record['ENGINE'], record['MARKET'], record['BOARDID'], record['SECID']) }).html(cell.html()))
                 
             animate()
                 
