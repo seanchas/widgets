@@ -127,6 +127,14 @@ table.mx-widget-turnovers {
         background-color: #fcc;
     }
     
+    td.loading {
+        background-color: #eee;
+    	background-image: image-url('facebook-ajax-loader.gif');
+    	background-position: center center;
+    	background-repeat: no-repeat;
+    	padding: 25px 0;
+    }
+    
     thead {
         
         td {

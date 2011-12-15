@@ -158,15 +158,14 @@ widget = (element, engine, market, params, options = {}) ->
         
         url     = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
         
-        chart_row.hide() unless _.size($("img", cell)) > 0
+        cell.addClass('loading') unless _.size($("img", cell)) > 0
         
         write_cache(element, cache_key) if cacheable
 
         image   = $("<img>").attr('src', url)
         
-
         image.on 'load', ->
-            chart_row.show()
+            cell.removeClass('loading')
             cell.children().remove()
             cell.html($("<img>").attr('src', url))
             charts_times[key] = + new Date
@@ -258,7 +257,7 @@ widget = (element, engine, market, params, options = {}) ->
                         .addClass("chart")
                         .attr
                             'data-key': record_key
-                        .html($("<td>").attr({ 'colspan': _.size(row.children()) }))
+                        .html($("<td>").attr({ 'colspan': _.size(row.children()) }).html("&nbsp;"))
                     row.after chart_row
 
                     if _.size(old_chart_row = $("tr.chart[data-key=#{escape_selector record_key}]")) > 0
