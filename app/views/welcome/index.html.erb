@@ -1,3 +1,6 @@
+<div id="main_indices">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -236,6 +239,10 @@
                 value = value / Math.pow(10, max_amount)
                 
                 $("#capitalization").html(mx.utils.render(value, { type: 'number', precision: 2 }) + ' ' + amounts[max_amount]);
+            });
+            
+            mx.widgets.indices('#main_indices', {
+                refresh_timeout: 60 * 1000
             });
 
         });

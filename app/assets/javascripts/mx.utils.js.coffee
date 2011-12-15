@@ -51,7 +51,7 @@ parse_date = (value) ->
             )
     value
 
-process_record = (record, columns) ->
+process_record = (record, columns, by_name = false) ->
     return record unless record?
     
     decimals = record['DECIMALS']

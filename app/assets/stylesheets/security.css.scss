@@ -99,11 +99,20 @@ table.mx-widget-turnovers {
     
     td {
         padding: 5px;
+    }
+    
+    tbody td {
+        vertical-align: top;
         white-space: nowrap;
     }
     
     td.title {
         width: 100%;
+    }
+    
+    td.time {
+        color: #4d4d4d;
+        text-align: right;
     }
     
     td.number {
@@ -139,7 +148,7 @@ table.mx-widget-turnovers {
         
         td {
             background-color: #ccc;
-            font-weight: bold;
+            vertical-align: top;
         }
         
     }
