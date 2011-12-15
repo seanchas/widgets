@@ -19,7 +19,7 @@ extract_options = (args) ->
     [args, options]
 
 
-make_queries = (args...) ->
+extract_queries_and_orders = (args...) ->
 
     engine  = undefined
     market  = undefined
@@ -60,7 +60,7 @@ widget = (element, args...) ->
     element = $(element); return if _.size(element) == 0
 
     [args, options]     = extract_options(args)
-    [queries, orders]   = make_queries(args...)
+    [queries, orders]   = extract_queries_and_orders(args...)
     
     console.log orders
     console.log queries
