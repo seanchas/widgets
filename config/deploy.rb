@@ -31,7 +31,8 @@ end
 
 configuration = [
   'config/database.yml',
-  'config/environments/production.rb'
+  'config/environments/production.rb',
+  'config/initializers/hosts_configuration.rb'
 ]
 
 namespace :deploy do
