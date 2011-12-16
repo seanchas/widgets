@@ -199,7 +199,8 @@ widget = (element, engine, market, params, options = {}) ->
         
         element.on 'click', 'a', (event) ->
             row = $(event.currentTarget).closest("tr.row")
-            return event.preventDefault() unless row.hasClass("current")
+            console.log row.data()
+            return event.preventDefault() if !row.hasClass("current") and row.next("tr.chart").data('defunct') != true
             event.stopPropagation()
         
     
