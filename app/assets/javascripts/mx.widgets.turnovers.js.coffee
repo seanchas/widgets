@@ -18,8 +18,10 @@ create_table_head = ->
         .append($('<td>').html('Объемы торгов'))
         .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [РУБ]'))
 
-create_row = (record) ->
+create_row = (record, index) ->
     $('<tr>')
+        .toggleClass('even',    (index + 1) %  2 == 0)
+        .toggleClass('odd',     (index + 1) %  2 == 1)
         .append(
             $('<td>')
                 .addClass('title')
@@ -39,8 +41,8 @@ render = (element, turnovers) ->
     
     table_head.html create_table_head()
     
-    for record in turnovers
-        table_body.append create_row record
+    for record, index in turnovers
+        table_body.append create_row record, index
     
     element.html table
 
