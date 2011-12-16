@@ -27,6 +27,8 @@ widget = (element, options = {}) ->
     
     cache_key = mx.utils.sha1("")
     
+    element.html cache.get cache_key
+    
     columns_data_source = mx.iss.columns('stock', 'shares')
     
     $.when(columns_data_source).then (columns) ->
@@ -72,6 +74,8 @@ widget = (element, options = {}) ->
                 table_body.append row
         
             element.empty().html table
+            
+            cache.set cache_key, element.html()
 
 
         render_table_head = (table_head) ->
@@ -88,6 +92,9 @@ widget = (element, options = {}) ->
                         _.indexOf params, "#{record.BOARDID}:#{record.SECID}"
                     
                     render records
+                
+                _.delay refresh, options.refresh_timeout ? timeout
+                
         
         refresh()
 

@@ -252,7 +252,7 @@ emitter_securities = (param) ->
     deferred.promise()
 
 
-turnovers = ->
+turnovers = (engine) ->
     deferred = new $.Deferred
     
     data =
@@ -260,7 +260,7 @@ turnovers = ->
         'iss.only': 'turnovers'
     
     $.ajax
-        url: "#{iss_host}/turnovers.jsonp?callback=?"
+        url: "#{iss_host}/#{if engine? then 'engines/' + engine + '/' else ''}turnovers.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
         scriptCharset: 'utf-8'

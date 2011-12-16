@@ -4,6 +4,9 @@
 <div id="main_shares">
 </div>
 
+<div id="main_turnovers">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -250,6 +253,11 @@
 
             mx.widgets.shares('#main_shares', {
                 refresh_timeout: 60 * 1000
+            });
+
+            mx.widgets.turnovers('#main_turnovers', {
+                extend:             'stock',
+                refresh_timeout:    60 * 1000
             });
 
         });
