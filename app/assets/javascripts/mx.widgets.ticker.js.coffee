@@ -8,6 +8,9 @@ scope = global.mx.widgets
 $ = jQuery
 
 
+cache = kizzy('widgets.ticker')
+
+
 escape_selector = (string) ->
     string.replace /([\W])/g, "\\$1"
 
@@ -17,9 +20,11 @@ widget = (element, params, options = {}) ->
     element.html($("<div>").addClass("mx-widget-ticker loading"))
     element = $(".mx-widget-ticker", element)
     
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    
     speed       = options.speed ? 25
     toggleable  = options.toggleable == true
-    animated    = true
+    animated    = cache.get(cache_key) ? true
     
     url_constructor = options.url if options.url and _.isFunction(options.url)
 
@@ -129,6 +134,7 @@ widget = (element, params, options = {}) ->
         screens = $("ul", element)
         animated = not screens.is(":animated")
         if screens.is(":animated") then screens.stop() else animate()
+        cache.set cache_key, animated
 
 
     $.when(fetch_filters(), fetch_columns()).then (filters, columns) ->
