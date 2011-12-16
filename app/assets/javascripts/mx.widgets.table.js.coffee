@@ -198,6 +198,8 @@ widget = (element, engine, market, params, options = {}) ->
             activate_row $(event.currentTarget)
         
         element.on 'click', 'a', (event) ->
+            row = $(event.currentTarget).closest("tr.row")
+            return event.preventDefault() unless row.hasClass("current")
             event.stopPropagation()
         
     
