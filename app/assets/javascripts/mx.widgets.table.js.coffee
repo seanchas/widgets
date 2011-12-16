@@ -224,7 +224,9 @@ widget = (element, engine, market, params, options = {}) ->
             
             current_row_key = $("tr.row.current", old_table).data('key') || current_row_key
             
-            for record in data
+            records_size = _.size(data)
+            
+            for record, record_index in data
                 [engine, market] = [record['ENGINE'], record['MARKET']]
                 
                 _filters    = filters["#{engine}:#{market}"][filter_name]
@@ -236,6 +238,10 @@ widget = (element, engine, market, params, options = {}) ->
                 
                 row = $("<tr>")
                     .addClass("row")
+                    .toggleClass('first',   record_index       == 0)
+                    .toggleClass('last',    (record_index + 1) == records_size)
+                    .toggleClass('even',    (record_index + 1) %  2 == 0)
+                    .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
                 
