@@ -13,6 +13,7 @@
 ##= require mx.widgets.turnovers
 ##= require mx.widgets.ticker
 ##= require mx.widgets.indices
+##= require mx.widgets.shares
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

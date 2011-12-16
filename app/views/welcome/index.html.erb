@@ -1,6 +1,9 @@
 <div id="main_indices">
 </div>
 
+<div id="main_shares">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -242,6 +245,10 @@
             });
             
             mx.widgets.indices('#main_indices', {
+                refresh_timeout: 60 * 1000
+            });
+
+            mx.widgets.shares('#main_shares', {
                 refresh_timeout: 60 * 1000
             });
 
