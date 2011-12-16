@@ -1,0 +1,57 @@
+.table_container {
+    border-top: 1px solid #ccc;
+    padding: 1px 5px 0;
+    margin: 0 0 10px;
+    
+    h2 {
+        background-image: -webkit-linear-gradient(top, #e7e7e7, #fff);
+        font-size: 14px;
+        margin: 0 -5px 5px;
+        padding: .25em 10px;
+    }
+    
+}
+
+table.mx-widget-table {
+	background-color: #fff;
+	border-collapse: collapse;
+	border-spacing: 0;
+	font: {
+		family: arial, verdana, tahoma, sans-serif;
+		size: 12px;
+	}
+	width: 100%;
+	
+
+	tr.even td {
+		background: #f0f0f0;
+	}
+
+	
+	td {
+ 		padding: 5px;
+		vertical-align: bottom;
+		white-space: nowrap;
+	}
+	
+	td.last {
+		padding-right: 5px;
+	}
+	
+	td.number {
+		text-align: right;
+	}
+	
+	td.time {
+		@extend td.number;
+		color: #888;
+		font-size: 10px;
+	}
+	
+	tr.chart {
+	    td {
+	        padding: 0;
+	    }
+	}
+	
+}

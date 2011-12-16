@@ -1,0 +1,210 @@
+<h1>Widgets.js</h1>
+
+
+<pre>
+&lt;link href="http://assets.beta.micex.ru/widgets/assets/examples.css" media="screen" rel="stylesheet" type="text/css" /&gt;
+&lt;script src="http://assets.beta.micex.ru/widgets/assets/mx.widget.js" type="text/javascript"&gt;&lt;/script&gt;
+</pre>
+
+
+<p>
+    <b class="header">chart</b>
+</p>
+
+
+<p>
+    <div id="chart_1" class="widget">
+        
+    </div>
+</p>
+
+
+<p>
+    <b class="header">table</b>
+    <code>mx.widget.table(element, engine, market, params, [options]);</code>
+    <br />
+    <br />
+    <b>element</b> &mdash; jQuery object | jQuery selector | DOM Node
+    <br />
+    <b>engine</b> &mdash; Торговая система <i>(stock | futures | ...)</i>
+    <br />
+    <b>market</b> &mdash; Рынок <i>(index | forts | ...)</i>
+    <br />
+    <b>params</b> &mdash; Список инструментов для поиска
+    <br />
+    <br />
+    <b>options</b> &mdash; Дополнительные параметры:
+    <br />
+    <i>cache</i> &ndash; <i>(true | false)</i> Кешировать виджет между запросами
+    <br />
+    <i>chart</i> &ndash; <i>(true | false | String)</i> Показывать график внутри виджета.
+    В случае строки в формате "BOARDID:SECID" будет найден и открыт инструмент по-умолчанию.
+    <br />
+    <i>sortBy</i> &ndash; <i>function(params, record)</i> Вес записи для сортировки
+    <br />
+    <i>params_name</i> &ndash; Наименование параметра для запроса в ISS. По-умолчанию — securities
+    <br />
+    <i>chart_options</i> &ndash; <i>hash</i> width - ширина виджета (по-умолчанию ширина контейнера); height - высота виджета (по-умолчанию половина ширины); proportions - ширина виджета к его высоте.
+    <br />
+    <i>nearest</i> &ndash; <i>(1 | 0)</i> Выбирать актуальные инструменты (для фьючерсов)
+    <br />
+    <i>leaders</i> &ndash; <i>(1 | 0)</i> Выбирать 5 первых инструментов (опционы)
+</p>
+
+<h2>Примеры</h2>
+
+<p>
+    <div id="shares_1" class="widget">
+    </div>
+</p>
+
+<h6>HTML</h6>
+<pre>
+&lt;div id="shares_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
+<pre>
+mx.widgets.table('#shares_1', 'stock', 'shares', [
+	'EQNE:GAZP',
+	'EQNL:ROSN',
+	'EQBR:LKOH',
+	'EQNL:VTBR',
+	'EQBR:HYDR'
+], {
+    chart: 'EQNL:ROSN',
+    chart_options: {
+        proportions: 4 / 1
+    }
+});
+</pre>
+
+<p>
+    <div id="shares_2" class="widget">
+    </div>
+</p>
+
+<h6>HTML</h6>
+<pre>
+&lt;div id="shares_2" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
+<pre>
+function sortBy_BOARDID_SECID(params, record) {
+	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+}
+
+mx.widgets.table('#shares_2', 'stock', 'shares', [
+	'EQNE:GAZP',
+	'EQNL:ROSN',
+	'EQBR:LKOH',
+	'EQNL:VTBR',
+	'EQBR:HYDR'
+], {
+    sortBy: sortBy_BOARDID_SECID
+});
+</pre>
+
+<p>
+    <div id="futures_1" class="widget">
+    </div>
+</p>
+
+<h6>HTML</h6>
+<pre>
+&lt;div id="futures_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
+<pre>
+function sortBy_SECTYPE(params, record) {
+	return params.indexOf(record['SECTYPE']);
+}
+
+mx.widgets.table('#futures_1', 'futures', 'forts', [
+    'RI',
+    'MX',
+    'SR',
+    'Si',
+    'GD'
+], {
+    params_name: 'sectypes',
+    nearest: 1,
+    sortBy: sortBy_SECTYPE
+});
+</pre>
+
+<p>
+    <div id="options_1" class="widget">
+    </div>
+</p>
+
+<h6>HTML</h6>
+<pre>
+&lt;div id="options_1" class="widget"&gt;&lt;/div&gt;
+</pre>
+
+<h6>JS</h6>
+<pre>
+mx.widgets.table('#options_1', 'futures', 'options', [
+], {
+    leaders: 1
+});
+</pre>
+
+<script type="text/javascript" charset="utf-8">
+    $(function() {
+        function sortBy_BOARDID_SECID(params, record) {
+        	return params.indexOf([record['BOARDID'], record['SECID']].join(':'));
+        }
+
+		function sortBy_SECTYPE(params, record) {
+			return params.indexOf(record['SECTYPE']);
+		}
+
+        mx.widgets.table('#shares_1', 'stock', 'shares', [
+    		'EQNE:GAZP',
+    		'EQNL:ROSN',
+    		'EQBR:LKOH',
+    		'EQNL:VTBR',
+    		'EQBR:HYDR'
+        ], {
+            chart: 'EQNL:ROSN',
+            chart_options: {
+                proportions: 4 / 1
+            }
+        });
+
+        mx.widgets.table('#shares_2', 'stock', 'shares', [
+    		'EQNE:GAZP',
+    		'EQNL:ROSN',
+    		'EQBR:LKOH',
+    		'EQNL:VTBR',
+    		'EQBR:HYDR'
+        ], {
+            sortBy: sortBy_BOARDID_SECID
+        });
+
+        mx.widgets.table('#futures_1', 'futures', 'forts', [
+            'RI',
+        	'MX',
+        	'SR',
+        	'Si',
+        	'GD'
+        ], {
+            params_name: 'sectypes',
+            nearest: 1,
+        	sortBy: sortBy_SECTYPE
+        });
+
+        mx.widgets.table('#options_1', 'futures', 'options', [
+        ], {
+            leaders: 1
+        });
+        
+        mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
+            compare: 'stock:index:RTSI'
+        });
+    })
+</script>

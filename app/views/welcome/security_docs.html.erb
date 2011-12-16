@@ -1,0 +1,94 @@
+<h1>mx.security</h1>
+
+<h2>.digest()</h2>
+
+<div class="details">
+    <p class="description">
+        <strong>Описание:</strong>
+        Выводит виджет с дайджестом по инструменту.
+    </p>
+    
+    <ul class="signatures">
+        <li>
+            <h4>
+               .digest( element, engine, market, board, param, options ) 
+            </h4>
+            <p>
+                <strong>element</strong>
+                DOM-element или объект jQuery или строка, содержащая селектор jQuery.
+            </p>
+            <p>
+                <strong>engine</strong>
+                Торговая система
+            </p>
+            <p>
+                <strong>market</strong>
+                Рынок
+            </p>
+            <p>
+                <strong>board</strong>
+                Режим торгов
+            </p>
+            <p>
+                <strong>param</strong>
+                Идентификатор инструмента
+            </p>
+            <p>
+                <strong>options</strong>
+                Дополнительные параметры
+            </p>
+            <div class="options">
+                <h5>
+                    refresh_timeout
+                    <span class="type">Number</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    60 * 1000
+                </div>
+                <p>
+                    Время в миллисекундах между обновлениями виджета
+                </p>
+
+                <h5>
+                    cache
+                    <span class="type">Boolean, Number</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    false
+                </div>
+                <p>
+                    Кеширование виджета между запросами в localStorage браузера.
+                    <code>False</code> &mdash; не кешировать.
+                    <code>True</code> &mdash; кешировать навсегда.
+                    <code>Number</code> &mdash; кешировать на указанное количество миллисекунд.
+                </p>
+            </div>
+        </li>
+    </ul>
+    
+    <p class="about">
+        <div id="security_digest">
+        </div>
+    </p>
+</div>
+
+
+<%- content_for :title, "Security Docs" -%>
+
+<%- content_for :javascript do -%>
+
+<%= javascript_include_tag 'mx.security.js' %>
+
+<script type="text/javascript" charset="utf-8">
+    
+    $(function() {
+        
+        mx.security.digest($('#security_digest'), 'stock', 'shares', 'EQBR', 'AFLT', { refresh_timeout: 5 * 1000 });
+        
+    });
+    
+</script>
+
+<%- end -%>

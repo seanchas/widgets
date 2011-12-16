@@ -1,6 +1,254 @@
+<%= javascript_include_tag 'widget' %>
+<%= stylesheet_link_tag 'table' %>
+
+<style type="text/css" media="screen">
+	body {
+		margin: 0;
+	}
+</style>
+
+<table><tbody></tbody></table>
+
 <script type="text/javascript" charset="utf-8">
 	
 	!(function($, undefined) {
+
+		var _ = require('underscore');
+
+		var engine = '<%= raw params[:engine] %>';
+		var market = '<%= raw params[:market] %>';
+		var params = '<%= raw params[:params] %>'.split(',');
+		var locale = '<%= raw params[:locale] %>';
+		var filter = 'small';
+		
+		var cache = $.cache('widgets'), cache_expires_in = 5 * 60 * 1000;
+		
+		var cached_filters_key = ['filters', engine, market].join('/');
+		var cached_columns_key = ['columns', engine, market].join('/');
+		var cached_records_key = _.flatten(['records', engine, market, params]).join('/');
+		var cached_render_key = _.flatten(['render', engine, market, params]).join('/');
+
+		<%- if @filters -%>
+			var cached_filters = <%= raw @filters.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- else -%>
+			var cached_filters = cache.get(cached_filters_key);
+		<%- end -%>
+		
+		<%- if @columns -%>
+			var cached_columns = <%= raw @columns.to_json.gsub(/\\u([0-9a-z]{4})/) {|s| [$1.to_i(16)].pack("U")} %>;
+		<%- else -%>
+			var cached_columns = cache.get(cached_columns_key);
+		<%- end -%>
+		
+		var cached_records = cache.get(cached_records_key);
+		var cached_render = cache.get(cached_render_key);
+
+		var t = function(s, d) { for (var p in d) s = s.replace(new RegExp('{{' + p + '}}', 'g'), d[p]); return s; }
+		
+		var iss_merge = function(data) {
+			return _.map(data.data, function(record) {
+				return _.reduce(record, function(memo, value, index) {
+					return memo[data.columns[index]] = value, memo; 
+				}, {});
+			});
+		}
+		
+		var iss_prepare_filters = function(filters) {
+			return _.reduce(filters, function(memo, filter) {
+				return (memo[filter.filter_name] || (memo[filter.filter_name] = [])).push({ id: filter.id, name: filter.name }), memo;
+			}, {})[filter];
+		}
+
+		var iss_prepare_columns = function(target, source) {
+			return _.extend(
+				_.reduce(target, function(memo, record) { return memo[record.id] = record, memo; }, {}),
+				_.reduce(source, function(memo, record) { return memo[record.id] = record, memo; }, {})
+			);
+		}
+		
+		var iss_prepare_records = function(target, source) {
+			target = _.reduce(target, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			source = _.reduce(source, function(memo, record) { return memo[[record.BOARDID, record.SECID].join('/')] = record, memo; }, {})
+			return _.reduce(_.keys(target), function(memo, key) { return memo.push(_.extend(target[key], source[key])), memo; }, []);
+		}
+		
+		var iss_sort_records = function(records) {
+			return _.sortBy(records, function(record) {
+				return _.indexOf(params, [record.BOARDID, record.SECID].join('/'))
+			});
+		}
+		
+		var ds = {};
+		
+		// filters
+		
+		ds.filters = (function() {
+			
+			var defer = Q.defer();
+
+			if (cached_filters) {
+				defer.resolve(cached_filters)
+				return defer.promise;
+			}
+
+			function onComplete(json) {
+				defer.resolve(cache.set(cached_filters_key, iss_prepare_filters(iss_merge(json.filters)), cache_expires_in))
+			}
+
+			$.ajax({
+				url: 	t('/iss/engines/{{engine}}/markets/{{market}}/securities/columns/filters.json', {
+					engine: engine,
+					market: market
+				}),
+				method: 'get',
+				data: {
+					'iss.meta': 'off',
+					'iss.only': 'filters',
+					'lang': 	locale
+				},
+				complete: onComplete
+			});
+			
+			return defer.promise;
+			
+		})();
+		
+		// columns
+		
+		ds.columns = (function() {
+
+			var defer = Q.defer();
+			
+			if (cached_columns) {
+				defer.resolve(cached_columns)
+				return defer.promise;
+			}
+
+			function onComplete(json) {
+				defer.resolve(cache.set(cached_columns_key, iss_prepare_columns(iss_merge(json.securities), iss_merge(json.marketdata)), cache_expires_in));
+			}
+			
+			$.ajax({
+				url: 	t('/iss/engines/{{engine}}/markets/{{market}}/securities/columns.json', {
+					engine: engine,
+					market: market
+				}),
+				method: 'get',
+				data: 	{
+					'iss.meta': 'off',
+					'iss.only': 'marketdata,securities',
+					'lang': 	locale
+				},
+				complete: onComplete
+			});
+			
+			return defer.promise;
+
+		})();
+
+		// records
+		
+		ds.records = (function() {
+			
+			var defer = Q.defer();
+			
+			if (cached_records)
+				defer.resolve(cached_records);
+			
+			var memo = [];
+
+			var boards = _.reduce(params, function(memo, param) {
+				var parts = param.split('/'), board = _.first(parts), security = _.last(parts);
+				return (memo[board] || (memo[board] = [])).push(security), memo;
+			}, {});
+			
+			function onSuccess(json) {
+				Array.prototype.push.apply(memo, iss_prepare_records(iss_merge(json.securities), iss_merge(json.marketdata)))
+			}
+			
+			function onComplete() {
+				defer.resolve(cache.set(cached_records_key, iss_sort_records(memo)));
+			}
+			
+			onComplete = _.after(_.size(boards), onComplete);
+			
+			_.each(boards, function(securities, board) {
+				$.ajax({
+					url: 	t('/iss/engines/{{engine}}/markets/{{market}}/boards/{{board}}/securities.json', {
+						engine: engine,
+						market: market,
+						board: board
+					}),
+					method: 'get',
+					data: 	{
+						'iss.meta': 	'off',
+						'iss.only': 	'securities,marketdata',
+						'lang': 		locale,
+						'securities': 	securities.join(',')
+					},
+					success: 	onSuccess,
+					complete: 	onComplete
+				});
+			});
+			
+			return defer.promise;
+			
+		})();
+		
+		var visible_columns_ids = function() {
+			return _.pluck(ds.filters.valueOf(), 'id');
+		}
+		
+		visible_columns_ids = _.memoize(visible_columns_ids);
+		
+		var visible_columns = function() {
+			return _.map(visible_columns_ids(), function(id) {
+				return _.detect(ds.columns.valueOf(), function(column) {
+					return column.id == id;
+				});
+			});
+		}
+		
+		visible_columns = _.memoize(visible_columns);
+
+		function prepare_cell(cell, column) {
+			return {
+				value_for_render: cell || '&mdash;',
+				type: column.type
+			};
+		}
+		
+		function prepare_row(row) {
+			row.cells = _.map(visible_columns(), function(column) {
+				return prepare_cell(row[column.name], column);
+			});
+		}
+
+		function render_cell(cell, index, cells) {
+			return $('<td>')
+				.addClass(cell.type)
+				.toggleClass('first', index == 0)
+				.toggleClass('last', index == _.size(cells) - 1)
+				.html($('<span>').html(cell.value_for_render));
+		}
+
+		function render_row(row, index) {
+			return $('<tr>')
+				.addClass(index % 2 ? 'even' : 'odd')
+				.html(_.flatten(_.map(row.cells, render_cell)));
+		}
+		
+		function render() {
+			_.each(ds.records.valueOf(), prepare_row);
+			$('table > tbody').html(_.flatten(_.map(ds.records.valueOf(), render_row)));
+			cache.set(cached_render_key, $('table').html());
+		}
+
+		Q.join(ds.filters, ds.columns, ds.records, render);
+		
+		if (cached_render)
+			$('table').html(cached_render);
+
 	})(ender);
 	
 </script>

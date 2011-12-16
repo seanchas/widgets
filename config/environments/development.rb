@@ -27,4 +27,9 @@ Widgets::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+  
+  config.assets.prefix = '/widgets/assets'
+  
+  config.cache_store = :mem_cache_store, 'beta:11411', { :namespace => 'widgets' }
+
 end

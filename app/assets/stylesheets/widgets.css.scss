@@ -1,0 +1,87 @@
+.mx-widget-ticker {
+    background: #ccc;
+    font-size: 11px;
+    height: 3em;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    
+    ul {
+        line-height: 1em;
+		list-style: none;
+        margin: 0;
+        padding: 1em 0;
+        position: absolute;
+        
+        li {
+            display: inline;
+			margin: 0 10px;
+			padding: 0
+        }
+        
+        .last {
+            color: #669;
+            padding-left: 5px;
+        }
+
+        .change {
+            color: #666;
+            padding-left: 5px;
+        }
+        
+        .trend_up {
+            color: #060;
+        }
+
+        .trend_down {
+            color: #900;
+        }
+
+    }
+    
+}
+
+.mx-widget-ticker.loading {
+	background-image: image-url('facebook-ajax-loader.gif');
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.toggleable,
+.toggleable * {
+    cursor: pointer;
+}
+
+.mx-widget-turnovers {
+    border-collapse: collapse;
+    border-spacing: 0;
+    
+    font-size: 11px;
+    
+    margin: 2em 0 0;
+    width: 100%;
+    
+    td {
+        padding: 5px;
+        white-space: nowrap;
+    }
+    
+    td.title {
+        width: 100%;
+    }
+    
+    td.number {
+        padding-left: 25px;
+        text-align: right;
+    }
+    
+    thead {
+        
+        td {
+            background-color: #ccc;
+            font-weight: bold;
+        }
+        
+    }
+
+}

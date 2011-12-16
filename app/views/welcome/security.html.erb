@@ -1,0 +1,180 @@
+<%- content_for :chart do -%>
+    <div id="chart_container" class="widget">
+    </div>
+<%- end -%>
+
+<%- content_for :digest do -%>
+    <div id="digest_container" class="widget">
+    </div>
+<%- end -%>
+
+<%- content_for :left_column do -%>
+    <h2 data-target="description_container" style="display: none;">Параметры инструмента</h2>
+    <div id="description_container" class="widget">
+    </div>
+<%- end -%>
+
+<%- content_for :right_column do -%>
+    <h2 data-target="emitter_container" style="display: none;">Информация об эмитенте</h2>
+    <div id="emitter_container" class="widget">
+    </div>
+    
+    <h2 data-target="boards_container" style="display: none;">Режимы торгов</h2>
+    <div id="boards_container" class="widget">
+    </div>
+    
+    <h2 data-target="others_container" style="display: none;">Другие инструменты</h2>
+    <div id="others_container" class="widget">
+    </div>
+    
+<%- end -%>
+
+<%- content_for :sidebar do -%>
+    <h2 data-target="orderbook_container" style="display: none; vertical-align: baseline;">
+        Котировки
+        <span class="update" style=" color: #666; float: right; font-size: .75em; margin-top: .25em; font-weight: normal;"></span>
+    </h2>
+    <div id="orderbook_container">
+    </div>
+
+    <div id="delay" style="display: none;">
+        <p class="watch">
+            Данные хода торгов предоставляются с задержкой в 15 минут.
+        </p>
+        <p>
+            Регистрация и авторизованный доступ к платным информационным услугам осуществляется через <a href="http://passport.beta.micex.ru/services">passport.beta.micex.ru/services</a>
+        </p>
+    </div>
+<%- end -%>
+
+<%- content_for :script do -%>
+
+<script type="text/javascript" charset="utf-8">
+    
+    $(function() {
+        
+        var widgets = {
+
+            'digest': {
+                container: $('#digest_container'),
+                options: {
+                    refresh_timeout: 5 * 1000,
+                    cache: true
+                }
+            },
+            'chart': {
+                container: $('#chart_container'),
+                options: {}
+            },
+            'orderbook': {
+                container: $('#orderbook_container'),
+                options: {
+                    refresh_timeout: 5 * 1000,
+                    cache: true
+                }
+            },
+            
+            'description': {
+                container: $('#description_container'),
+                options: {
+                    url: function(engine, market, board, security) {
+                        return "#" + security;
+                    }
+                }
+            },
+            
+            'emitter': {
+                container: $('#emitter_container'),
+                options: {}
+            },
+            
+            'emitter_securities': {
+                container: $('#others_container'),
+                options: {
+                    url: function(engine, market, board, security) {
+                        return "#" + engine + ':' + market + ':' + board + ':' + security;
+                    }
+                }
+            },
+            
+            'boards': {
+                container: $('#boards_container'),
+                options: {
+                    url: function(engine, market, board, security) {
+                        return "#" + engine + ':' + market + ':' + board + ':' + security;
+                    }
+                }
+            }
+
+        }
+        
+        var markers = {};
+        
+        function render() {
+            var parts = window.location.hash.substr(1).split(":");
+            
+            $('[data-target]').hide();
+            $('#delay').hide();
+
+            if (_.size(parts) == 1) {
+                var param = parts[0];
+
+                mx.iss.boards(param).then(function(json) {
+                    if (_.size(json) > 0) {
+                        var board = _.first(json);
+                        window.location.hash = board.engine + ":" + board.market + ":" + board.boardid + ":" + board.secid;
+                    }
+                });
+                
+                return;
+            }
+
+            if (_.size(parts) == 4)
+                _.each(widgets, function(widget, key) {
+                    if (widget.instance && widget.instance.destroy)
+                        widget.instance.destroy();
+
+                    widget.instance = mx.security[key](widget.container, parts[0], parts[1], parts[2], parts[3], widget.options)
+                });
+        }
+        
+        render();
+        
+        
+        function title(element) {
+            return $('[data-target=' + element.attr('id') + ']');
+        }
+        
+        function show_title(element) {
+            title(element).show();
+        }
+        
+        function hide_title(element) {
+            title(element).hide();
+        }
+        
+        function checkMarkers() {
+            $('#delay')[_.include(_.values(markers), 'denied') ? 'show' : 'hide']();
+        }
+        
+        
+        $(window).on('hashchange', render);
+        
+
+        $(window).on('render', function(event, memo) {
+            element = $(event.target);
+
+            memo.status == 'success' ? show_title(element) : hide_title(element);
+
+            if (memo.iss && memo.iss.headers)
+                markers[element.attr('id')] = memo.iss.headers['X-MicexPassport-Marker']
+                
+            checkMarkers();
+        });
+
+
+    });
+    
+</script>
+
+<%- end -%>

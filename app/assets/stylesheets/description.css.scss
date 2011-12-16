@@ -1,0 +1,26 @@
+table.mx-widget-description {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+
+    th,
+    td {
+        padding: 2px 0;
+    }
+
+    th {
+        color: #333;
+        font-weight: normal;
+        padding-right: 10px;
+        text-align: left;
+    }
+
+    tr.divider {
+        
+        td {
+            border-bottom: 1px solid #ccc;
+        }
+        
+    }
+
+}

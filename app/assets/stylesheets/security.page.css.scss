@@ -1,0 +1,400 @@
+$width:         1000px;
+$content_width: 735px;
+$sidebar_width: 240px;
+$column_width:  354px;
+
+// page layout
+
+html {
+    background-color: #fff;
+    margin: 0 auto;
+    padding: 0;
+}
+
+body {
+    @extend html;
+    font: {
+        family: tahoma, verdana, arial, sans-serif;
+        size: 12px;
+    }
+    width: $width;
+}
+
+// content layout
+
+#page {
+    
+    overflow: hidden;
+    
+    .digest {
+        margin: 10px 0;
+        padding: 5px 0;
+    }
+    
+    .content {
+
+        float: left;
+        overflow: hidden;
+        width: $content_width;
+
+        .chart {
+        }
+        
+        .left_column,
+        .right_column {
+            border-right: 1px solid #ccc;
+            margin-top: 20px;
+            margin-bottom: -1000px;
+            padding-bottom: 1000px;
+            width: $column_width;
+        }
+        
+        .left_column {
+            float: left;
+        }
+        
+        .right_column {
+            float: right;
+        }
+
+    }
+    
+    .sidebar {
+        float: right;
+        width: $sidebar_width;
+    }
+    
+    
+}
+
+// typographics
+
+h2 {
+    border-bottom: 3px solid #a0a0a0;
+    color: #4d4d4d;
+    font-size: 1.2em;
+    margin: .5em 0 .25em;
+    padding-bottom: .25em;
+}
+
+a {
+    color: #235673;
+}
+
+a:hover {
+    color: #992323;
+}
+
+// widgets
+
+ul.mx-security-digest {
+    
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    
+    li {
+        display: inline-block;
+        margin: 0 40px 0 0;
+        padding: 0;
+        vertical-align: top;
+        
+        label {
+            color: #666;
+            margin-right: 5px;
+        }
+    }
+    
+    li.last {
+        font-size: 200%;
+        margin-right: 5px;
+    }
+    
+    span.trend_up,
+    span.trend_down,
+    span.trend_none {
+        font-size: 125%;
+    }
+    
+    span.trend_up {
+        color: #090;
+    }
+    
+    span.trend_down {
+        color: #c00;
+    }
+    
+    span.trend_none {
+        color: #666;
+    }
+
+}
+
+
+.mx-security-orderbook {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    
+    margin-bottom: 3em;
+    
+    width: 100%;
+
+    thead {
+        td {
+            color: #666;
+        }
+        
+        td.buy {
+            text-align: left;
+        }
+        
+        td.sell {
+            text-align: right;
+        }
+    }
+    
+    tbody td {
+        padding: 7px 0;
+        white-space: nowrap;
+        
+    }
+    
+    tr.buy td {
+        border-bottom: 1px solid #eeeeee;
+    }
+    
+    tr.sell td {
+        border-top: 1px solid #eeeeee;
+    }
+    
+    td.buy,
+    td.sell {
+        text-align: right;
+    }
+    
+    td.buy_bar,
+    td.sell_bar {
+        width: 50%;
+        
+        padding: 7px 5px;
+        
+        span {
+            background: #ccc;
+            display: block;
+            font-size: .5em;
+            padding: 0;
+        }
+        
+    }
+    
+    td.buy_bar span {
+        background: #01c525;
+        float: right;
+    }
+    
+    td.sell_bar span {
+        background: #ec2a04;
+        float: left;
+    }
+    
+}
+
+ul.mx-security-chart-periods {
+    background-color: #e7e7e7;
+    font-size: .9em;
+    margin: 20px 0 0;
+    overflow: hidden;
+    padding: 3px 5px 0;
+
+    li {
+        float: left;
+        list-style: none;
+        margin: 0;
+        padding: 2px 5px 6px;
+    }
+
+    li.current {
+        background-color: #fff;
+        
+        a {
+            color: #000;
+            cursor: text;
+            text-decoration: none;
+        }
+    }
+    
+    position: relative;
+    z-index: 2;
+
+}
+
+.mx-security-chart-container {
+    height: 400px;
+    margin-top: -1px;
+    z-index: 1;
+}
+
+.mx-security-description {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+            vertical-align: top;
+        }
+        
+        td {
+            padding-right: 10px;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+        }
+        
+        tr.divider td {
+            background: #ccc;
+            height: 2px;
+            padding: 0;
+        }
+    }
+    
+}
+
+
+.mx-security-emitter {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    thead {
+        td {
+            font-weight: bold;
+        }
+        
+    }
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+        }
+    }
+    
+}
+
+
+.mx-security-boards {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+        
+        td {
+            padding-right: 10px;
+            text-align: right;
+            vertical-align: top;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+        }
+        
+        tr.current th a {
+            color: #4d4d4d;
+            cursor: text;
+            text-decoration: none;
+        }
+    }
+    
+}
+
+
+.mx-security-emitter-securities {
+    
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+    
+    tbody {
+        
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            padding: 7px 0;
+            vertical-align: top;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+        
+        td {
+            padding-right: 10px;
+            padding-left: 10px;
+            text-align: left;
+        }
+
+        th {
+            color: #666;
+            font-weight: normal;
+            text-align: left;
+            white-space: nowrap;
+        }
+        
+    }
+    
+}
+
+p.watch {
+    background: url('http://www.beta.micex.ru/images/icon_delay_watch.gif') no-repeat left center;
+    padding-left: 20px;
+}
