@@ -31,6 +31,8 @@ widget = (element, options = {}) ->
     
     columns_data_source = mx.iss.columns('stock', 'shares')
     
+    options.url = $.noop unless options.url and _.isFunction(options.url);
+    
     $.when(columns_data_source).then (columns) ->
         
         filtered_columns = _.reduce filter, (memo, name) ->
@@ -52,19 +54,19 @@ widget = (element, options = {}) ->
             
             records_size = _.size(records)
             
-            for record, index in records
+            for record in records
                 row = $("<tr>")
-                    .toggleClass('first',   0 == index)
-                    .toggleClass('last',    records_size - 1 == index)
-                    .toggleClass('even',    (index + 1) % 2 == 0)
-                    .toggleClass('odd',     (index + 1) % 2 == 1)
                     .attr({ 'data-key': "#{record.BOARDID}:#{record.SECID}" })
                 
-                for column in filtered_columns
+                for column, index in filtered_columns
                     cell = $("<td>")
                         .addClass(column.type)
                         .html(mx.utils.render(record[column.name], column) or whitespace)
                     
+                    if index == 0
+                        url = options.url(record.ENGINE, record.MARKET, record.BOARDID, record.SECID)
+                        cell.html $("<a>").attr('href', url).html(cell.html()) if url?
+
                     if trend = record.trends[column.name]
                         prefix = if column.trend_by == column.id then 'trend' else 'trending'
                         cell.addClass prefix + if trend > 0 then '_up' else if trend < 0 then '_down' else '_none'
@@ -73,6 +75,13 @@ widget = (element, options = {}) ->
                 
                 table_body.append row
         
+            rows = $("tr", table_body)
+
+            rows.filter(":first").addClass("first")
+            rows.filter(":last").addClass("last")
+            rows.filter(":even").addClass("even")
+            rows.filter(":odd").addClass("odd")
+
             element.empty().html table
             
             cache.set cache_key, element.html()
@@ -88,6 +97,8 @@ widget = (element, options = {}) ->
                 if records? and _.size(records) > 0
                     
                     records = _.sortBy records, (record) ->
+                        record.ENGINE = 'stock'
+                        record.MARKET = 'shares'
                         mx.utils.process_record record, columns
                         _.indexOf params, "#{record.BOARDID}:#{record.SECID}"
                     
