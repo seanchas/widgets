@@ -28,6 +28,8 @@ widget = (element, options = {}) ->
 
     columns_data_source = mx.iss.columns('stock', 'index')
     
+    options.url = $.noop unless options.url and _.isFunction(options.url);
+    
     element.html cache.get cache_key
     
     $.when(columns_data_source).then (columns) ->
@@ -52,8 +54,12 @@ widget = (element, options = {}) ->
             for record in records
                 row = $("<tr>")
                 
-                for column in filtered_columns
+                for column, index in filtered_columns
                     cell = $("<td>").addClass(column.type).html(mx.utils.render(record[column.name], column) || whitespace)
+                    
+                    if index == 0
+                        url = options.url(record.ENGINE, record.MARKET, record.BOARDID, record.SECID)
+                        cell.html $("<a>").attr('href', url).html(cell.html()) if url?
                     
                     if column.trend_by == column.id and trend = record.trends[column.name]
                         cell.addClass if trend > 0 then 'trend_up' else if trend < 0 then 'trend_down' else 'trend_none'
@@ -62,6 +68,14 @@ widget = (element, options = {}) ->
                     
                 
                 table_body.append row
+            
+
+            rows = $("tr", table_body)
+
+            rows.filter(":first").addClass("first")
+            rows.filter(":last").addClass("last")
+            rows.filter(":even").addClass("even")
+            rows.filter(":odd").addClass("odd")
                 
             
             element.empty().html table
@@ -85,6 +99,8 @@ widget = (element, options = {}) ->
                         _.indexOf params, "#{record.BOARDID}:#{record.SECID}"
                 
                     for record in records
+                        record.ENGINE = 'stock'
+                        record.MARKET = 'index'
                         mx.utils.process_record record, columns, true
                 
                     render records
