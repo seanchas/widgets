@@ -70,7 +70,10 @@
                 container: $('#orderbook_container'),
                 options: {
                     refresh_timeout: 5 * 1000,
-                    cache: true
+                    cache: true,
+                    afterRender: function(time) {
+                        console.log(time);
+                    }
                 }
             },
             
@@ -121,7 +124,7 @@
 
                 mx.iss.boards(param).then(function(json) {
                     if (_.size(json) > 0) {
-                        var board = _.first(json);
+                        var board = _.first(_.select(json, function(board) { return board.is_traded == 1; }));
                         window.location.hash = board.engine + ":" + board.market + ":" + board.boardid + ":" + board.secid;
                     }
                 });
