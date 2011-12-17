@@ -248,10 +248,16 @@
             });
             
             mx.widgets.indices('#main_indices', {
+                url: function(engine, market, board, security) {
+                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
+                },
                 refresh_timeout: 60 * 1000
             });
 
             mx.widgets.shares('#main_shares', {
+                url: function(engine, market, board, security) {
+                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
+                },
                 refresh_timeout: 60 * 1000
             });
 
