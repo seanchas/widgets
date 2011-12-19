@@ -316,56 +316,65 @@ widget = (element) ->
 	element = $(element)
 	return if _.size(element) == 0
     
+	chart = new Highcharts.StockChart
+		chart:
+            renderTo: element[0]
+            alignTicks: false
+            width: 300
+            height: 150
+        
+        loading:
+            hideDuration: 250
+            labelStyle:
+                top: '50px'
+            
+        credits:
+            enabled: false
+                
+        rangeSelector:
+            enabled: false
+                
+        navigator:
+            enabled: false
+                
+        scrollbar:
+            enabled: false
+                
+        tooltip:
+            style:
+                padding: '10px'
+            formatter: ->
+                "<strong>#{mx.utils.render _.first(@points).y, { type: 'number', precision: 2 }}</strong><br />"
+                
+        series: [
+            data: []
+            type: 'area'
+            threshold: null
+            fillOpacity: .5
+            tooltip:
+                yDecimals: 2
+        ]
+                
+        yAxis:
+            tickPixelInterval: 35
+            labels:
+                style:
+                    fontSize: '9px'
+                
+        xAxis:
+            tickPixelInterval: 55
+            labels:
+                style:
+                    fontSize: '9px'
+
+	chart.showLoading()
+
 	mx.iss.defaults().then (json) ->
 		defaults ?= json
 
 		loader("SNDX:MICEXINDEXCF").then (json) ->
-			
-			new Highcharts.StockChart
-				chart:
-                    renderTo: element[0]
-                    alignTicks: false
-                    width: 300
-                    height: 150
-
-                credits:
-                    enabled: false
-                
-                rangeSelector:
-                    enabled: false
-                
-                navigator:
-                    enabled: false
-                
-                scrollbar:
-                    enabled: false
-                
-                tooltip:
-                    style:
-                        padding: '10px'
-                    formatter: ->
-                        "<strong>#{mx.utils.render _.first(@points).y, { type: 'number', precision: 2 }}</strong><br />"
-                
-                series: [
-                    data: _.first(_.first(json)).data
-                    type: 'area'
-                    threshold: null
-                    fillOpacity: .5
-                    tooltip:
-                        yDecimals: 2
-                ]
-                
-                yAxis:
-                    tickPixelInterval: 35
-                    labels:
-                        style:
-                            fontSize: '9px'
-                
-                xAxis:
-                    tickPixelInterval: 55
-                    labels:
-                        style:
-                            fontSize: '9px'
+			_.first(chart.series).setData(_.first(_.first(json)).data, true)
+			chart.hideLoading()
             
             
 		
@@ -382,5 +391,6 @@ Highcharts.setOptions({
         months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
         shortMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
         weekdays: ['Воскресение', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+        loading: "Подождите..."
     }
 });
