@@ -84,6 +84,28 @@ request_meta =
         key: (engine, market, board, param) ->
             [engine, market, board, param]
     
+    boards:
+        url: (param) ->
+            "#{iss_host}/securities/#{param}.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'boards'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.boards)
+        key: (param) ->
+            [param]
+    
+    turnovers:
+        url: (engine) ->
+            "#{iss_host}/#{if engine? then 'engines/' + engine + '/' else ''}turnovers.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'turnovers'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.turnovers)
+        key: (engine) ->
+            [engine]
+    
     security_indices:
         url: (param) ->
             "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
@@ -204,24 +226,6 @@ records = (engine, market, params, options = {}) ->
     deferred.promise()
 
 
-boards = (param) ->
-    deferred = $.Deferred()
-
-    data = 
-        'iss.meta': 'off'
-        'iss.only': 'boards'
-
-    $.ajax
-        url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
-        data: data
-        dataType: 'jsonp'
-        scriptCharset: 'utf-8'
-    .then (json) ->
-        deferred.resolve iss_merge_columns_and_data(json?.boards)
-
-    deferred.promise()
-
-
 emitter = (param) ->
     deferred = $.Deferred()
     
@@ -302,10 +306,10 @@ _.extend scope,
     index_securities:   (args...) -> request('index_securities', args...)
     orderbook:          (args...) -> request('orderbook', args...)
     description:        (args...) -> request('description', args...)
-    boards:             boards
+    boards:             (args...) -> request('boards', args...)
     emitter:            emitter
     emitter_securities: emitter_securities
-    turnovers:          turnovers
+    turnovers:          (args...) -> request('turnovers', args...)
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization', args...)
