@@ -154,9 +154,9 @@ request = (name, args...) ->
     $.ajax
         url: meta.url(args...)
         data: meta.data(args...)
-        dataType: 'jsonp',
-        cache: true,
-        jsonpCallback: "callback_#{key}"
+        dataType: 'jsonp'
+        jsonpCallback: "iss_jsonp_#{key}"
+        cache: true
     .done (json) ->
         cache[key].resolve meta.parse(json)
     
