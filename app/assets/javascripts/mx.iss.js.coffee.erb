@@ -229,6 +229,8 @@ records = (engine, market, params, options = {}) ->
 emitter = (param) ->
     deferred = $.Deferred()
     
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter', arguments...])
+    
     data =
         'iss.meta': 'off'
         'iss.only': 'emitter'
@@ -237,6 +239,8 @@ emitter = (param) ->
         url: "#{iss_host}/emitters/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve _.first(iss_merge_columns_and_data(json?.emitter))
@@ -247,6 +251,8 @@ emitter = (param) ->
 emitter_securities = (param) ->
     deferred = $.Deferred()
     
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter_securities', arguments...])
+
     data =
         'iss.meta': 'off'
         'iss.only': 'securities'
@@ -255,33 +261,19 @@ emitter_securities = (param) ->
         url: "#{iss_host}/emitters/#{param}/securities.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.securities)
     
     deferred.promise()
 
-
-turnovers = (engine) ->
-    deferred = new $.Deferred
-    
-    data =
-        'iss.meta': 'off'
-        'iss.only': 'turnovers'
-    
-    $.ajax
-        url: "#{iss_host}/#{if engine? then 'engines/' + engine + '/' else ''}turnovers.jsonp?callback=?"
-        data: data
-        dataType: 'jsonp'
-        scriptCharset: 'utf-8'
-    .then (json) ->
-        deferred.resolve iss_merge_columns_and_data(json?.turnovers)
-    
-    deferred.promise()
-
 candle_borders = (engine, market, param) ->
     deferred = new $.Deferred
     
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['candle_borders', arguments...])
+
     data =
         'iss.meta': 'off'
         'iss.only': 'borders'
@@ -290,6 +282,8 @@ candle_borders = (engine, market, param) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/candleborders.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.borders)
