@@ -244,7 +244,7 @@ widget = (element, engine, market, params, options = {}) ->
                     .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
-                
+                    
                 for field, index in _filters
 
                     column  = _columns[field.id]

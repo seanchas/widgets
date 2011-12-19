@@ -122,7 +122,7 @@ request = (name, args...) ->
     meta    = request_meta[name]
     key     = mx.utils.sha1 JSON.stringify [name, meta.key(args...)]
     options = mx.utils.extract_options(args)
-
+    
     if cache[key]?
         return cache[key].promise() if cache[key].state() == 'pending'
         return cache[key].promise() unless options.force == true
@@ -132,7 +132,9 @@ request = (name, args...) ->
     $.ajax
         url: meta.url(args...)
         data: meta.data(args...)
-        dataType: 'jsonp'
+        dataType: 'jsonp',
+        cache: true,
+        jsonpCallback: "callback_#{key}"
     .done (json) ->
         cache[key].resolve meta.parse(json)
     
@@ -170,6 +172,8 @@ iss_prepare_records = (securities, marketdata) ->
 records = (engine, market, params, options = {}) ->
     deferred = $.Deferred();
 
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['records', _.toArray(arguments)])
+
     known_keys = ['nearest', 'leaders']
 
     params_name = options.params_name || 'securities'
@@ -191,6 +195,8 @@ records = (engine, market, params, options = {}) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        cache: true
+        jsonpCallback: "callback_#{key}"
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
