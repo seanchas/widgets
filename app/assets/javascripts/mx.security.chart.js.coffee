@@ -261,7 +261,7 @@ l2u = (milliseconds) ->
 u2l = (milliseconds) ->
     milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
 
-cs_host = "http://www.micex.ru/cs"
+cs_host = "http://www.beta.micex.ru/cs"
 
 defaults = undefined
 
@@ -289,7 +289,7 @@ loader = (param) ->
 	deferred = new $.Deferred
 	
 	$.ajax
-		url: "#{cs_host}/engines/#{engine.name}/markets/#{market.market_name}/boardgroups/#{board_group.board_group_id}/securities/#{security}.json?callback=?&interval=1&candles=540"
+		url: "#{cs_host}/engines/#{engine.name}/markets/#{market.market_name}/boardgroups/#{board_group.board_group_id}/securities/#{security}.json?callback=?&interval=1&candles=720"
 		dataType: "jsonp"
 		cache: true
 	.then (json) ->
@@ -341,11 +341,8 @@ widget = (element) ->
             enabled: false
                 
         tooltip:
-            style:
-                padding: '10px'
-            formatter: ->
-                "<strong>#{mx.utils.render _.first(@points).y, { type: 'number', precision: 2 }}</strong><br />"
-                
+            enabled: false
+        
         series: [
             data: []
             type: 'area'
@@ -353,16 +350,18 @@ widget = (element) ->
             fillOpacity: .5
             tooltip:
                 yDecimals: 2
+            enableMouseTracking: false
+            shadow: true
         ]
                 
         yAxis:
-            tickPixelInterval: 35
+            tickPixelInterval: 50
             labels:
                 style:
                     fontSize: '9px'
                 
         xAxis:
-            tickPixelInterval: 55
+            tickPixelInterval: 40
             labels:
                 style:
                     fontSize: '9px'
