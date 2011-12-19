@@ -13,10 +13,14 @@ $ = jQuery
 data = (engine, market, param, options = {}) ->
     deferred = new $.Deferred
     
+    key = mx.utils.sha1 JSON.stringify ['chart', arguments...]
+    
     $.ajax
         url: "#{cs_host}/engines/#{engine}/markets/#{market}/securities/#{param}.json?callback=?"
         data: options
         dataType: 'jsonp'
+        jsonpCallback: "callback_#{key}"
+        cache: true
     .then (json) ->
         deferred.resolve json
     
