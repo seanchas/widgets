@@ -12,6 +12,7 @@ $ = jQuery
 
 cache = kizzy('security/chart')
 
+###
 
 periods =
     day:
@@ -127,12 +128,6 @@ process_borders = (borders) ->
         memo
     , {}
 
-
-l2u = (milliseconds) ->
-    milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
-
-u2l = (milliseconds) ->
-    milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
 
 
 tonight = ->
@@ -258,7 +253,124 @@ widget = (element, engine, market, board, param, options = {}) ->
     {
         destroy: destroy
     }
+###
 
+l2u = (milliseconds) ->
+    milliseconds - (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
+
+u2l = (milliseconds) ->
+    milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
+
+cs_host = "http://www.micex.ru/cs"
+
+defaults = undefined
+
+loader = (param) ->
+	[board, security] = param.split(":")
+	
+	return {} unless security?
+	
+	board = _.first(b for b in defaults.boards when board == b.boardid)
+	
+	return {} unless board?
+	
+	board_group = _.first(g for g in defaults.boardgroups when g.board_group_id == board.board_group_id)
+	
+	return {} unless board_group?
+
+	market = _.first(m for m in defaults.markets when m.market_id == board_group.market_id)
+	
+	return {} unless market?
+	
+	engine = _.first(e for e in defaults.engines when e.id == market.trade_engine_id)
+	
+	return {} unless engine?
+	
+	deferred = new $.Deferred
+	
+	$.ajax
+		url: "#{cs_host}/engines/#{engine.name}/markets/#{market.market_name}/boardgroups/#{board_group.board_group_id}/securities/#{security}.json?callback=?&interval=1&candles=540"
+		dataType: "jsonp"
+		cache: true
+	.then (json) ->
+		result = []
+		
+		for zone in json.zones
+			result.push([])
+			_serie_result = _.last(result)
+			for serie in zone.series
+				_serie_result.push({ data: [], type: serie.type })
+				_candle_result = _.last(_serie_result)
+				for candle in serie.candles
+					_candle_result.data.push switch _candle_result.type
+						when 'line' then [l2u(candle.open_time), candle.value]
+						when 'bar'	then [l2u(candle.close_time), candle.value]
+		
+		deferred.resolve(result)
+	
+	deferred.promise()
+
+
+widget = (element) ->
+	
+	element = $(element)
+	return if _.size(element) == 0
+    
+	mx.iss.defaults().then (json) ->
+		defaults ?= json
+
+		loader("SNDX:MICEXINDEXCF").then (json) ->
+			
+			new Highcharts.StockChart
+				chart:
+                    renderTo: element[0]
+                    alignTicks: false
+                    width: 300
+                    height: 150
+
+                credits:
+                    enabled: false
+                
+                rangeSelector:
+                    enabled: false
+                
+                navigator:
+                    enabled: false
+                
+                scrollbar:
+                    enabled: false
+                
+                tooltip:
+                    style:
+                        padding: '10px'
+                    formatter: ->
+                        "<strong>#{mx.utils.render _.first(@points).y, { type: 'number', precision: 2 }}</strong><br />"
+                
+                series: [
+                    data: _.first(_.first(json)).data
+                    type: 'area'
+                    threshold: null
+                    fillOpacity: .5
+                    tooltip:
+                        yDecimals: 2
+                ]
+                
+                yAxis:
+                    tickPixelInterval: 35
+                    labels:
+                        style:
+                            fontSize: '9px'
+                
+                xAxis:
+                    tickPixelInterval: 55
+                    labels:
+                        style:
+                            fontSize: '9px'
+            
+            
+		
+	
+	return
 
 _.extend scope,
     chart: widget
