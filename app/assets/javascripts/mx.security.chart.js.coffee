@@ -289,7 +289,7 @@ loader = (param) ->
 	deferred = new $.Deferred
 	
 	$.ajax
-		url: "#{cs_host}/engines/#{engine.name}/markets/#{market.market_name}/boardgroups/#{board_group.board_group_id}/securities/#{security}.json?callback=?&interval=1&candles=720"
+		url: "#{cs_host}/engines/#{engine.name}/markets/#{market.market_name}/boardgroups/#{board_group.board_group_id}/securities/#{security}.json?callback=?&interval=1&period=1d"
 		dataType: "jsonp"
 		cache: true
 	.then (json) ->
@@ -304,6 +304,7 @@ loader = (param) ->
 				for candle in serie.candles
 					_candle_result.data.push switch _candle_result.type
 						when 'line' then [l2u(candle.open_time), candle.value]
+						when 'stockbar' then [l2u(candle.open_time), candle.open, candle.high, candle.low, candle.close]
 						when 'bar'	then [l2u(candle.close_time), candle.value]
 		
 		deferred.resolve(result)
@@ -311,7 +312,7 @@ loader = (param) ->
 	deferred.promise()
 
 
-widget = (element) ->
+widget = (element, engine, market, board, security) ->
 	
 	element = $(element)
 	return if _.size(element) == 0
@@ -320,8 +321,6 @@ widget = (element) ->
 		chart:
             renderTo: element[0]
             alignTicks: false
-            width: 300
-            height: 175
             spacingRight: 0
             spacingLeft: 0
         
@@ -336,46 +335,37 @@ widget = (element) ->
         rangeSelector:
             enabled: false
                 
-        navigator:
-            enabled: false
-                
-        scrollbar:
-            enabled: false
-                
-        tooltip:
-            enabled: false
-        
         series: [
-            data: []
-            type: 'area'
-            threshold: null
-            fillOpacity: .5
+            data: [[0, 0]]
+            type: 'line'
+            yAxis: 0
             tooltip:
                 yDecimals: 2
-            enableMouseTracking: false
-            shadow: true
+        ,
+            data: [[0, 0]]
+            type: 'column'
+            yAxis: 1
+            tooltip:
+                yDecimals: 0
         ]
-                
-        yAxis:
-            tickPixelInterval: 50
-            labels:
-                style:
-                    fontSize: '9px'
-                
-        xAxis:
-            tickPixelInterval: 40
-            labels:
-                style:
-                    fontSize: '9px'
+        
+        yAxis: [
+            height: 180
+            opposite: true
+        ,
+            height:105
+            opposite: true
+        ]
+            
 
 	chart.showLoading()
 
 	mx.iss.defaults().then (json) ->
 		defaults ?= json
 
-		loader("SNDX:MICEXINDEXCF").then (json) ->
-			_.first(chart.series).setData(_.first(_.first(json)).data, true)
-			chart.hideLoading()
+		loader("#{board}:#{security}").then (json) ->
+            _.first(chart.series).setData(_.first(_.first(json)).data, true)
+            chart.hideLoading()
             
             
 		
