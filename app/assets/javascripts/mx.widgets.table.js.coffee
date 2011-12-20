@@ -81,6 +81,7 @@ columns_data_source = (params) ->
 records_data_source = (params, options) ->
     deferred = new $.Deferred
     
+
     result = {}
     
     complete = _.after _.size(params), ->
@@ -199,7 +200,6 @@ widget = (element, engine, market, params, options = {}) ->
         
         element.on 'click', 'a', (event) ->
             row = $(event.currentTarget).closest("tr.row")
-            console.log row.data()
             return event.preventDefault() if !row.hasClass("current") and row.next("tr.chart").data('defunct') != true
             event.stopPropagation()
         
@@ -244,11 +244,11 @@ widget = (element, engine, market, params, options = {}) ->
                     .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
-                    
+                        
                 for field, index in _filters
-
+                    
                     column  = _columns[field.id]
-
+                    
                     trend   = record.trends[column.name]
                     
                     cell = $("<td>")
@@ -256,7 +256,7 @@ widget = (element, engine, market, params, options = {}) ->
                             'data-name':    column.name
                             'title':        column.title
                         .addClass(column.type)
-                        .html($("<span>").html(mx.utils.render(record[column.name], column) || '&mdash;'))
+                        .html($("<span>").html(mx.utils.render(record[column.name], _.extend({}, column, { precision: record.precisions[column.name]} )) || '&mdash;'))
                     
                     if column.trend_by == field.id
                         cell.toggleClass('trend_up',    trend  > 0)

@@ -93,7 +93,7 @@
     		function sortBy_SECTYPE(params, record) {
     			return params.indexOf(record['SECTYPE']);
     		}
-
+    		
             mx.widgets.ticker('#ticker', [
                 'stock:index:SNDX:MICEXINDEXCF',
                 'stock:index:RTSI:RTSI',
@@ -111,7 +111,7 @@
                     return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
                 }
             });
-            
+
             mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
                 compare: 'stock:index:RTSI'
             });
@@ -176,7 +176,6 @@
                 'CLMR:GMNK',
                 'CLMR:VTBR'
             ], {
-                chart: 0,
                 refresh_timeout: 5 * 1000
             });
             
@@ -189,8 +188,7 @@
             ], {
                 sortBy: sortBy_SECTYPE,
                 params_name: 'sectypes',
-                nearest: 1,
-                chart: true
+                nearest: 1
             });
             
             mx.widgets.table('#futures_2', 'futures', 'forts', [
@@ -205,7 +203,6 @@
                 nearest: 1
             });
 
-
             mx.widgets.table('#futures_3', 'futures', 'forts', [
                 'RFUD:Si',
                 'RFUD:ED',
@@ -213,11 +210,10 @@
                 'RFUD:O4',
                 'RFUD:O2'
             ], {
-                sortBy: sortBy_SECTYPE,
                 params_name: 'sectypes',
+                refresh_timeout: 5 * 1000,
                 nearest: 1
             });
-
 
             mx.widgets.turnovers('#turnovers', {
                 afterRefresh: function(time) {
@@ -265,7 +261,7 @@
                 extend:             'stock',
                 refresh_timeout:    60 * 1000
             });
-
+            
         });
     
     </script>

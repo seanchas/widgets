@@ -56,6 +56,8 @@ process_record = (record, columns, by_name = false) ->
     
     decimals = record['DECIMALS']
 
+    record.precisions = {}
+
     for name, value of record
 
         column = _.first(column for id, column of columns when column.name == name)
@@ -66,8 +68,8 @@ process_record = (record, columns, by_name = false) ->
             when 'string'
                 value
             when 'number'
-                column.precision ?= decimals
-                if value? then parseFloat(new Number(value).toFixed(column.precision ? decimals)) else value
+                record.precisions[name] = column.precision ? decimals
+                if value? then parseFloat(new Number(value).toFixed(record.precisions[name])) else value
             when 'date'
                 parse_date value
             when 'time'

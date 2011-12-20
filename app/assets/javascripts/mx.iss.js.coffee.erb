@@ -50,6 +50,35 @@ request_meta =
             iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
         key: (engine, market, options = {}) ->
             [engine, market, options.only]
+    
+    securities:
+        url: (engine, market, params, options = {}) ->
+            "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
+        data: (engine, market, params, options = {}) ->
+            known_keys = ['nearest', 'leaders']
+
+            params_name = options.params_name || 'securities'
+
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'securities,marketdata'
+
+            data[params_name] = if _.isArray params then params.join(',') else params
+
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+
+            _.extend data, options
+            
+            data
+        
+        parse: (json) ->
+            iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
+
+        key: (engine, market, params) ->
+            [engine, market, params]
 
     security:
         url: (engine, market, board, param) ->
@@ -294,7 +323,7 @@ candle_borders = (engine, market, param) ->
 _.extend scope,
     defaults:           (args...) -> request('defaults', args...)
     columns:            (args...) -> request('columns', args...)
-    records:            records
+    records:            (args...) -> request('securities', args...)
     security:           (args...) -> request('security', args...)
     security_indices:   (args...) -> request('security_indices', args...)
     index_securities:   (args...) -> request('index_securities', args...)
