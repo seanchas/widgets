@@ -261,7 +261,7 @@ l2u = (milliseconds) ->
 u2l = (milliseconds) ->
     milliseconds + (new Date(milliseconds).getTimezoneOffset() * 60 * 1000);
 
-cs_host = "http://www.beta.micex.ru/cs"
+cs_host = "http://www.micex.ru/cs"
 
 defaults = undefined
 
@@ -321,7 +321,9 @@ widget = (element) ->
             renderTo: element[0]
             alignTicks: false
             width: 300
-            height: 150
+            height: 175
+            spacingRight: 0
+            spacingLeft: 0
         
         loading:
             hideDuration: 250
