@@ -313,64 +313,71 @@ loader = (param) ->
 
 
 widget = (element, engine, market, board, security) ->
-	
-	element = $(element)
-	return if _.size(element) == 0
-    
-	chart = new Highcharts.StockChart
-		chart:
+
+    element = $(element)
+    return if _.size(element) == 0
+
+    chart = new Highcharts.StockChart
+        chart:
             renderTo: element[0]
             alignTicks: false
             spacingRight: 0
             spacingLeft: 0
-        
+            
         loading:
             hideDuration: 250
             labelStyle:
                 top: '50px'
-            
+                
         credits:
             enabled: false
-                
+            
         rangeSelector:
             enabled: false
-                
+            
         series: [
-            data: [[0, 0]]
             type: 'line'
-            yAxis: 0
-            tooltip:
-                yDecimals: 2
-        ,
             data: [[0, 0]]
+            visible: false
+            gapSize: 60
+            yAxis: 0
+        ,
             type: 'column'
+            data: [[0, 0]]
+            visible: false
             yAxis: 1
-            tooltip:
-                yDecimals: 0
         ]
         
         yAxis: [
+            id: 'values'
             height: 180
             opposite: true
         ,
+            id: 'volumes'
             height:105
+            top: 200
+            offset: 0
             opposite: true
         ]
-            
 
-	chart.showLoading()
+    chart.showLoading()
 
-	mx.iss.defaults().then (json) ->
-		defaults ?= json
+    mx.iss.defaults().then (json) ->
+        defaults ?= json
 
-		loader("#{board}:#{security}").then (json) ->
+        loader("#{board}:#{security}").then (json) ->
             _.first(chart.series).setData(_.first(_.first(json)).data, true)
+            
+            chart.series[1].setData(_.first(_.last(json)).data, true)
+            
+            serie.show() for serie in chart.series
+        
+            console.log chart.series
             chart.hideLoading()
-            
-            
-		
-	
-	return
+        
+        
+
+    return
 
 _.extend scope,
     chart: widget
