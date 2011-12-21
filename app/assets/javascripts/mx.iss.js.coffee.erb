@@ -185,7 +185,6 @@ request = (name, args...) ->
         data: meta.data(args...)
         dataType: 'jsonp'
         jsonpCallback: "iss_jsonp_#{key}"
-        cache: true
     .done (json) ->
         cache[key].resolve meta.parse(json)
     
