@@ -8,8 +8,16 @@ scope = global.mx._widget
 $ = jQuery
 
 
+extract_options = (args) ->
+    [
+        args
+        if _.isObject(_.last(args)) and !_.isArray(_.last(args)) then args.pop() else {}
+    ]
+
+
 area_series_options =
     data: []
+
 
 line_series_options =
     data: []
@@ -18,9 +26,10 @@ line_series_options =
 widget = (element, args...) ->
     element = $(element); return unless _.size(element) > 0
     
-    # [args, options] = extract_options args
+    [args, options] = extract_options args
     
-    console.log args
+    mx.iss.defaults().then (json) ->
+        $.noop()
 
 
 _.extend scope,
