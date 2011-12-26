@@ -38,6 +38,7 @@ render = (element, description, security, columns, filters, indices, index_secur
 
     for field in description
         field.value = mx.utils.parse_date(field.value) if field.type == 'date'
+        field.value = 'RUB' if field.name == 'FACEUNIT' and field.value == 'SUR'
 
 
     mx.utils.process_record security, columns
