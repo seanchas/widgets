@@ -68,7 +68,7 @@ process_record = (record, columns, by_name = false) ->
             when 'string'
                 if name == 'FACEUNIT' and value == 'SUR' then 'RUB' else value
             when 'number'
-                record.precisions[name] = column.precision ? decimals
+                record.precisions[name] = if column.has_percent == 1 then 2 else column.precision ? decimals
                 if value? then parseFloat(new Number(value).toFixed(record.precisions[name])) else value
             when 'date'
                 parse_date value
