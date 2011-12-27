@@ -167,7 +167,7 @@ widget = (element, engine, market, params, options = {}) ->
         
         image.on 'load', ->
             cell.removeClass('loading')
-            cell.empty().html(image)
+            cell.html(image)
             charts_times[key] = + new Date
             write_cache(element, cache_key) if cacheable
         
