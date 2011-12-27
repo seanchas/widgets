@@ -167,7 +167,10 @@ widget = (element, engine, market, params, options = {}) ->
         
         image.on 'load', ->
             cell.removeClass('loading')
-            cell.html(image)
+            if i = $("img", cell)
+                i.attr('src', image.attr('src'))
+            else
+                cell.html(image)
             cell.css('height', image.height())
             charts_times[key] = + new Date
             write_cache(element, cache_key) if cacheable
