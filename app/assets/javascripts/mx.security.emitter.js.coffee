@@ -19,7 +19,7 @@ fields = [
     { name: 'URL',                      title: 'WEB-адрес' }
 ]
 
-url_re = /(\b(https?|ftp|file):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))/ig
+url_re = /(\b((https?|ftp|file):\/\/)*([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))/ig
 
 widget = (element, engine, market, board, param, options = {}) ->
     
@@ -41,14 +41,16 @@ widget = (element, engine, market, board, param, options = {}) ->
         table_body = $('tbody', table)
 
         for field in fields
-            table_body.append $("<tr><th>#{field.title}</th><td>#{emitter[field.name] ? '&mdash;'}</td></tr>")
+            value = emitter[field.name]
+            if value and field.name == 'URL'
+                value = value.replace(url_re, (args...) ->
+                    schema = args[2] ? "http://"
+                    domain = args[4].replace(/([^\/])\/$/, "$1")
+                    "<a href=\"#{schema + domain}\">#{domain}</a>"
+                )
+            table_body.append $("<tr><th>#{field.title}</th><td>#{value ? '&mdash;'}</td></tr>")
 
         element.html table
-        element.html(element.html().replace(url_re, (string, link, schema, domain) ->
-            if domain.charAt(domain.length - 1) == '/' then domain = domain.slice(0, -1)
-            "<a href=\"#{link}\">#{domain}</a>"
-        ))
-
 
     mx.iss.description(param).then (description) ->
         emitter_id = _.first(field.value for field in description when field.name == 'EMITTER_ID')
