@@ -170,6 +170,7 @@ widget = (element, engine, market, params, options = {}) ->
             cell.children().remove()
             cell.html($("<img>").attr('src', url))
             charts_times[key] = + new Date
+            cell.css('height', cell.height())
             write_cache(element, cache_key) if cacheable
         
         image.on 'error', ->
