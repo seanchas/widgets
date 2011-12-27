@@ -19,6 +19,8 @@ fields = [
     { name: 'URL',                      title: 'WEB-адрес' }
 ]
 
+url_re = /(\b(https?|ftp|file):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))/ig
+
 widget = (element, engine, market, board, param, options = {}) ->
     
     element = $(element); return if element.length == 0
@@ -42,6 +44,10 @@ widget = (element, engine, market, board, param, options = {}) ->
             table_body.append $("<tr><th>#{field.title}</th><td>#{emitter[field.name] ? '&mdash;'}</td></tr>")
 
         element.html table
+        element.html(element.html().replace(url_re, (string, link, schema, domain) ->
+            if domain.charAt(domain.length - 1) == '/' then domain = domain.slice(0, -1)
+            "<a href=\"#{link}\">#{domain}</a>"
+        ))
 
 
     mx.iss.description(param).then (description) ->
@@ -105,7 +111,6 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
             table_body.append create_row(engine.title, records) if _.size(records) > 0
         
         element.html table
-        
         
 
     $.when(mx.iss.defaults(), mx.iss.description(param)).then (defaults, description) ->
