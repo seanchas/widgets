@@ -279,7 +279,7 @@ widget = (element, engine, market, params, options = {}) ->
 
                     if _.size(old_chart_row = $("tr.chart[data-key=#{escape_selector record_key}]")) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            $("td", chart_row).html($("<img>").attr('src', url))
+                            $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
                         chart_row.data('defunct', old_chart_row.data('defunct'))
             
             element.children().remove()
