@@ -37,7 +37,7 @@ escape_selector = (string) ->
 
 default_delay       = 60 * 1000
 min_delay           =  5 * 1000
-chart_refresh_delay =  6 * 1000
+chart_refresh_delay = 60 * 1000
 
 calculate_delay = (delay) ->
     delay = + delay
