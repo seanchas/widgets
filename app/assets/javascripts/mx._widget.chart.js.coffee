@@ -13,7 +13,7 @@ cs_data = (engine, market, boardgroup, security, options = {}) ->
     deferred = new $.Deferred
     
     $.ajax
-        url: "#{cs_host}/engines/#{engine}/markets/#{market}/boardgroups/#{boardgroup}/securities/#{security}.hs?callback=?&candles=540&interval=1"
+        url: "#{cs_host}/engines/#{engine}/markets/#{market}/boardgroups/#{boardgroup}/securities/#{security}.hs?callback=?&candles=540&interval=5"
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve(_.first(json))
@@ -27,6 +27,8 @@ extract_options = (args) ->
         if _.isObject(_.last(args)) and !_.isArray(_.last(args)) then args.pop() else {}
     ]
 
+merge = (args...) ->
+    $.extend(true, args...)
 
 area_series_options =
     data: []
@@ -39,7 +41,13 @@ line_series_options =
 chart_options =
     chart:
         alignTicks: false
-        renderTo: undefined
+        borderRadius: 0
+        
+        spacingTop: 0
+        spacingRight: 0
+        spacingBottom: 5
+        spacingLeft: 0
+        
     credits:
         enabled: false
     navigator:
@@ -52,8 +60,18 @@ chart_options =
         data: []
         type: 'area'
         threshold: null
-        gapSize: 60
+        gapSize: 6
     ]
+    xAxis:
+        labels:
+            style:
+                fontSize: '9px'
+    yAxis:
+        labels:
+            style:
+                fontSize: '9px'
+        opposite: true
+
 
 widget = (element, args...) ->
     element = $(element); return unless _.size(element) > 0
@@ -63,14 +81,12 @@ widget = (element, args...) ->
     mx.iss.defaults().then (json) ->
         
         chart = _.once ->
-            _options = _.clone chart_options
-            _options.chart.renderTo = element[0]
+            _options = merge({}, chart_options, { chart: { renderTo: element[0] }})
             new Highcharts.StockChart _options
         
         cs_data('stock', 'index', '9', 'MICEXINDEXCF').then (json) ->
             
             for serie in json
-                console.log serie
                 chart().series[0].setData(serie.data)
             
 

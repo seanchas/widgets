@@ -1,14 +1,21 @@
 <%= javascript_include_tag "mx._widget" %>
 
-<div id="test">
+<div id="test" style="background-color: #ccc; width: 500px; height: 200px; overflow: hidden;">
     
 </div>
+
+<a href="#" id="test_link">click</a>
 
 <script type="text/javascript" charset="utf-8">
     
     $(function() {
         
         mx._widget.chart('#test', 'stock:shares:EQBR:AFLT');
+        
+        $("#test_link").on("click", function(e) {
+            e.preventDefault();
+            $("#test").toggle();
+        })
         
     });
     
