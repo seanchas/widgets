@@ -168,7 +168,7 @@ widget = (element, engine, market, params, options = {}) ->
         image.on 'load', ->
             cell.removeClass('loading')
             cell.children().remove()
-            cell.html($("<img>").attr('src', url))
+            cell.empty().html(image)
             charts_times[key] = + new Date
             cell.css('height', cell.height())
             write_cache(element, cache_key) if cacheable
@@ -177,7 +177,7 @@ widget = (element, engine, market, params, options = {}) ->
             chart_row.prev("tr.row").removeClass("current")
             chart_row.data('defunct', true).hide()
             cell.removeClass('loading')
-            cell.children().remove()
+            cell.empty()
             write_cache(element, cache_key) if cacheable
 
         
