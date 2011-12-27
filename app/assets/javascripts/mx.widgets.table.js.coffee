@@ -37,7 +37,7 @@ escape_selector = (string) ->
 
 default_delay       = 60 * 1000
 min_delay           =  5 * 1000
-chart_refresh_delay = 60 * 1000
+chart_refresh_delay =  6 * 1000
 
 calculate_delay = (delay) ->
     delay = + delay
@@ -168,8 +168,7 @@ widget = (element, engine, market, params, options = {}) ->
         image.on 'load', ->
             cell.removeClass('loading')
             cell.html(image)
-            console.log image.height()
-            cell.css('height', image.height())
+            cell.css('height', cell.height())
             charts_times[key] = + new Date
             write_cache(element, cache_key) if cacheable
         
