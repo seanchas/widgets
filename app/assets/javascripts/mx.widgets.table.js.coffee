@@ -251,12 +251,21 @@ widget = (element, engine, market, params, options = {}) ->
                     
                     trend   = record.trends[column.name]
                     
+                    value = record[column.name]
+                    
+                    if value == 0
+                        if column.trend_by == field.id
+                            value = undefined if _.all((record[c.name] for id, c of _columns when c.trend_by == field.id), (v) -> v == 0)
+                        else
+                            value = undefined if trend == 0
+                        
+                    
                     cell = $("<td>")
                         .attr
                             'data-name':    column.name
                             'title':        column.title
                         .addClass(column.type)
-                        .html($("<span>").html(mx.utils.render(record[column.name], _.extend({}, column, { precision: record.precisions[column.name]} )) || '&mdash;'))
+                        .html($("<span>").html(mx.utils.render(value, _.extend({}, column, { precision: record.precisions[column.name]} )) || '&mdash;'))
                     
                     if column.trend_by == field.id
                         cell.toggleClass('trend_up',    trend  > 0)
