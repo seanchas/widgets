@@ -13,7 +13,7 @@ cs_data = (engine, market, boardgroup, security, options = {}) ->
     deferred = new $.Deferred
     
     $.ajax
-        url: "#{cs_host}/engines/#{engine}/markets/#{market}/boardgroups/#{boardgroup}/securities/#{security}.hs?callback=?&candles=540&interval=5"
+        url: "#{cs_host}/engines/#{engine}/markets/#{market}/boardgroups/#{boardgroup}/securities/#{security}.hs?callback=?&candles=50&interval=1&s1.type=line"
         dataType: 'jsonp'
     .then (json) ->
         deferred.resolve(_.first(json))
@@ -60,7 +60,7 @@ chart_options =
         data: []
         type: 'area'
         threshold: null
-        gapSize: 6
+        gapSize: 60
     ]
     xAxis:
         labels:

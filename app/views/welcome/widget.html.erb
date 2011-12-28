@@ -1,7 +1,6 @@
 <%= javascript_include_tag "mx._widget" %>
 
 <div id="test" style="background-color: #ccc; width: 500px; height: 200px; overflow: hidden;">
-    
 </div>
 
 <a href="#" id="test_link">click</a>
@@ -14,8 +13,7 @@
         
         $("#test_link").on("click", function(e) {
             e.preventDefault();
-            $("#test").toggle();
-        })
+        });
         
     });
     
