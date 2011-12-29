@@ -253,9 +253,9 @@ widget = (element, engine, market, params, options = {}) ->
                     
                     value = record[column.name]
                     
-                    if value == 0
+                    if value == 0 or value == null
                         if column.trend_by == field.id
-                            value = undefined if _.all((record[c.name] for id, c of _columns when c.trend_by == field.id), (v) -> v == 0)
+                            value = undefined if _.all((record[c.name] for id, c of _columns when c.trend_by == field.id), (v) -> v == 0 or v == null)
                         else
                             value = undefined if trend == 0
                         
