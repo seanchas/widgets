@@ -125,15 +125,16 @@ request_meta =
             [param]
     
     turnovers:
-        url: (engine) ->
-            "#{iss_host}/#{if engine? then 'engines/' + engine + '/' else ''}turnovers.jsonp?callback=?"
-        data: ->
+        url: ->
+            "#{iss_host}/turnovers.jsonp?callback=?"
+        data: (options = {}) ->
             'iss.meta': 'off'
             'iss.only': 'turnovers'
+            'is_tonight_session': if options.is_tonight_session == true then 1 else 0
         parse: (json) ->
             iss_merge_columns_and_data(json?.turnovers)
-        key: (engine) ->
-            [engine]
+        key: (options = {}) ->
+            [options]
     
     security_indices:
         url: (param) ->

@@ -19,6 +19,8 @@ create_table_head = ->
         .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [РУБ]'))
 
 create_row = (record, index) ->
+    value = mx.widgets.utils.render_value(record['VALTODAY'] * 1000000, { type: 'number', precision: '0' })
+
     $('<tr>')
         .toggleClass('even',    (index + 1) %  2 == 0)
         .toggleClass('odd',     (index + 1) %  2 == 1)
@@ -30,7 +32,7 @@ create_row = (record, index) ->
         .append(
             $('<td>')
                 .addClass('number')
-                .html(mx.widgets.utils.render_value(record['VALTODAY'] * 1000000, { type: 'number', precision: '0' }))
+                .html(value)
         )
 
 render = (element, turnovers) ->
@@ -55,7 +57,7 @@ widget = (element, options = {}) ->
     refresh_callback = if options.afterRefresh and _.isFunction(options.afterRefresh) then options.afterRefresh else undefined
 
     refresh = ->
-        mx.iss.turnovers().then (turnovers) ->
+        mx.iss.turnovers(options).then (turnovers) ->
             render element, turnovers
             refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
             _.delay refresh, refresh_timeout

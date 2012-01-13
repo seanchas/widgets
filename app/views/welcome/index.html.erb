@@ -216,6 +216,7 @@
             });
 
             mx.widgets.turnovers('#turnovers', {
+                is_tonight_session: true,
                 afterRefresh: function(time) {
                 }
             });
@@ -258,7 +259,6 @@
             });
 
             mx.widgets.turnovers('#main_turnovers', {
-                extend:             'stock',
                 refresh_timeout:    60 * 1000
             });
             
