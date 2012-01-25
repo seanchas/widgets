@@ -1,0 +1,166 @@
+<h1>mx.widget</h1>
+
+<h2 data-target="turnovers_details">.turnovers()</h2>
+<div id="turnovers_details" class="details">
+    <p class="description">
+        <strong>Описание:</strong>
+        Выводит виджет с объемами торгов.
+    </p>
+
+    <ul class="signatures">
+        <li>
+            <h4>
+               .turnovers( element, options )
+            </h4>
+            <p>
+                <strong>element</strong>
+                DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+            </p>
+            <p>
+                <strong>options</strong>
+                Дополнительные параметры
+            </p>
+            <div class="options">
+                <h5>
+                    refresh_timeout
+                    <span class="type">Number</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    60 * 1000
+                </div>
+                <p>
+                    Задержка, в миллисекундах, между обновлениями данных в виджете.
+                </p>
+
+                <h5>
+                    is_tonight_session
+                    <span class="type">Boolean</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    false
+                </div>
+                <p>
+                    Дневная (false) или вечерняя (true) сессия.
+                </p>
+            </div>
+        </li>
+    </ul>
+
+    <div class="about">
+
+        <h3>
+          Примеры:
+        </h3>
+
+        <h4>
+            Пример кода для стилизации:
+        </h4>
+
+<pre class="prettyprint"><code>&lt;table class="mx-widget-turnovers"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Объемы торгов&lt;/td&gt;
+            &lt;td class="number"&gt;30.11.2011 [РУБ]&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td class="title"&gt;Фондовый рынок&lt;/td&gt;
+            &lt;td class="number"&gt;320 803 796 147&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td class="title"&gt;Валютный рынок&lt;/td&gt;
+            &lt;td class="number"&gt;481 980 456 435&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+        <hr />
+
+        <h4>
+          Пример: Объемы торгов (дневная сессия)
+        </h4>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="turnovers_today"&gt;
+        &lt;/div&gt;
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.turnovers('#turnovers_today', {
+                    is_tonight_session: false
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+
+        <h4>
+          Демо
+        </h4>
+        <div id="turnovers_today">
+        </div>
+
+        <hr />
+
+        <h4>Пример: Объемы торгов (вечерняя сессия):</h4>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="turnovers_tonight"&gt;
+        &lt;/div&gt;
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.turnovers('#turnovers_tonight', {
+                    refresh_timeout: 10 * 1000,
+                    is_tonight_session: true
+                });
+            });
+        &lt;/script&gt;
+    &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <h4>
+          Демо
+        </h4>
+
+        <div id="turnovers_tonight">
+        </div>
+
+    </div>
+</div>
+
+
+<%- content_for :javascript do -%>
+
+<%= stylesheet_link_tag    "widgets.css"  %>
+<%= javascript_include_tag "mx.widget.js" %>
+<%= javascript_include_tag "prettify.js"  %>
+
+<script type="text/javascript">
+
+  $(function() {
+
+    prettyPrint();
+
+    mx.widgets.turnovers("#turnovers_today",   { is_tonight_session: false });
+    mx.widgets.turnovers("#turnovers_tonight", { is_tonight_session: true });
+
+  });
+
+</script>
+
+<%- end %>

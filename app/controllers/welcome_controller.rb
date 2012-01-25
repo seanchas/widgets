@@ -9,11 +9,15 @@ class WelcomeController < ApplicationController
   def widget_docs
     render :layout => "docs"
   end
-  
+
+  def turnovers
+    render :layout => "docs"
+  end
+
   def examples
     render :layout => "examples"
   end
-  
+
   def security
     render :layout => "security"
   end
