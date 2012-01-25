@@ -19,7 +19,7 @@ create_table_head = ->
         .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [РУБ]'))
 
 create_row = (record, index) ->
-    value = mx.widgets.utils.render_value(record['VALTODAY'] * 1000000, { type: 'number', precision: '0' })
+    value = mx.widgets.utils.render_value((if record['VALTODAY'] then record['VALTODAY'] * 1000000 else null), { type: 'number', precision: '0' })
 
     $('<tr>')
         .toggleClass('even',    (index + 1) %  2 == 0)
@@ -32,7 +32,7 @@ create_row = (record, index) ->
         .append(
             $('<td>')
                 .addClass('number')
-                .html(value)
+                .html(value || '&mdash;')
         )
 
 render = (element, turnovers) ->
