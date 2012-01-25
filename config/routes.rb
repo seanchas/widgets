@@ -57,6 +57,8 @@ Widgets::Application.routes.draw do
 
     get 'widget' => 'welcome#widget'
     get 'examples' => 'welcome#examples'
+
+    get 'docs/turnovers' => 'welcome#turnovers'
     
     scope "security" do
       root :to => 'welcome#security', :as => "security"
