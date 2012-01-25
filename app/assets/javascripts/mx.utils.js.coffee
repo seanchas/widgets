@@ -92,7 +92,7 @@ render = (value, descriptor = {}) ->
 
 
 render_number = (value, descriptor = {}) ->
-    return value unless value? and typeof value == 'number'
+    return value unless value?
 
     value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
 
