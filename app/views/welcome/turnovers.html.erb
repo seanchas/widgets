@@ -44,6 +44,16 @@
                 <p>
                     Дневная (false) или вечерняя (true) сессия.
                 </p>
+
+                <h5>
+                    afterRefresh
+                    <span class="type">Function</span>
+                </h5>
+                <p>
+                    Функция, вызываемая после обновления виджета.<br />
+                    В качестве параметра передается дата обновления данных в виджете.
+                </p>
+
             </div>
         </li>
     </ul>
@@ -90,13 +100,25 @@
         &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
     &lt;/head&gt;
     &lt;body&gt;
+        &lt;p&gt;
+          Дата последнего обновления:
+          &lt;span id="turnovers_today_time"&gt;
+          &lt;/span&gt;
+        &lt;/p&gt;
         &lt;div id="turnovers_today"&gt;
         &lt;/div&gt;
         &lt;script type="text/javascript"&gt;
             $(function() {
-                mx.widgets.turnovers('#turnovers_today', {
-                    is_tonight_session: false
-                });
+
+              mx.widgets.turnovers('#turnovers_today', {
+                // дневная сессия
+                is_tonight_session: false,
+                // callback вызывается после обновления (параметр: дата обновления)
+                afterRefresh: function (time) {
+                  $('#turnovers_today_time').html(time.toString());
+                }
+              });
+
             });
         &lt;/script&gt;
     &lt;/body&gt;
@@ -106,6 +128,12 @@
         <h4>
           Демо
         </h4>
+
+        <p>
+          Дата последнего обновления:
+          <span id="turnovers_today_time"></span>
+        </p>
+
         <div id="turnovers_today">
         </div>
 
@@ -125,8 +153,10 @@
         &lt;script type="text/javascript"&gt;
             $(function() {
                 mx.widgets.turnovers('#turnovers_tonight', {
-                    refresh_timeout: 10 * 1000,
-                    is_tonight_session: true
+                    // вечерняя сессия
+                    is_tonight_session: true,
+                    // обновление виджета каждые 15 секунд
+                    refresh_timeout: 15 * 1000
                 });
             });
         &lt;/script&gt;
@@ -156,8 +186,47 @@
 
     prettyPrint();
 
-    mx.widgets.turnovers("#turnovers_today",   { is_tonight_session: false });
-    mx.widgets.turnovers("#turnovers_tonight", { is_tonight_session: true });
+    mx.widgets.turnovers('#turnovers_today', {
+      is_tonight_session: false,
+      afterRefresh: function (time) {
+        $('#turnovers_today_time').html(time.toString());
+      }
+    });
+
+    mx.widgets.turnovers('#turnovers_tonight', {
+      is_tonight_session: true,
+      refresh_timeout: 15 * 1000
+    });
+
+    /*
+    render_date = function (date, options) {
+      var f, formatted_date_string, formatted_time_string;
+      if (!(date instanceof Date)) {
+          return (date instanceof Date);
+      }
+
+      f = function (n) { if (n < 10) { return '0' + n; } else { return '' + n; } };
+
+      options = options || {};
+      options.type = options.type || "date";
+
+      formatted_date_string = "" + f(date.getDate())  + "." + f(date.getMonth() + 1) + "." + date.getFullYear();
+      formatted_time_string = "" + f(date.getHours()) + ":" + f(date.getMinutes())   + ":" + f(date.getSeconds());
+
+      switch(options.type) {
+        case "datetime":
+        return formatted_date_string + " / " + formatted_time_string;
+        break;
+
+        case "time":
+        return formatted_time_string;
+        break;
+
+        default:
+        return formatted_date_string;
+      }
+    };
+    */
 
   });
 
