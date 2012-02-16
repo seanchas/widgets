@@ -16,30 +16,35 @@ cache = kizzy('security/chart')
 periods =
     day:
         name: 'День'
-        interval: 1
+        interval: 10
+        period: '2d'
         offset: 24 * 60 * 60 * 1000
     week:
         name: 'Неделя'
-        interval: 10
+        interval: 60
+        period: '2w'
         offset: 7 * 24 * 60 * 60 * 1000
     month:
         name: 'Месяц'
-        interval: 24
+        interval: 60
+        period: '2M'
         offset: 31 * 24 * 60 * 60 * 1000
     year:
         name: 'Год'
         interval: 24
+        period: '2y'
         offset: 365 * 24 * 60 * 60 * 1000
     all:
         name: 'Весь период'
-        interval: 24
+        interval: 7
+        period: 'all'
         offset: 1000 * 365 * 24 * 60 * 60 * 1000
 
 
 visible_periods = ['day', 'week', 'month', 'year', 'all']
 
 
-default_period  = 'all'
+default_period  = 'day'
 default_type    = 'line'
 
 
@@ -58,6 +63,9 @@ chart_options = ->
         marginRight: 1
         marginBottom: 0
         marginLeft: 1
+    
+    lang:
+        loading: 'Загрузка...'
     
     global:
         useUTC: false
@@ -92,12 +100,16 @@ chart_options = ->
             lineWidth: 1
             labels:
                 formatter: ->
-                    mx.utils.number_with_delimiter(@value)
+                    mx.utils.number_with_power(@value)
             style:
                 color: '#000'
         }
         
     ]
+    
+    plotOptions:
+        series:
+            gapSize: 72
     
     scrollbar:
         height: 12
@@ -202,29 +214,36 @@ widget = (element, engine, market, board, param, options = {}) ->
             for serie, index in series
                 chart.series[index].setData series[index], false
             
-            from = mx.utils.parse_date(begin)
-            till = mx.utils.parse_date(end)
+            from = _.first(_.first(series))[0]
+            till = _.last(_.first(series))[0]
             
             proposedFrom = + tonight() - period.offset
             
             from = proposedFrom if proposedFrom > from
             
             chart.xAxis[0].setExtremes(
-                l2u(from),
-                l2u(till)
+                from,
+                till
             )
+            
+            chart.options.plotOptions.series.gapSize = 0
             
             chart.redraw()
 
+            chart.hideLoading() if chart?
+
         load = (type = default_type) ->
+            
+            chart.showLoading() if chart?
             
             {begin, end} = borders[period.interval]
 
             mx.cs.data(engine, market, param, {
                 'interval': period.interval
                 's1.type':  type
-                'from':     begin
-                'till':     end
+                'period':   period.period
+                #'from':     begin
+                #'till':     end
             }).then (data) ->
                 
                 series = for zone in data.zones

@@ -27,6 +27,24 @@ number_with_precision = (number, options = {}) ->
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)
 
 
+power_amounts =
+    6:      'Млн'
+    9:      'Млрд'
+    12:     'Трлн'
+
+number_with_power = (number) ->
+    return '-' unless number?
+    
+    digits      = Math.ceil(Math.log(number) / Math.LN10);
+    max_amount  = 0;
+
+    for amount, label of power_amounts
+        amount = parseInt(amount)
+        max_amount = amount if max_amount < amount and amount <= digits
+    
+    number_with_delimiter(number / Math.pow(10, max_amount)) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
+    
+
 extract_options = (args) ->
     options = _.last(args)
     if typeof options == 'object' then options else {}
@@ -213,6 +231,7 @@ sha1 = (string) ->
 _.extend scope,
     number_with_delimiter:  number_with_delimiter
     number_with_precision:  number_with_precision
+    number_with_power:      number_with_power
     extract_options:        extract_options
     process_record:         process_record
     parse_date:             parse_date
