@@ -1,3 +1,21 @@
+<div id="currency_rates">
+    <h3>
+        Курс ЦБ РФ на <span class="date"></span>
+    </h3>
+    <dl>
+        <dt>$</dt>
+        <dd class="usd">
+            <span class="value"></span>
+            <span class="change"></span>
+        </dd>
+        <dt>€</dt>
+        <dd class="eur">
+            <span class="value"></span>
+            <span class="change"></span>
+        </dd>
+    </dl>
+</div>
+
 <div id="main_indices">
 </div>
 
@@ -261,6 +279,8 @@
             mx.widgets.turnovers('#main_turnovers', {
                 refresh_timeout:    60 * 1000
             });
+            
+            mx.widgets.tiny.currency_rates($("#currency_rates"));
             
         });
     

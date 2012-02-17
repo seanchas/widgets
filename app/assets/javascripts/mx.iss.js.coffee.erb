@@ -168,6 +168,16 @@ request_meta =
             _.first(iss_merge_columns_and_data(json?.capitalization))?['CAPITALIZATION']
         key: ->
             []
+    
+    currency_rates:
+        url: ->
+            "#{iss_host}/statistics/engines/currency/markets/selt/rates.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            _.first iss_merge_columns_and_data(json?.cbrf)
+        key: ->
+            []
 
 
 request = (name, args...) ->
@@ -336,3 +346,4 @@ _.extend scope,
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization', args...)
+    currency_rates:     (args...) -> request('currency_rates', args...)
