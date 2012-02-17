@@ -44,14 +44,35 @@
                 <p>
                     Дневная (false) или вечерняя (true) сессия.
                 </p>
+              
+                <h5>
+                    engines
+                    <span class="type">String, Array</span>
+                </h5>
+                <div class="default">
+                    <strong>Default:</strong>
+                    Все рынки
+                </div>
+                <p>
+                    Объемы торгов по определенным рынкам, например, engines: "currency, stock"
+                </p>
 
                 <h5>
                     afterRefresh
                     <span class="type">Function</span>
                 </h5>
                 <p>
-                    Функция, вызываемая после обновления виджета.<br />
+                    Функция обратного вызова после обновления виджета.<br />
                     В качестве параметра передается дата обновления данных в виджете.
+                </p>
+                
+                <h5>
+                    issCallback
+                    <span class="type">Function</span>
+                </h5>
+                <p>
+                    Функция обратного вызова после обновления виджета.<br />
+                    В качестве параметра передаются данные результата iss-запроса.
                 </p>
 
             </div>

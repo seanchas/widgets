@@ -10,6 +10,10 @@ class WelcomeController < ApplicationController
     render :layout => "docs"
   end
 
+  def tiny_docs
+    render :layout => "docs"
+  end
+
   def turnovers
     render :layout => "docs"
   end

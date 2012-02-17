@@ -51,13 +51,12 @@ Widgets::Application.routes.draw do
   # just remember to delete public/index.html.
 
   scope "widgets" do
-    root :to => 'welcome#index'
 
-    get 'docs' => 'welcome#widget_docs'
-
-    get 'widget' => 'welcome#widget'
-    get 'examples' => 'welcome#examples'
-
+    root :to             => 'welcome#index'
+    get 'docs'           => 'welcome#widget_docs'
+    get 'widget'         => 'welcome#widget'
+    get 'examples'       => 'welcome#examples'
+    get 'tiny/docs'      => 'welcome#tiny_docs'
     get 'docs/turnovers' => 'welcome#turnovers'
     
     scope "security" do

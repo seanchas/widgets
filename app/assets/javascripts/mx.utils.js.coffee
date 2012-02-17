@@ -32,7 +32,7 @@ power_amounts =
     9:      'Млрд'
     12:     'Трлн'
 
-number_with_power = (number) ->
+number_with_power = (number, options = {}) ->
     return '-' unless number?
     
     digits      = Math.ceil(Math.log(number) / Math.LN10);
@@ -42,7 +42,7 @@ number_with_power = (number) ->
         amount = parseInt(amount)
         max_amount = amount if max_amount < amount and amount <= digits
     
-    number_with_delimiter(number / Math.pow(10, max_amount)) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
+    number_with_precision(number / Math.pow(10, max_amount), options) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
     
 
 extract_options = (args) ->

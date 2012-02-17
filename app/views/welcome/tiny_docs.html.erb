@@ -1,0 +1,279 @@
+<h1>mx.widgets.tiny</h1>
+
+<h2 data-target="currency_rates_details">.currency_rates()</h2>
+
+<div id="currency_rates_details" class="details">
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет с данными о курсе валют ЦБ на следующий день.
+  </p>
+
+  <ul class="signatures">
+    <li>
+      <h4>
+        .currency_rates( element )
+      </h4>
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+    </li>
+  </ul>
+
+  <div class="about">
+    <h3>
+      Пример работы:
+    </h3>
+
+<pre class="prettyprint"><code>
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="tiny_currency_rates"&gt;
+            &lt;p&gt;Курс ЦБ РФ на &lt;span class="date"&gt;&lt;/span&gt;&lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li class="usd"&gt;
+                    &lt;span class="value"&gt;&lt;/span&gt; ( &lt;span class="change"&gt;&lt;/span&gt; )
+                &lt;/li&gt;
+                &lt;li class="eur"&gt;
+                    &lt;span class="value"&gt;&lt;/span&gt; ( &lt;span class="change"&gt;&lt;/span&gt; )
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.tiny.currency_rates("#tiny_currency_rates");
+            });
+        &lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+    <h4>Демо:</h4>
+    <div id="tiny_currency_rates">
+      <p>Курс ЦБ РФ на <span class="date"></span></p>
+      <ul>
+        <li class="usd">
+          <span class="value"></span> ( <span class="change"></span> )
+        </li>
+        <li class="eur">
+          <span class="value"></span> ( <span class="change"></span> )
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+
+
+<h2 data-target="usdrub_closed_details">.usdrub_closed()</h2>
+
+<div id="usdrub_closed_details" class="details">
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет средневзвешенную оценку USDRUB_TOM на 11:30.
+  </p>
+
+  <ul class="signatures">
+    <li>
+      <h4>
+        .usdrub_closed( element )
+      </h4>
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+    </li>
+  </ul>
+
+  <div class="about">
+    <h3>
+      Пример работы:
+    </h3>
+
+<pre class="prettyprint"><code>
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="tiny_usdrub_closed"&gt;
+            &lt;p&gt;Средневзв. оценка USDRUB_TOM на 11:30&lt;/p&gt;
+            &lt;p class="usd"&gt;
+                &lt;span class="value"&gt;&lt;/span&gt;
+                &lt;span class="change"&gt;&lt;/span&gt;
+                (&lt;span class="date"&gt;&lt;/span&gt;)
+            &lt;/p&gt;
+        &lt;/div&gt;
+
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.tiny.usdrub_closed("#tiny_usdrub_closed");
+            });
+        &lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+
+    <h4>Демо:</h4>
+    <div id="tiny_usdrub_closed">
+      <p>Средневзв. оценка USDRUB_TOM на 11:30</p>
+      <p class="usd">
+          <span class="value"></span>
+          <span class="change"></span>
+          (<span class="date"></span>)
+      </p>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<h2 data-target="turnovers_details">.turnovers()</h2>
+
+<div id="turnovers_details" class="details">
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет с объемами торгов на заданном рынке.
+  </p>
+
+  <ul class="signatures">
+    <li>
+      <h4>
+        .turnovers( element, options )
+      </h4>
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+      </p>
+      <div class="options">
+        <h5>
+          engine
+          <span class="type">String</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          "currency"
+        </div>
+        <p>
+          Объемы торгов по заданному рынку, например, engine: "stock"
+        </p>
+
+        <h5>
+          refresh_timeout
+          <span class="type">Number</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          60 * 1000
+        </div>
+        <p>
+          Задержка, в миллисекундах, между обновлениями данных в виджете.
+        </p>
+
+        <h5>
+          is_tonight_session
+          <span class="type">Boolean</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          false
+        </div>
+        <p>
+          Дневная (false) или вечерняя (true) сессия.
+        </p>
+
+      </div>
+    </li>
+  </ul>
+
+  <div class="about">
+    <h3>
+      Пример работы:
+    </h3>
+
+<pre class="prettyprint"><code>
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="tiny_turnovers"&gt;
+            &lt;p&gt;Объем сделок на рынке на &lt;span class="date"&gt;&lt;/span&gt;&lt;/p&gt;
+            &lt;ul&gt;
+                &lt;li class="rub"&gt;
+                    &lt;span class="value"&gt;&lt;/span&gt;
+                    &lt;span class="order"&gt;&lt;/span&gt;
+                &lt;/li&gt;
+                &lt;li class="usd"&gt;
+                    &lt;span class="value"&gt;&lt;/span&gt;
+                    &lt;span class="change"&gt;&lt;/span&gt;
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.tiny.turnovers("#tiny_turnovers", { engine: "stock" });
+            });
+        &lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+
+    <h4>Демо:</h4>
+    <div id="tiny_turnovers">
+      <p>Объем сделок на рынке на <span class="date"></span></p>
+      <ul>
+        <li class="rub">
+          <span class="value"></span>
+          <span class="order"></span>
+          руб.
+        </li>
+        <li class="usd">
+          <span class="value"></span>
+          <span class="order"></span>
+          $
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<%- content_for :javascript do -%>
+
+    <%= stylesheet_link_tag "widgets.css" %>
+    <%= javascript_include_tag 'mx.widget.js' %>
+    <%= javascript_include_tag 'prettify.js' %>
+
+    <script type="text/javascript" charset="utf-8">
+
+        $(function() {
+
+            prettyPrint();
+
+            mx.widgets.tiny.currency_rates("#tiny_currency_rates");
+            mx.widgets.tiny.usdrub_closed("#tiny_usdrub_closed");
+            mx.widgets.tiny.turnovers("#tiny_turnovers", { engine: "stock" });
+
+        });
+
+    </script>
+
+<%- end -%>
