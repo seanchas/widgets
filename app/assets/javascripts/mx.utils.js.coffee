@@ -1,3 +1,5 @@
+##= require mx.locale
+
 global = module?.exports ? ( exports ? this )
 
 global.mx        ?=  {}
