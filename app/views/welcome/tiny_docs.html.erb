@@ -256,6 +256,98 @@
   </div>
 </div>
 
+
+<h2 data-target="repo_dealers_details">.repo_dealers()</h2>
+
+<div id="repo_dealers_details" class="details">
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет со средневзвешенными ставками междилерского РЕПО.
+  </p>
+
+  <ul class="signatures">
+    <li>
+      <h4>
+        .repo_dealers( element )
+      </h4>
+
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+    </li>
+  </ul>
+
+  <div class="about">
+    <h3>
+      Пример кода для стилизации:
+    </h3>
+
+<pre class="prettyprint"><code>
+&lt;table class="mx-widget-repo-dealers"&gt;
+  &lt;thead&gt;
+        &lt;tr class="header"&gt;
+            &lt;td class="string"&gt;Срок РЕПО&lt;/td&gt;
+            &lt;td class="number"&gt;Ставка, % годовых&lt;/td&gt;
+            &lt;td class="number"&gt;Изменение&lt;/td&gt;&lt;td class="number"&gt;Объем, млн. руб.&lt;/td&gt;
+            &lt;td class="number"&gt;Сделок, шт.&lt;/td&gt;&lt;td class="date"&gt;Дата&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr class="odd"&gt;
+            &lt;td class="string"&gt;1 день&lt;/td&gt;
+            &lt;td class="number lt"&gt;4,98&lt;/td&gt;
+            &lt;td class="number lt"&gt;-0,18%&lt;/td&gt;
+            &lt;td class="number"&gt;45 774,55&lt;/td&gt;
+            &lt;td class="number"&gt;215&lt;/td&gt;
+            &lt;td class="date"&gt;20.02.2012&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr class="even"&gt;
+            &lt;td class="string"&gt;2-7 дней&lt;/td&gt;
+            &lt;td class="number gt"&gt;5,17&lt;/td&gt;
+            &lt;td class="number gt"&gt;+0,27%&lt;/td&gt;
+            &lt;td class="number"&gt;770,05&lt;/td&gt;
+            &lt;td class="number"&gt;8&lt;/td&gt;
+            &lt;td class="date"&gt;20.02.2012&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+      <h3>
+        Пример работы:
+      </h3>
+
+<pre class="prettyprint"><code>
+&lt;html&gt;
+  &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h2&gt;Средневзвешенные ставки междилерского РЕПО&lt;/h2&gt;
+
+        &lt;div id="tiny_repo"&gt;
+        &lt;/div&gt;
+
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.tiny.repo_dealers("#tiny_repo");
+            });
+        &lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+
+      <h4>Демо:</h4>
+      <p>Средневзвешенные ставки междилерского РЕПО</p>
+      <div id="tiny_repo">
+      </div>
+
+    </div>
+</div>
+
 <%- content_for :javascript do -%>
 
     <%= stylesheet_link_tag "widgets.css" %>
@@ -271,6 +363,7 @@
             mx.widgets.tiny.currency_rates("#tiny_currency_rates");
             mx.widgets.tiny.usdrub_closed("#tiny_usdrub_closed");
             mx.widgets.tiny.turnovers("#tiny_turnovers", { engine: "stock" });
+            mx.widgets.tiny.repo_dealers("#tiny_repo");
 
         });
 

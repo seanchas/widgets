@@ -179,6 +179,17 @@ request_meta =
         key: ->
             []
 
+    repo_dealers:
+        url: ->
+            "#{iss_host}/statistics/engines/state/markets/repo/dealers.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'data'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.data)
+        key: ->
+            []
+
 
 request = (name, args...) ->
     meta    = request_meta[name]
@@ -347,3 +358,4 @@ _.extend scope,
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization', args...)
     currency_rates:     (args...) -> request('currency_rates', args...)
+    repo_dealers:       (args...) -> request('repo_dealers',   args...)

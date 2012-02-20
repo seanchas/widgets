@@ -117,44 +117,92 @@
 
 <h2 data-target="turnovers_details">.turnovers()</h2>
 <div id="turnovers_details" class="details">
-    <p class="description">
-        <strong>Описание:</strong>
-        Выводит виджет с объемами торгов.
-    </p>
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет с объемами торгов.
+  </p>
 
-    <ul class="signatures">
-        <li>
-            <h4>
-               .turnovers( element, options ) 
-            </h4>
-            <p>
-                <strong>element</strong>
-                DOM-element | объект jQuery | строка, содержащая селектор jQuery.
-            </p>
-            <p>
-                <strong>options</strong>
-                Дополнительные параметры
-            </p>
-            <div class="options">
-                <h5>
-                    refresh_timeout
-                    <span class="type">Number</span>
-                </h5>
-                <div class="default">
-                    <strong>Default:</strong>
-                    60 * 1000
-                </div>
-                <p>
-                    Задержка, в миллисекундах, между обновлениями данных в виджете.
-                </p>
-            </div>
-        </li>
-    </ul>
+  <ul class="signatures">
+    <li>
+      <h4>
+        .turnovers( element, options )
+      </h4>
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+      <p>
+        <strong>options</strong>
+        Дополнительные параметры
+      </p>
+      <div class="options">
+        <h5>
+          refresh_timeout
+          <span class="type">Number</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          60 * 1000
+        </div>
+        <p>
+          Задержка, в миллисекундах, между обновлениями данных в виджете.
+        </p>
 
-    <div class="about">
-        <h3>
-            Пример кода для стилизации:
-        </h3>
+        <h5>
+          is_tonight_session
+          <span class="type">Boolean</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          false
+        </div>
+        <p>
+          Дневная (false) или вечерняя (true) сессия.
+        </p>
+
+        <h5>
+          engines
+          <span class="type">String, Array</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          Все рынки
+        </div>
+        <p>
+          Объемы торгов по определенным рынкам, например, engines: "currency, stock"
+        </p>
+
+        <h5>
+          afterRefresh
+          <span class="type">Function</span>
+        </h5>
+        <p>
+          Функция обратного вызова после обновления виджета.<br />
+          В качестве параметра передается дата обновления данных в виджете.
+        </p>
+
+        <h5>
+          issCallback
+          <span class="type">Function</span>
+        </h5>
+        <p>
+          Функция обратного вызова после обновления виджета.<br />
+          В качестве параметра передаются данные результата iss-запроса.
+        </p>
+
+      </div>
+    </li>
+  </ul>
+
+  <div class="about">
+
+    <h3>
+      Примеры:
+    </h3>
+
+    <h4>
+      Пример кода для стилизации:
+    </h4>
 
 <pre class="prettyprint"><code>&lt;table class="mx-widget-turnovers"&gt;
     &lt;thead&gt;
@@ -175,7 +223,11 @@
     &lt;/tbody&gt;
 &lt;/table&gt;</code></pre>
 
-        <h3>Пример работы:</h3>
+    <hr />
+
+    <h4>
+      Пример: Объемы торгов (дневная сессия)
+    </h4>
 
 <pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
 &lt;html&gt;
@@ -184,22 +236,167 @@
         &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
     &lt;/head&gt;
     &lt;body&gt;
-        &lt;div id="turnovers_widget_1"&gt;
+        &lt;p&gt;
+            Дата последнего обновления:
+            &lt;span id="turnovers_today_time"&gt;
+            &lt;/span&gt;
+        &lt;/p&gt;
+        &lt;div id="turnovers_today"&gt;
         &lt;/div&gt;
         &lt;script type="text/javascript"&gt;
             $(function() {
-                mx.widgets.turnovers('#turnovers_widget_1', {
-                    refresh_timeout: 10 * 1000
+                mx.widgets.turnovers('#turnovers_today', {
+                    // дневная сессия
+                    is_tonight_session: false,
+                    // callback вызывается после обновления (параметр: дата обновления)
+                    afterRefresh: function (time) {
+                        $('#turnovers_today_time').html(time.toString());
+                    }
                 });
             });
         &lt;/script&gt;
-    &lt;/body&gt;
+&lt;/body&gt;
 &lt;/html&gt;</code></pre>
 
-        <h4>Демо:</h4>
-        <div id="turnovers_widget_1">
-        </div>
+
+    <h4>
+      Демо
+    </h4>
+
+    <p>
+      Дата последнего обновления:
+      <span id="turnovers_today_time"></span>
+    </p>
+
+    <div id="turnovers_today">
     </div>
+
+    <hr />
+
+    <h4>Пример: Объемы торгов (вечерняя сессия):</h4>
+
+<pre class="prettyprint"><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;div id="turnovers_tonight"&gt;
+        &lt;/div&gt;
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.turnovers('#turnovers_tonight', {
+                    // вечерняя сессия
+                    is_tonight_session: true,
+                    // обновление виджета каждые 15 секунд
+                    refresh_timeout: 15 * 1000
+                    });
+            });
+        &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+    <h4>
+      Демо
+    </h4>
+
+    <div id="turnovers_tonight">
+    </div>
+
+  </div>
+</div>
+
+
+<h2 data-target="repo_dealers_details">.repo_dealers()</h2>
+
+<div id="repo_dealers_details" class="details">
+  <p class="description">
+    <strong>Описание:</strong>
+    Выводит виджет со средневзвешенными ставками междилерского РЕПО.
+  </p>
+
+  <ul class="signatures">
+    <li>
+      <h4>
+        .repo_dealers( element )
+      </h4>
+
+      <p>
+        <strong>element</strong>
+        DOM-element | объект jQuery | строка, содержащая селектор jQuery.
+      </p>
+    </li>
+  </ul>
+
+  <div class="about">
+    <h3>
+      Пример кода для стилизации:
+    </h3>
+
+<pre class="prettyprint"><code>&lt;table class="mx-widget-repo-dealers"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;td class="string"&gt;Срок РЕПО&lt;/td&gt;
+            &lt;td class="number"&gt;Ставка, % годовых&lt;/td&gt;
+            &lt;td class="number"&gt;Изменение&lt;/td&gt;
+            &lt;td class="number"&gt;Объем, млн. руб.&lt;/td&gt;
+            &lt;td class="number"&gt;Сделок, шт.&lt;/td&gt;
+            &lt;td class="date"&gt;Дата&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr class="odd"&gt;
+            &lt;td class="string"&gt;1 день&lt;/td&gt;
+            &lt;td class="number lt"&gt;4,98&lt;/td&gt;
+            &lt;td class="number lt"&gt;-0,18%&lt;/td&gt;
+            &lt;td class="number"&gt;45 774,55&lt;/td&gt;
+            &lt;td class="number"&gt;215&lt;/td&gt;
+            &lt;td class="date"&gt;20.02.2012&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr class="even"&gt;
+            &lt;td class="string"&gt;2-7 дней&lt;/td&gt;
+            &lt;td class="number gt"&gt;5,17&lt;/td&gt;
+            &lt;td class="number gt"&gt;+0,27%&lt;/td&gt;
+            &lt;td class="number"&gt;770,05&lt;/td&gt;
+            &lt;td class="number"&gt;8&lt;/td&gt;
+            &lt;td class="date"&gt;20.02.2012&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+
+    <h3>
+      Пример работы:
+    </h3>
+
+<pre class="prettyprint"><code>&lt;html&gt;
+    &lt;head&gt;
+        &lt;link rel="stylesheet" href="<%= path_to_stylesheet "widgets.css" %>" type="text/css" /&gt;
+        &lt;script src="<%= path_to_javascript "mx.widget.js" %>"&gt;&lt;/script&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h2&gt;Средневзвешенные ставки междилерского РЕПО&lt;/h2&gt;
+
+        &lt;div id="repo_dealers"&gt;
+        &lt;/div&gt;
+
+        &lt;script type="text/javascript"&gt;
+            $(function() {
+                mx.widgets.repo_dealers("#repo_dealers");
+            });
+        &lt;/script&gt;
+
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+
+    <h4>Демо:</h4>
+    <p>Средневзвешенные ставки междилерского РЕПО</p>
+    <div id="repo_dealers">
+    </div>
+
+  </div>
 </div>
 
 <%- content_for :javascript do -%>
@@ -226,10 +423,20 @@
             speed: 25,
             toggleable: true
         });
-        
-        mx.widgets.turnovers('#turnovers_widget_1', {
-            refresh_timeout: 10 * 1000
+
+        mx.widgets.turnovers('#turnovers_today', {
+            is_tonight_session: false,
+            afterRefresh: function (time) {
+                $('#turnovers_today_time').html(time.toString());
+            }
         });
+
+        mx.widgets.turnovers('#turnovers_tonight', {
+            is_tonight_session: true,
+            refresh_timeout: 15 * 1000
+        });
+
+        mx.widgets.repo_dealers('#repo_dealers');
         
     });
     
