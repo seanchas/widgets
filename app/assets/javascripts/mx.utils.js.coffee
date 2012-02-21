@@ -5,7 +5,6 @@ global.mx.utils  ?=  {}
 
 scope = global.mx.utils
 
-
 number_with_delimiter = (number, options = {}) ->
     return '-' unless number?
 
@@ -47,7 +46,15 @@ number_with_power = (number, options = {}) ->
 
     max_amount = max_amount - degree_shift if max_amount >= degree_shift
 
-    number_with_precision(number / Math.pow(10, max_amount), options) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
+    base = if max_amount > 0 then ' ' + power_amounts[max_amount] else ''
+
+    if options.separate
+        [
+            number_with_precision(number / Math.pow(10, max_amount), options)
+            base.substr(1)
+        ]
+    else
+        number_with_precision(number / Math.pow(10, max_amount), options) + (base)
     
 
 extract_options = (args) ->
