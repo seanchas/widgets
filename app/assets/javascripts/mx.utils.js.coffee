@@ -34,6 +34,8 @@ power_amounts =
 
 number_with_power = (number, options = {}) ->
     return '-' unless number?
+
+    degree_shift = (parseInt(options.shift || 0) * 3)
     
     digits      = Math.ceil(Math.log(number) / Math.LN10);
     max_amount  = 0;
@@ -41,7 +43,10 @@ number_with_power = (number, options = {}) ->
     for amount, label of power_amounts
         amount = parseInt(amount)
         max_amount = amount if max_amount < amount and amount <= digits
-    
+
+
+    max_amount = max_amount - degree_shift if max_amount >= degree_shift
+
     number_with_precision(number / Math.pow(10, max_amount), options) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
     
 

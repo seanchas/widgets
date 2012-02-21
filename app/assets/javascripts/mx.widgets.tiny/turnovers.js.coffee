@@ -27,7 +27,7 @@ render = (element, data) ->
     for type in ["rub", "usd"]
         value    = ( if type == "usd" then data["VALTODAY_USD"] else data["VALTODAY"] ) * 1000000
         if value == 0 then value = "-" else
-            value    = mx.utils.number_with_power value, { precision: 4 }
+            value    = mx.utils.number_with_power value, { precision: 4, shift: 1 }
         containers["#{type}_value"].html(value)
 
 widget = (element, options = {}) ->

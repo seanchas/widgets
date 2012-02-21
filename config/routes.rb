@@ -54,11 +54,10 @@ Widgets::Application.routes.draw do
 
     root :to             => 'welcome#index'
     get 'docs'           => 'welcome#widget_docs'
+    get 'tiny/docs'      => 'welcome#tiny_docs'
     get 'widget'         => 'welcome#widget'
     get 'examples'       => 'welcome#examples'
-    get 'tiny/docs'      => 'welcome#tiny_docs'
-    get 'docs/turnovers' => 'welcome#turnovers'
-    
+
     scope "security" do
       root :to => 'welcome#security', :as => "security"
       get "docs" => "welcome#security_docs"

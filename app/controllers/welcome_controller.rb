@@ -14,10 +14,6 @@ class WelcomeController < ApplicationController
     render :layout => "docs"
   end
 
-  def turnovers
-    render :layout => "docs"
-  end
-
   def examples
     render :layout => "examples"
   end
