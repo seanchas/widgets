@@ -25,7 +25,7 @@ widget = (element, options = {}) ->
     element = $(element)
     return if _.size(element) == 0
     
-    cache_key = mx.utils.sha1("")
+    cache_key = mx.utils.sha1(mx.locale())
     
     element.html cache.get cache_key
     

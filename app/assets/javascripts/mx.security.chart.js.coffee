@@ -15,27 +15,27 @@ cache = kizzy('security/chart')
 
 periods =
     day:
-        name: 'День'
+        name: { ru: 'День', en: 'Day' }
         interval: 10
         period: '2d'
         offset: 24 * 60 * 60 * 1000
     week:
-        name: 'Неделя'
+        name: { ru: 'Неделя', en: 'Week' }
         interval: 60
         period: '2w'
         offset: 7 * 24 * 60 * 60 * 1000
     month:
-        name: 'Месяц'
+        name: { ru: 'Месяц', en: 'Month' }
         interval: 60
         period: '2M'
         offset: 31 * 24 * 60 * 60 * 1000
     year:
-        name: 'Год'
+        name: { ru: 'Год', en: 'Year' }
         interval: 24
         period: '2y'
         offset: 365 * 24 * 60 * 60 * 1000
     all:
-        name: 'Весь период'
+        name: { ru: 'Весь период', en: 'All' }
         interval: 7
         period: 'all'
         offset: 1000 * 365 * 24 * 60 * 60 * 1000
@@ -161,7 +161,7 @@ make_periods = () ->
         item = $("<li>")
             .toggleClass('current', period == default_period)
             .html(
-                $("<a>").attr('href', "##{period}").html(periods[period].name)
+                $("<a>").attr('href', "##{period}").html(periods[period].name[mx.locale()])
             )
 
         list.append(item)
@@ -178,6 +178,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
     element = $(element); return if element.length == 0
 
+    set_highcharts_options()
 
     chart = null
 
@@ -279,15 +280,19 @@ widget = (element, engine, market, board, param, options = {}) ->
     }
 
 
+set_highcharts_options = _.once ->
+    Highcharts.setOptions(highcharts_options[mx.locale()])
+
+
 _.extend scope,
     chart: widget
 
-Highcharts.setOptions({
-    lang: {
-        decimalPoint: '.',
-        thousandsSep: ' ',
-        months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
-        shortMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-        weekdays: ['Воскресение', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
-    }
-});
+highcharts_options = 
+    ru:
+        lang:
+            decimalPoint: '.'
+            thousandsSep: ' '
+            months: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+            shortMonths: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
+            weekdays: ['Воскресение', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+    en: {}

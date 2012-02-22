@@ -24,7 +24,7 @@ widget = (element, options = {}) ->
     element = $(element)
     return if _.size(element) == 0
     
-    cache_key = mx.utils.sha1("")
+    cache_key = mx.utils.sha1(mx.locale())
 
     columns_data_source = mx.iss.columns('stock', 'index')
     

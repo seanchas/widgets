@@ -101,7 +101,7 @@ widget = (element, engine, market, params, options = {}) ->
     element = $ element; return if _.size(element) == 0
 
 
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     cacheable = options.cache == true
     
     read_cache(element, cache_key) if cacheable

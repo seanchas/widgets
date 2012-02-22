@@ -7,26 +7,41 @@ $ = jQuery
 cache = kizzy('mx.widgets.tiny.currency_rates')
 
 
-months = [
-    'января'
-    'февраля'
-    'марта'
-    'апреля'
-    'мая'
-    'июня'
-    'июля'
-    'августа'
-    'сентября'
-    'октября'
-    'ноября'
-    'декабря'
-]
+months = 
+    ru: [
+        'января'
+        'февраля'
+        'марта'
+        'апреля'
+        'мая'
+        'июня'
+        'июля'
+        'августа'
+        'сентября'
+        'октября'
+        'ноября'
+        'декабря'
+    ]
+    en: [
+        'january'
+        'february'
+        'march'
+        'april'
+        'may'
+        'june'
+        'july'
+        'august'
+        'september'
+        'october'
+        'november'
+        'december'
+    ]
 
 
 widget = (element) ->
     element = $(element); return unless _.size(element) == 1
     
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     
     containers =
         date:       $('.date',          element)
@@ -42,7 +57,7 @@ widget = (element) ->
         
         date = mx.utils.parse_date(data['CBRF_EUR_TRADEDATE'])
         
-        containers['date'].html(date.getDate() + ' ' + months[date.getMonth()])
+        containers['date'].html(date.getDate() + ' ' + months[mx.locale()]?[date.getMonth()])
         
         for type in ['eur', 'usd']
             container   = containers[type]
