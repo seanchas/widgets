@@ -35,31 +35,40 @@ create_row = (record, index) ->
                 .html(value || '&mdash;')
         )
 
-render = (element, turnovers) ->
+render = (engines, element, turnovers) ->
+
+    if engines.length > 0 then turnovers = _.filter turnovers, (obj) -> _.include(engines, obj["NAME"])
+
     table = create_table()
-    
+
     table_head = $('thead', table)
     table_body = $('tbody', table)
-    
+
     table_head.html create_table_head()
-    
+
     for record, index in turnovers
         table_body.append create_row record, index
-    
+
     element.html table
 
 
 widget = (element, options = {}) ->
     element = $(element); return if element.length == 0
-    
-    refresh_timeout = options.refresh_timeout || 60 * 1000
-    
+
+    engines          = options.engines || []
+    engines          = engines.split(",").map( (w) -> w.trim() ) if _.isString(engines)
+
+    refresh_timeout  = options.refresh_timeout || 60 * 1000
+
     refresh_callback = if options.afterRefresh and _.isFunction(options.afterRefresh) then options.afterRefresh else undefined
+
+    iss_callback = if options.issCallback and _.isFunction(options.issCallback) then options.issCallback else undefined
 
     refresh = ->
         mx.iss.turnovers(options).then (turnovers) ->
-            render element, turnovers
+            render engines, element, turnovers
             refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
+            iss_callback turnovers if iss_callback
             _.delay refresh, refresh_timeout
 
     refresh()
