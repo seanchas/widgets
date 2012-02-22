@@ -8,11 +8,20 @@ global.mx.utils  ?=  {}
 scope = global.mx.utils
 
 
+number_with_delimiter_options =
+    ru:
+        delimiter: ' '
+        separator: ','
+    en:
+        delimiter: ','
+        separator: '.'
+
+
 number_with_delimiter = (number, options = {}) ->
     return '-' unless number?
 
-    delimiter   = options.delimiter || ' '
-    separator   = options.separator || ','
+    delimiter   = options.delimiter || number_with_delimiter_options[mx.locale()].delimiter
+    separator   = options.separator || number_with_delimiter_options[mx.locale()].separator
 
     parts = number.toString().split '.'
     
@@ -30,9 +39,9 @@ number_with_precision = (number, options = {}) ->
 
 
 power_amounts =
-    6:      'Млн'
-    9:      'Млрд'
-    12:     'Трлн'
+    6:      { ru: 'Млн', en: 'M' }
+    9:      { ru: 'Млрд', en: 'G' }
+    12:     { ru: 'Трлн', en: 'T' }
 
 number_with_power = (number) ->
     return '-' unless number?
@@ -44,7 +53,7 @@ number_with_power = (number) ->
         amount = parseInt(amount)
         max_amount = amount if max_amount < amount and amount <= digits
     
-    number_with_delimiter(number / Math.pow(10, max_amount)) + (if max_amount > 0 then ' ' + power_amounts[max_amount] else '')
+    number_with_delimiter(number / Math.pow(10, max_amount)) + (if max_amount > 0 then ' ' + power_amounts[max_amount][mx.locale()] else '')
     
 
 extract_options = (args) ->

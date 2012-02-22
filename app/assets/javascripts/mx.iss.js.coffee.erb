@@ -1,5 +1,6 @@
 ##= require jquery
 ##= require underscore
+##= require mx.locale
 
 global = module?.exports ? ( exports ? this )
 
@@ -10,7 +11,7 @@ $ = jQuery
 
 scope = global.mx.iss
 
-iss_host = "<%= Rails.application.config.iss_host %>"
+iss_host = "http://www.micex.ru/iss" #"<%= Rails.application.config.iss_host %>"
 
 cache = {}
 
@@ -193,7 +194,7 @@ request = (name, args...) ->
     
     $.ajax
         url: meta.url(args...)
-        data: meta.data(args...)
+        data: _.extend(meta.data(args...), { lang: mx.locale() })
         dataType: 'jsonp'
         jsonpCallback: "iss_jsonp_#{key}"
     .done (json) ->
