@@ -15,10 +15,10 @@ render = (element, data) ->
         date:      $(".date",       element)
         rub:       $(".rub",        element)
         rub_value: $(".rub .value", element)
-        rub_base:  $(".rub .base", element)
+        rub_base:  $(".rub .base",  element)
         usd:       $(".usd",        element)
         usd_value: $(".usd .value", element)
-        usd_base:  $(".usd .base", element)
+        usd_base:  $(".usd .base",  element)
 
     date = mx.utils.parse_date data["UPDATETIME"]
 
@@ -26,10 +26,12 @@ render = (element, data) ->
 
     for type in ["rub", "usd"]
         value    = ( if type == "usd" then data["VALTODAY_USD"] else data["VALTODAY"] ) * 1000000
-        if value == 0 then value = ["-", ""] else
-            value    = mx.utils.number_with_power value, { precision: 4, shift: 1, separate: 1 }
-        containers["#{type}_value"].html(value[0])
-        containers["#{type}_base"].html(value[1])
+        if value == 0 then value = "-"; base = "" else
+            str  = mx.utils.number_with_power(value, { precision: 4, shift: 1 }).match /([\d ,.]+)(.+)?/
+            base  = str[2]
+            value = str[1]
+        containers["#{type}_value"].html(value)
+        containers["#{type}_base"].html(base)
 
 widget = (element, options = {}) ->
 
