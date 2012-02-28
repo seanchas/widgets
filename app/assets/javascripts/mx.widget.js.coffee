@@ -11,9 +11,11 @@
 ##= require mx.widgets.security.emitter
 ##= require mx.widgets.security.chart
 ##= require mx.widgets.turnovers
+##= require mx.widgets.repo.dealers
 ##= require mx.widgets.ticker
 ##= require mx.widgets.indices
 ##= require mx.widgets.shares
+##= require mx.widgets.tiny
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

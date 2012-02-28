@@ -37,7 +37,7 @@ escape_selector = (string) ->
 
 default_delay       = 60 * 1000
 min_delay           =  5 * 1000
-chart_refresh_delay = 60 * 1000
+chart_refresh_delay =  5 * 1000
 
 calculate_delay = (delay) ->
     delay = + delay
@@ -81,6 +81,7 @@ columns_data_source = (params) ->
 records_data_source = (params, options) ->
     deferred = new $.Deferred
     
+
     result = {}
     
     complete = _.after _.size(params), ->
@@ -100,7 +101,7 @@ widget = (element, engine, market, params, options = {}) ->
     element = $ element; return if _.size(element) == 0
 
 
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     cacheable = options.cache == true
     
     read_cache(element, cache_key) if cacheable
@@ -166,8 +167,8 @@ widget = (element, engine, market, params, options = {}) ->
         
         image.on 'load', ->
             cell.removeClass('loading')
-            cell.children().remove()
-            cell.html($("<img>").attr('src', url))
+            cell.html(image)
+            cell.css('height', cell.height())
             charts_times[key] = + new Date
             write_cache(element, cache_key) if cacheable
         
@@ -175,7 +176,7 @@ widget = (element, engine, market, params, options = {}) ->
             chart_row.prev("tr.row").removeClass("current")
             chart_row.data('defunct', true).hide()
             cell.removeClass('loading')
-            cell.children().remove()
+            cell.empty()
             write_cache(element, cache_key) if cacheable
 
         
@@ -199,7 +200,6 @@ widget = (element, engine, market, params, options = {}) ->
         
         element.on 'click', 'a', (event) ->
             row = $(event.currentTarget).closest("tr.row")
-            console.log row.data()
             return event.preventDefault() if !row.hasClass("current") and row.next("tr.chart").data('defunct') != true
             event.stopPropagation()
         
@@ -244,19 +244,27 @@ widget = (element, engine, market, params, options = {}) ->
                     .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
-                    
+                        
                 for field, index in _filters
-
+                    
                     column  = _columns[field.id]
-
+                    
                     trend   = record.trends[column.name]
+                    
+                    value = record[column.name]
+                    
+                    if value == 0 or value == null
+                        if column.trend_by == field.id
+                            value = undefined if _.all((record[c.name] for id, c of _columns when c.trend_by == field.id), (v) -> v == 0 or v == null)
+                        else
+                            value = undefined if trend == 0 or trend == null
                     
                     cell = $("<td>")
                         .attr
                             'data-name':    column.name
                             'title':        column.title
                         .addClass(column.type)
-                        .html($("<span>").html(mx.utils.render(record[column.name], column) || '&mdash;'))
+                        .html($("<span>").html(mx.utils.render(value, _.extend({}, column, { precision: record.precisions[column.name]} )) || '&mdash;'))
                     
                     if column.trend_by == field.id
                         cell.toggleClass('trend_up',    trend  > 0)
@@ -279,7 +287,7 @@ widget = (element, engine, market, params, options = {}) ->
 
                     if _.size(old_chart_row = $("tr.chart[data-key=#{escape_selector record_key}]")) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            $("td", chart_row).html($("<img>").attr('src', url))
+                            $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
                         chart_row.data('defunct', old_chart_row.data('defunct'))
             
             element.children().remove()

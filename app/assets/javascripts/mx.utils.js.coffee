@@ -1,3 +1,5 @@
+##= require mx.locale
+
 global = module?.exports ? ( exports ? this )
 
 global.mx        ?=  {}
@@ -5,12 +7,19 @@ global.mx.utils  ?=  {}
 
 scope = global.mx.utils
 
+number_with_delimiter_options =
+    ru:
+        delimiter: ' '
+        separator: ','
+    en:
+        delimiter: ','
+        separator: '.'
 
 number_with_delimiter = (number, options = {}) ->
     return '-' unless number?
 
-    delimiter   = options.delimiter || ' '
-    separator   = options.separator || ','
+    delimiter   = options.delimiter || number_with_delimiter_options[mx.locale()].delimiter
+    separator   = options.separator || number_with_delimiter_options[mx.locale()].separator
 
     parts = number.toString().split '.'
     
@@ -26,6 +35,36 @@ number_with_precision = (number, options = {}) ->
     
     number_with_delimiter(new Number(number.toString()).toFixed(precision), options)
 
+
+power_amounts =
+    6:      { ru: 'Млн', en: 'M' }
+    9:      { ru: 'Млрд', en: 'G' }
+    12:     { ru: 'Трлн', en: 'T' }
+
+number_with_power = (number, options = {}) ->
+    return '-' unless number?
+
+    degree_shift = (parseInt(options.shift || 0) * 3)
+    
+    digits      = Math.ceil(Math.log(number) / Math.LN10);
+    max_amount  = 0;
+
+    for amount, label of power_amounts
+        amount = parseInt(amount)
+        max_amount = amount if max_amount < amount and amount <= digits
+
+    max_amount = max_amount - degree_shift if max_amount >= degree_shift
+
+    base = if max_amount > 0 then ' ' + power_amounts[max_amount][mx.locale()] else ''
+
+    if options.separate
+        [
+            number_with_precision(number / Math.pow(10, max_amount), options)
+            base.substr(1)
+        ]
+    else
+        number_with_precision(number / Math.pow(10, max_amount), options) + (base)
+    
 
 extract_options = (args) ->
     options = _.last(args)
@@ -56,6 +95,8 @@ process_record = (record, columns, by_name = false) ->
     
     decimals = record['DECIMALS']
 
+    record.precisions = {}
+
     for name, value of record
 
         column = _.first(column for id, column of columns when column.name == name)
@@ -64,10 +105,10 @@ process_record = (record, columns, by_name = false) ->
 
         record[name] = switch column.type
             when 'string'
-                value
+                if name == 'FACEUNIT' and value == 'SUR' then 'RUB' else value
             when 'number'
-                column.precision ?= decimals
-                if value? then parseFloat(new Number(value).toFixed(column.precision ? decimals)) else value
+                record.precisions[name] = if column.has_percent == 1 then 2 else column.precision ? decimals
+                if value? then parseFloat(new Number(value).toFixed(record.precisions[name])) else value
             when 'date'
                 parse_date value
             when 'time'
@@ -90,7 +131,7 @@ render = (value, descriptor = {}) ->
 
 
 render_number = (value, descriptor = {}) ->
-    return value unless value? and typeof value == 'number'
+    return value unless value?
 
     value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
 
@@ -211,6 +252,7 @@ sha1 = (string) ->
 _.extend scope,
     number_with_delimiter:  number_with_delimiter
     number_with_precision:  number_with_precision
+    number_with_power:      number_with_power
     extract_options:        extract_options
     process_record:         process_record
     parse_date:             parse_date

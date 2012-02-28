@@ -59,7 +59,7 @@ trigger_render_event = (element, status, iss, options = {}) ->
 widget = (element, engine, market, board, param, options = {}) ->
     element = $ element; return if element.length == 0
     
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     
     element.html cache.get(cache_key) if options.cache
 

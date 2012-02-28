@@ -9,24 +9,29 @@ $ = jQuery
 
 periods =
     day:
-        name: 'День'
-        interval: 1
+        name: 'Денёк'
+        interval: 10
+        period: '2d'
         offset: 24 * 60 * 60 * 1000
     week:
         name: 'Неделя'
-        interval: 10
+        interval: 60
+        period: '2w'
         offset: 7 * 24 * 60 * 60 * 1000
     month:
         name: 'Месяц'
-        interval: 24
+        interval: 60
+        period: '2m'
         offset: 31 * 24 * 60 * 60 * 1000
     year:
         name: 'Год'
         interval: 24
+        period: '2y'
         offset: 365 * 24 * 60 * 60 * 1000
     all:
         name: 'Весь период'
-        interval: 24
+        interval: 7
+        period: 'all'
         offset: 1000 * 365 * 24 * 60 * 60 * 1000
 
 
@@ -211,8 +216,8 @@ widget = (element, engine, market, board, param, options = {}) ->
             mx.cs.data(engine, market, param, {
                 'interval': period.interval
                 's1.type':  type
-                'from':     begin
-                'till':     end
+                #'from':     begin
+                #'till':     end
             }).then (data) ->
                 
                 series = for zone in data.zones

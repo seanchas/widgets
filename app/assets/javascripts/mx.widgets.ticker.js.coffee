@@ -20,7 +20,7 @@ widget = (element, params, options = {}) ->
     element.html($("<div>").addClass("mx-widget-ticker loading"))
     element = $(".mx-widget-ticker", element)
     
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     
     speed       = options.speed ? 25
     toggleable  = options.toggleable == true

@@ -9,15 +9,17 @@ $ = jQuery
 
 
 fields = [
-    { name: 'SHORT_TITLE',              title: 'Краткое наименование' }
-    { name: 'TRANSLITERATION_TITLE',    title: 'Транслитерация' }
-    { name: 'LEGAL_ADDRESS',            title: 'Юридический адрес' }
-    { name: 'POSTAL_ADDRESS',           title: 'Почтовый адрес' }
-    { name: 'OKPO',                     title: 'ОКПО' }
-    { name: 'OGRN',                     title: 'ОГРН' }
-    { name: 'INN',                      title: 'ИНН' }
-    { name: 'URL',                      title: 'WEB-адрес' }
+    { name: 'SHORT_TITLE',              title: { ru: 'Краткое наименование', en: 'Shortname' } }
+    { name: 'TRANSLITERATION_TITLE',    title: { ru: 'Транслитерация'      , en: 'Transliteration' } }
+    { name: 'LEGAL_ADDRESS',            title: { ru: 'Юридический адрес'   , en: 'Legal address' } }
+    { name: 'POSTAL_ADDRESS',           title: { ru: 'Почтовый адрес'      , en: 'Postal address' } }
+    { name: 'OKPO',                     title: { ru: 'ОКПО'                , en: 'OKPO' } }
+    { name: 'OGRN',                     title: { ru: 'ОГРН'                , en: 'OGRN' } }
+    { name: 'INN',                      title: { ru: 'ИНН'                 , en: 'INN' } }
+    { name: 'URL',                      title: { ru: 'WEB-адрес'           , en: 'Web' } }
 ]
+
+url_re = /(\b((https?|ftp|file):\/\/)*([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))/ig
 
 widget = (element, engine, market, board, param, options = {}) ->
     
@@ -39,10 +41,16 @@ widget = (element, engine, market, board, param, options = {}) ->
         table_body = $('tbody', table)
 
         for field in fields
-            table_body.append $("<tr><th>#{field.title}</th><td>#{emitter[field.name] ? '&mdash;'}</td></tr>")
+            value = emitter[field.name]
+            if value and field.name == 'URL'
+                value = value.replace(url_re, (args...) ->
+                    schema = args[2] ? "http://"
+                    domain = args[4].replace(/([^\/])\/$/, "$1")
+                    "<a href=\"#{schema + domain}\">#{domain}</a>"
+                )
+            table_body.append $("<tr><th>#{field.title[mx.locale()]}</th><td>#{value ? '&mdash;'}</td></tr>")
 
         element.html table
-
 
     mx.iss.description(param).then (description) ->
         emitter_id = _.first(field.value for field in description when field.name == 'EMITTER_ID')
@@ -105,7 +113,6 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
             table_body.append create_row(engine.title, records) if _.size(records) > 0
         
         element.html table
-        
         
 
     $.when(mx.iss.defaults(), mx.iss.description(param)).then (defaults, description) ->

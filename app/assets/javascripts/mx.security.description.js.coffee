@@ -7,6 +7,15 @@ scope = global.mx.security
 
 $ = jQuery
 
+
+calculation_base =
+    ru: 'База расчета'
+    en: 'Calculation base'
+
+indices_inclusion =
+    ru: 'Входит в индексы'
+    en: 'Included in indices'
+
 create_table = ->
     $('<table>')
         .addClass('mx-security-description')
@@ -38,6 +47,7 @@ render = (element, description, security, columns, filters, indices, index_secur
 
     for field in description
         field.value = mx.utils.parse_date(field.value) if field.type == 'date'
+        field.value = 'RUB' if field.name == 'FACEUNIT' and field.value == 'SUR'
 
 
     mx.utils.process_record security, columns
@@ -60,14 +70,14 @@ render = (element, description, security, columns, filters, indices, index_secur
     for column in columns
         table_body.append make_row column.short_title, mx.utils.render(security[column.name], column) unless _.isEmpty(security)
     
-    table_body.append make_row "Входит в индексы", ("<a href=\"#{make_url index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
+    table_body.append make_row indices_inclusion[mx.locale()], ("<a href=\"#{make_url index['SECID']}\">#{index['SHORTNAME']}</a>" for index in indices).join(", ") if _.size(indices) > 0
     
     index_securities = _.reduce index_securities, (memo, ticker) ->
         memo.push ticker.secids.split(',')...
         memo
     , []
 
-    table_body.append make_row "База расчета", ("<a href=\"#{make_url ticker}\">#{ticker}</a>" for ticker in index_securities).join(", ") if _.size(index_securities) > 0
+    table_body.append make_row calculation_base[mx.locale()], ("<a href=\"#{make_url ticker}\">#{ticker}</a>" for ticker in index_securities).join(", ") if _.size(index_securities) > 0
     
     element.html table
 

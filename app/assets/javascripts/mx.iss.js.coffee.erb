@@ -1,5 +1,6 @@
 ##= require jquery
 ##= require underscore
+##= require mx.locale
 
 global = module?.exports ? ( exports ? this )
 
@@ -50,6 +51,35 @@ request_meta =
             iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
         key: (engine, market, options = {}) ->
             [engine, market, options.only]
+    
+    securities:
+        url: (engine, market, params, options = {}) ->
+            "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
+        data: (engine, market, params, options = {}) ->
+            known_keys = ['nearest', 'leaders']
+
+            params_name = options.params_name || 'securities'
+
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'securities,marketdata'
+
+            data[params_name] = if _.isArray params then params.join(',') else params
+
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+
+            _.extend data, options
+            
+            data
+        
+        parse: (json) ->
+            iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
+
+        key: (engine, market, params) ->
+            [engine, market, params]
 
     security:
         url: (engine, market, board, param) ->
@@ -84,6 +114,29 @@ request_meta =
         key: (engine, market, board, param) ->
             [engine, market, board, param]
     
+    boards:
+        url: (param) ->
+            "#{iss_host}/securities/#{param}.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'boards'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.boards)
+        key: (param) ->
+            [param]
+    
+    turnovers:
+        url: ->
+            "#{iss_host}/turnovers.jsonp?callback=?"
+        data: (options = {}) ->
+            'iss.meta': 'off'
+            'iss.only': 'turnovers'
+            'is_tonight_session': if options.is_tonight_session == true then 1 else 0
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.turnovers)
+        key: (options = {}) ->
+            [options]
+    
     security_indices:
         url: (param) ->
             "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
@@ -116,6 +169,27 @@ request_meta =
             _.first(iss_merge_columns_and_data(json?.capitalization))?['CAPITALIZATION']
         key: ->
             []
+    
+    currency_rates:
+        url: ->
+            "#{iss_host}/statistics/engines/currency/markets/selt/rates.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            _.first iss_merge_columns_and_data(json?.cbrf)
+        key: ->
+            []
+
+    repo_dealers:
+        url: ->
+            "#{iss_host}/statistics/engines/state/markets/repo/dealers.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'data'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.data)
+        key: ->
+            []
 
 
 request = (name, args...) ->
@@ -131,10 +205,9 @@ request = (name, args...) ->
     
     $.ajax
         url: meta.url(args...)
-        data: meta.data(args...)
-        dataType: 'jsonp',
-        cache: true,
-        jsonpCallback: "callback_#{key}"
+        data: _.extend(meta.data(args...), { lang: mx.locale() })
+        dataType: 'jsonp'
+        jsonpCallback: "iss_jsonp_#{key}"
     .done (json) ->
         cache[key].resolve meta.parse(json)
     
@@ -204,26 +277,10 @@ records = (engine, market, params, options = {}) ->
     deferred.promise()
 
 
-boards = (param) ->
-    deferred = $.Deferred()
-
-    data = 
-        'iss.meta': 'off'
-        'iss.only': 'boards'
-
-    $.ajax
-        url: "#{iss_host}/securities/#{param}.jsonp?callback=?"
-        data: data
-        dataType: 'jsonp'
-        scriptCharset: 'utf-8'
-    .then (json) ->
-        deferred.resolve iss_merge_columns_and_data(json?.boards)
-
-    deferred.promise()
-
-
 emitter = (param) ->
     deferred = $.Deferred()
+    
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter', arguments...])
     
     data =
         'iss.meta': 'off'
@@ -233,6 +290,8 @@ emitter = (param) ->
         url: "#{iss_host}/emitters/#{param}.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve _.first(iss_merge_columns_and_data(json?.emitter))
@@ -243,6 +302,8 @@ emitter = (param) ->
 emitter_securities = (param) ->
     deferred = $.Deferred()
     
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter_securities', arguments...])
+
     data =
         'iss.meta': 'off'
         'iss.only': 'securities'
@@ -251,33 +312,19 @@ emitter_securities = (param) ->
         url: "#{iss_host}/emitters/#{param}/securities.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.securities)
     
     deferred.promise()
 
-
-turnovers = (engine) ->
-    deferred = new $.Deferred
-    
-    data =
-        'iss.meta': 'off'
-        'iss.only': 'turnovers'
-    
-    $.ajax
-        url: "#{iss_host}/#{if engine? then 'engines/' + engine + '/' else ''}turnovers.jsonp?callback=?"
-        data: data
-        dataType: 'jsonp'
-        scriptCharset: 'utf-8'
-    .then (json) ->
-        deferred.resolve iss_merge_columns_and_data(json?.turnovers)
-    
-    deferred.promise()
-
 candle_borders = (engine, market, param) ->
     deferred = new $.Deferred
     
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['candle_borders', arguments...])
+
     data =
         'iss.meta': 'off'
         'iss.only': 'borders'
@@ -286,6 +333,8 @@ candle_borders = (engine, market, param) ->
         url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/candleborders.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
+        jsonCallback: "callback_#{key}}"
+        cache: true
         scriptCharset: 'utf-8'
     .then (json) ->
         deferred.resolve iss_merge_columns_and_data(json?.borders)
@@ -296,16 +345,18 @@ candle_borders = (engine, market, param) ->
 _.extend scope,
     defaults:           (args...) -> request('defaults', args...)
     columns:            (args...) -> request('columns', args...)
-    records:            records
+    records:            (args...) -> request('securities', args...)
     security:           (args...) -> request('security', args...)
     security_indices:   (args...) -> request('security_indices', args...)
     index_securities:   (args...) -> request('index_securities', args...)
     orderbook:          (args...) -> request('orderbook', args...)
     description:        (args...) -> request('description', args...)
-    boards:             boards
+    boards:             (args...) -> request('boards', args...)
     emitter:            emitter
     emitter_securities: emitter_securities
-    turnovers:          turnovers
+    turnovers:          (args...) -> request('turnovers', args...)
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization', args...)
+    currency_rates:     (args...) -> request('currency_rates', args...)
+    repo_dealers:       (args...) -> request('repo_dealers',   args...)
