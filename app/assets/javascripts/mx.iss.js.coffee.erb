@@ -191,6 +191,17 @@ request_meta =
         key: ->
             []
 
+    cb_transactions:
+        url: ->
+            "#{iss_host}/statistics/engines/state/markets/repo/cboper.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'date'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.date)
+        key: ->
+            []
+
 
 request = (name, args...) ->
     meta    = request_meta[name]
@@ -357,6 +368,7 @@ _.extend scope,
     turnovers:          (args...) -> request('turnovers', args...)
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
-    capitalization:     (args...) -> request('capitalization', args...)
-    currency_rates:     (args...) -> request('currency_rates', args...)
-    repo_dealers:       (args...) -> request('repo_dealers',   args...)
+    capitalization:     (args...) -> request('capitalization',  args...)
+    currency_rates:     (args...) -> request('currency_rates',  args...)
+    repo_dealers:       (args...) -> request('repo_dealers',    args...)
+    cb_transactions:    (args...) -> request('cb_transactions', args...)
