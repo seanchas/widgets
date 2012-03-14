@@ -11,6 +11,11 @@ $ = jQuery
 cache = kizzy('security.boards')
 
 
+now = 
+    ru: 'По н. вр.'
+    en: 'Present'
+
+
 format_date = (date) ->
     return '&mdash;' unless date
     date = if date instanceof Date then date else mx.utils.parse_date(date)
@@ -37,7 +42,7 @@ widget = (element, engine, market, board, param, options = {}) ->
 
     make_row = (b) ->
         row = $("<tr>")
-            .html("<th><a href=\"#{make_url b}\">#{b.title}</a></th><td>#{format_date b.history_from} &ndash; По н. вр.</td>")
+            .html("<th><a href=\"#{make_url b}\">#{b.title}</a></th><td>#{format_date b.history_from} &ndash; #{now[mx.locale()]}</td>")
         
         cell = $('th', row)
         row.toggleClass('current', b.boardid == board)

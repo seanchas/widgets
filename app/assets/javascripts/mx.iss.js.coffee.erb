@@ -291,11 +291,12 @@ records = (engine, market, params, options = {}) ->
 emitter = (param) ->
     deferred = $.Deferred()
     
-    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter', arguments...])
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter', mx.locale(), arguments...])
     
     data =
         'iss.meta': 'off'
         'iss.only': 'emitter'
+        'lang':     mx.locale()
     
     $.ajax
         url: "#{iss_host}/emitters/#{param}.jsonp?callback=?"
@@ -313,11 +314,12 @@ emitter = (param) ->
 emitter_securities = (param) ->
     deferred = $.Deferred()
     
-    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter_securities', arguments...])
+    key     = mx.utils.sha1 JSON.stringify _.flatten(['emitter_securities', mx.locale(), arguments...])
 
     data =
         'iss.meta': 'off'
         'iss.only': 'securities'
+        'lang':     mx.locale()
     
     $.ajax
         url: "#{iss_host}/emitters/#{param}/securities.jsonp?callback=?"
