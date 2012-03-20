@@ -13,13 +13,16 @@ create_table = ->
         .addClass('mx-widget-turnovers')
         .html('<thead></thead><tbody></tbody>')
 
-create_table_head = ->
+create_table_head = (options = {}) ->
+    currency = if options.usd == true then 'USD' else 'РУБ'
+    
     $('<tr>')
         .append($('<td>').html('Объемы торгов'))
-        .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + ' [РУБ]'))
+        .append($('<td>').addClass('number').html(mx.widgets.utils.render_value(new Date, { type: 'date' }) + " [#{currency}]"))
 
-create_row = (record, index) ->
-    value = mx.widgets.utils.render_value((if record['VALTODAY'] then record['VALTODAY'] * 1000000 else null), { type: 'number', precision: '0' })
+create_row = (record, index, options = {}) ->
+    value = record["VALTODAY#{ if options.usd == true then '_USD' else ''}"]
+    value = mx.widgets.utils.render_value((if value then value * 1000000 else null), { type: 'number', precision: '0' })
 
     $('<tr>')
         .toggleClass('even',    (index + 1) %  2 == 0)
@@ -35,7 +38,7 @@ create_row = (record, index) ->
                 .html(value || '&mdash;')
         )
 
-render = (engines, element, turnovers) ->
+render = (engines, element, turnovers, options = {}) ->
 
     if engines.length > 0 then turnovers = _.filter turnovers, (obj) -> _.include(engines, obj["NAME"])
 
@@ -44,10 +47,10 @@ render = (engines, element, turnovers) ->
     table_head = $('thead', table)
     table_body = $('tbody', table)
 
-    table_head.html create_table_head()
+    table_head.html create_table_head options
 
     for record, index in turnovers
-        table_body.append create_row record, index
+        table_body.append create_row record, index, options
 
     element.html table
 
@@ -66,7 +69,7 @@ widget = (element, options = {}) ->
 
     refresh = ->
         mx.iss.turnovers(options).then (turnovers) ->
-            render engines, element, turnovers
+            render engines, element, turnovers, options
             refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
             iss_callback turnovers if iss_callback
             _.delay refresh, refresh_timeout
