@@ -10,11 +10,11 @@ $ = jQuery
 cache = kizzy('mx.widgets.cb_transactions')
 
 columns = [
-  { title: "",                   column: "TITLE",          type: "string"   },
-  { title: "Депозиты",           column: "WADEPSRATE",     type: "number", is_signed: 0, has_percent: 0, precision: 0  },
-  { title: "Прямое РЕПО",        column: "WAREPORATE",     type: "number", is_signed: 0, has_percent: 0, precision: 0  },
-  { title: "Фикс. прямого РЕПО", column: "WAREPORATEFIXN", type: "number", is_signed: 0, has_percent: 0, precision: 0  },
-  { title: "Дата",               column: "TRADEDATE",      type: "date"     }]
+  { title: { ru: "", en: "" },                                  column: "TITLE",          type: "string"   },
+  { title: { ru: "Депозиты", en: "Deposits" },                  column: "WADEPSRATE",     type: "number", is_signed: 0, has_percent: 0, precision: 0  },
+  { title: { ru: "Прямое РЕПО", en: "Direct REPO" },            column: "WAREPORATE",     type: "number", is_signed: 0, has_percent: 0, precision: 0  },
+  { title: { ru: "Фикс. прямого РЕПО", en: "Direct REPO fix" }, column: "WAREPORATEFIXN", type: "number", is_signed: 0, has_percent: 0, precision: 0  },
+  { title: { ru: "Дата", en: "Date" },                          column: "TRADEDATE",      type: "date"     }]
 
 sort_order = [ 0, 1, 4, 3, 5, 2 ]
 
@@ -25,7 +25,7 @@ create_table = ->
 
 create_table_head = ->
   tr    = $("<tr>")
-  for col in columns then tr.append $("<td>").addClass(col.type).html(col.title)
+  for col in columns then tr.append $("<td>").addClass(col.type).html(col.title[ mx.locale() ])
   return tr
 
 create_table_row = (row, index) ->

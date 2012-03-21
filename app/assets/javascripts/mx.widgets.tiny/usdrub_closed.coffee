@@ -9,26 +9,10 @@ cache = kizzy('mx.widgets.tiny.usdrub_closed')
 f = (x) -> if 0 < x < 10 then "0" + x else x
 d = (d) -> "#{f d.getDate()}.#{f( d.getMonth() + 1 )}.#{d.getFullYear()}"
 
-months = [
-    'января'
-    'февраля'
-    'марта'
-    'апреля'
-    'мая'
-    'июня'
-    'июля'
-    'августа'
-    'сентября'
-    'октября'
-    'ноября'
-    'декабря'
-]
-
-
 widget = (element) ->
     element = $(element); return unless _.size(element) == 1
 
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")))
+    cache_key = mx.utils.sha1( "usd_rub" + mx.locale() )
 
     containers =
         date:       $('.date',          element)
