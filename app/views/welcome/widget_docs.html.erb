@@ -137,6 +137,18 @@
       </p>
       <div class="options">
         <h5>
+          show_sectors
+          <span class="type">Boolean</span>
+        </h5>
+        <div class="default">
+          <strong>Default:</strong>
+          true
+        </div>
+        <p>
+          Показывать детализацию рынков.
+        </p>
+        
+        <h5>
           usd
           <span class="type">Boolean</span>
         </h5>
@@ -224,11 +236,15 @@
         &lt;/tr&gt;
     &lt;/thead&gt;
     &lt;tbody&gt;
-        &lt;tr&gt;
+        &lt;tr class="odd"&gt;
             &lt;td class="title"&gt;Фондовый рынок&lt;/td&gt;
             &lt;td class="number"&gt;320 803 796 147&lt;/td&gt;
         &lt;/tr&gt;
-        &lt;tr&gt;
+        &lt;tr class="odd alt"&gt;
+            &lt;td class="title"&gt;в т.ч. Все корпоративные облигации &lt;/td&gt;
+            &lt;td class="number"&gt;142 393 551 065&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr class="even"&gt;
             &lt;td class="title"&gt;Валютный рынок&lt;/td&gt;
             &lt;td class="number"&gt;481 980 456 435&lt;/td&gt;
         &lt;/tr&gt;
@@ -301,6 +317,8 @@
                 mx.widgets.turnovers('#turnovers_tonight', {
                     // вечерняя сессия
                     is_tonight_session: true,
+                    // отключить детализацию рынков
+                    show_sectors: false,
                     // обновление виджета каждые 15 секунд
                     refresh_timeout: 15 * 1000
                     });
@@ -533,7 +551,6 @@
 
         mx.widgets.turnovers('#turnovers_today', {
             is_tonight_session: false,
-            without_sectors:    false,
             afterRefresh: function (time) {
                 $('#turnovers_today_time').html(time.toString());
             }
@@ -541,6 +558,7 @@
 
         mx.widgets.turnovers('#turnovers_tonight', {
             is_tonight_session: true,
+            show_sectors:       false,
             refresh_timeout: 15 * 1000
         });
 

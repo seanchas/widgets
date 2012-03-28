@@ -76,7 +76,7 @@ render = (engines, element, data, options = {}) ->
     for record, index in turnovers
         table_body.append create_row record, index, options
 
-        unless options.without_sectors == true
+        if options.show_sectors
             sectors = _.filter turnoverssectors, (obj) -> obj["NAME"] == record["NAME"]
             table_body.append create_row sector, k, _.extend _.clone(options), { is_sector: true } for sector, k in sectors if sectors.length > 0
 
@@ -87,6 +87,9 @@ widget = (element, options = {}) ->
     element = $(element); return if element.length == 0
 
     cache_key = mx.utils.sha1(JSON.stringify( { is_tonight_session: !!(options.is_tonight_session || false) } ) + mx.locale())
+
+    options.show_sectors = if options.show_sectors == undefined then true
+    options.show_sectors = !!options.show_sectors
 
     engines          = options.engines || []
     engines          = engines.split(",").map( (w) -> w.trim() ) if _.isString(engines)
