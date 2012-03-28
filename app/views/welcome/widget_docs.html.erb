@@ -533,6 +533,7 @@
 
         mx.widgets.turnovers('#turnovers_today', {
             is_tonight_session: false,
+            without_sectors:    false,
             afterRefresh: function (time) {
                 $('#turnovers_today_time').html(time.toString());
             }

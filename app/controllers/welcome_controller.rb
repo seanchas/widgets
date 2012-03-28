@@ -25,5 +25,9 @@ class WelcomeController < ApplicationController
   def security_docs
     render :layout => "docs"
   end
+
+  def dragndrop
+    render :layout => nil
+  end
   
 end

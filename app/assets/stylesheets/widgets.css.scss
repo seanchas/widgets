@@ -76,6 +76,14 @@
         padding-left: 25px;
         text-align: right;
     }
+
+    tr.alt {
+        background-color: #ddd;
+
+        td:first-of-type {
+          padding-left: 2em;
+        }
+    }
     
     thead {
         

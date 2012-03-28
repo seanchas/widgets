@@ -18,6 +18,9 @@ localization =
     en:
       usd: "USD"
       rub: "RUB"
+  sector_prefix:
+    ru: "в т.ч."
+    en: "inc."
 
 cache = kizzy('mx.widgets.turnovers')
 
@@ -40,10 +43,11 @@ create_row = (record, index, options = {}) ->
     $('<tr>')
         .toggleClass('even',    (index + 1) %  2 == 0)
         .toggleClass('odd',     (index + 1) %  2 == 1)
+        .toggleClass('alt',  options.is_sector?)
         .append(
             $('<td>')
                 .addClass('title')
-                .html(record['TITLE'])
+                .html([ (if options.is_sector? then localization.sector_prefix[ mx.locale() ] else ""), record['TITLE'] ].join " ")
         )
         .append(
             $('<td>')
@@ -51,7 +55,12 @@ create_row = (record, index, options = {}) ->
                 .html(value || '&mdash;')
         )
 
-render = (engines, element, turnovers, options = {}) ->
+render = (engines, element, data, options = {}) ->
+
+    return unless data?
+
+    turnovers =        data.turnovers
+    turnoverssectors = data.turnoverssectors
 
     return unless turnovers?
 
@@ -66,6 +75,10 @@ render = (engines, element, turnovers, options = {}) ->
 
     for record, index in turnovers
         table_body.append create_row record, index, options
+
+        unless options.without_sectors == true
+            sectors = _.filter turnoverssectors, (obj) -> obj["NAME"] == record["NAME"]
+            table_body.append create_row sector, k, _.extend _.clone(options), { is_sector: true } for sector, k in sectors if sectors.length > 0
 
     element.html table
 
@@ -87,13 +100,12 @@ widget = (element, options = {}) ->
     render engines, element, cache.get(cache_key), options
 
     refresh = ->
-        mx.iss.turnovers(options).then (turnovers) ->
-            render engines, element, turnovers, options
-            refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
-            iss_callback turnovers if iss_callback
+        mx.iss.turnovers(options).then (data) ->
+            render engines, element, data, options
+            refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(data.turnovers, 'UPDATETIME')) if refresh_callback
+            iss_callback data if iss_callback
 
-            cache.set(cache_key, turnovers)
-
+            cache.set(cache_key, data)
             _.delay refresh, refresh_timeout
 
     refresh()
