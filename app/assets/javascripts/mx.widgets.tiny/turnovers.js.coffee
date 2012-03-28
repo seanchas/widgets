@@ -8,6 +8,8 @@ f = (x) -> if 0 < x < 10 then "0" + x else x
 d = (d) -> "#{f d.getDate()}.#{f( d.getMonth() + 1 )}.#{d.getFullYear()} #{f d.getHours()}:#{f d.getMinutes()}"
 
 
+cache = kizzy('mx.widgets.turnovers')
+
 render = (element, data) ->
     return unless data?
 
@@ -37,12 +39,17 @@ widget = (element, options = {}) ->
 
     element = $(element); return unless _.size(element) == 1
 
-    engine           = options.engine          || "currency"
-    refresh_timeout  = options.refresh_timeout || 10 * 1000
+    cache_key = mx.utils.sha1(JSON.stringify( { is_tonight_session: !!(options.is_tonight_session || false) } ) + mx.locale())
+
+    engine           = options.engine             || "currency"
+    refresh_timeout  = options.refresh_timeout    || 10 * 1000
+
+    render element, (_.find cache.get(cache_key)?.turnovers || [], (obj) -> obj["NAME"] == engine)
 
     refresh = ->
         mx.iss.turnovers(options).then (data) ->
-            render element, (_.find data, (obj) -> obj["NAME"] == engine)
+            render element, (_.find data?.turnovers || [], (obj) -> obj["NAME"] == engine)
+            cache.set cache_key, data
             _.delay refresh, refresh_timeout
 
     refresh()

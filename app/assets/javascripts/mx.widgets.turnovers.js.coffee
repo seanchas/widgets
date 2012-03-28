@@ -43,7 +43,7 @@ create_row = (record, index, options = {}) ->
     $('<tr>')
         .toggleClass('even',    (index + 1) %  2 == 0)
         .toggleClass('odd',     (index + 1) %  2 == 1)
-        .toggleClass('alt',  options.is_sector?)
+        .toggleClass('alt',     options.is_sector?)
         .append(
             $('<td>')
                 .addClass('title')
@@ -86,7 +86,7 @@ render = (engines, element, data, options = {}) ->
 widget = (element, options = {}) ->
     element = $(element); return if element.length == 0
 
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
+    cache_key = mx.utils.sha1(JSON.stringify( { is_tonight_session: !!(options.is_tonight_session || false) } ) + mx.locale())
 
     engines          = options.engines || []
     engines          = engines.split(",").map( (w) -> w.trim() ) if _.isString(engines)
