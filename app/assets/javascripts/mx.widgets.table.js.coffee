@@ -229,7 +229,7 @@ widget = (element, engine, market, params, options = {}) ->
             for record, record_index in data
                 [engine, market] = [record['ENGINE'], record['MARKET']]
                 
-                _filters    = filters["#{engine}:#{market}"][filter_name]
+                _filters    = filters["#{engine}:#{market}"][options.filter_name || filter_name]
                 _columns    = columns["#{engine}:#{market}"]
                 
                 record = mx.utils.process_record record, _columns
@@ -273,7 +273,7 @@ widget = (element, engine, market, params, options = {}) ->
                     
                     row.append cell
                     
-                    $("span", cell).wrap($("<a>").attr('href', make_url(row))) if index == 0
+                    $("span", cell).wrap($("<a>").attr('href', make_url(row))) if index == 0 and options.url != false
                 
                 table_body.append row
                 

@@ -25,6 +25,10 @@
 <div id="main_turnovers">
 </div>
 
+<h2>Товарный рынок</h2>
+<div id="commodity_1">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -284,6 +288,13 @@
             });
             
             mx.widgets.tiny.currency_rates($("#currency_rates"));
+
+            mx.widgets.table("#commodity_1", "commodity", "futures", [
+                ""
+            ],{
+                url: false,
+                filter_name: "small"
+            });
             
         });
     
