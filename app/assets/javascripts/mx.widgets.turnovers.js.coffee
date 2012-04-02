@@ -91,6 +91,8 @@ widget = (element, options = {}) ->
     options.show_sectors = if options.show_sectors == undefined then true
     options.show_sectors = !!options.show_sectors
 
+    options.force    = true
+
     engines          = options.engines || []
     engines          = engines.split(",").map( (w) -> w.trim() ) if _.isString(engines)
 
@@ -102,10 +104,15 @@ widget = (element, options = {}) ->
 
     render engines, element, cache.get(cache_key), options
 
+    deferred = () -> $.when(mx.iss.turnovers(options), mx.iss.turnoverssectors(options))
+
     refresh = ->
-        mx.iss.turnovers(options).then (data) ->
+        deferred().then (turnovers, turnoverssectors) ->
+
+            data = { turnovers: turnovers, turnoverssectors: turnoverssectors }
+
             render engines, element, data, options
-            refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(data.turnovers, 'UPDATETIME')) if refresh_callback
+            refresh_callback new Date _.max(mx.utils.parse_date time for time in _.pluck(turnovers, 'UPDATETIME')) if refresh_callback
             iss_callback data if iss_callback
 
             cache.set(cache_key, data)

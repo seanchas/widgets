@@ -319,8 +319,8 @@
                     is_tonight_session: true,
                     // отключить детализацию рынков
                     show_sectors: false,
-                    // обновление виджета каждые 15 секунд
-                    refresh_timeout: 15 * 1000
+                    // обновление виджета каждые 5 минут
+                    refresh_timeout: 5 * 60 * 1000
                     });
             });
         &lt;/script&gt;
@@ -559,7 +559,7 @@
         mx.widgets.turnovers('#turnovers_tonight', {
             is_tonight_session: true,
             show_sectors:       false,
-            refresh_timeout: 15 * 1000
+            refresh_timeout: 5 * 60 * 1000
         });
 
         mx.widgets.repo_dealers('#repo_dealers');

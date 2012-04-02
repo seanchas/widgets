@@ -130,13 +130,22 @@ request_meta =
             "#{iss_host}/turnovers.jsonp?callback=?"
         data: (options = {}) ->
             'iss.meta': 'off'
-            'iss.only': 'turnovers,turnoverssectors'
+            'iss.only': 'turnovers'
             'is_tonight_session': if options.is_tonight_session == true then 1 else 0
         parse: (json) ->
-            {
-                turnovers:        iss_merge_columns_and_data(json?.turnovers)
-                turnoverssectors: iss_merge_columns_and_data(json?.turnoverssectors)
-            }
+            iss_merge_columns_and_data(json?.turnovers)
+        key: (options = {}) ->
+            [options]
+
+    turnoverssectors:
+        url: ->
+            "#{iss_host}/turnovers.jsonp?callback=?"
+        data: (options = {}) ->
+            'iss.meta': 'off'
+            'iss.only': 'turnoverssectors'
+            'is_tonight_session': if options.is_tonight_session == true then 1 else 0
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.turnoverssectors)
         key: (options = {}) ->
             [options]
     
@@ -371,6 +380,7 @@ _.extend scope,
     emitter:            emitter
     emitter_securities: emitter_securities
     turnovers:          (args...) -> request('turnovers', args...)
+    turnoverssectors:   (args...) -> request('turnoverssectors', args...)
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization',  args...)
