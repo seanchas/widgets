@@ -53,6 +53,8 @@ make_change_cell = (value, unit, column, trend) ->
         .toggleClass('trend_none', trend == 0 || not trend)
         .html(mx.utils.render(value, column) || '&mdash;')
     
+    if unit == 'SUR' then unit = 'RUB'
+    
     unit_field = $("<span>")
         .html(unit ? '&nbsp;')
     
@@ -124,7 +126,7 @@ widget = (element, engine, market, board, param, options = {}) ->
                 container.append make_last_cell(record[column.name], column) if column
                 
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
-                container.append make_change_cell(record[column.name], record['FACEUNIT'], column, record.trends[column.name]) if column
+                container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name]) if column
             
             filter  = filters['digest']
             count   = 2
