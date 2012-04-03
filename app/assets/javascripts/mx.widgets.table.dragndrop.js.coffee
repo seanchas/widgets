@@ -160,12 +160,19 @@ widget = (element, engine, market, params, options = {}) ->
         key         = row.data('key')
         compare_key = row.data('compare-key')
         
-        return if charts_times[key]? and charts_times[key] + chart_refresh_delay > + new Date
+        return if charts_times[key]? and charts_times[key] + chart_refresh_delay > + new Date and !compare_key
         
-        parts   = key.split(":")
+        parts             = key.split(":")
         cell    = $("td", chart_row)
         
-        url     = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
+        if compare_key
+          compare_key_parts = compare_key.split(":")
+          compare_key_parts.splice(2, 1)
+          url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width, compare: compare_key_parts.join(":") }, options.chart_option))
+        else
+          url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
+
+        console.log compare_key, url
         
         cell.addClass('loading') unless _.size($("img", cell)) > 0
         
@@ -217,27 +224,34 @@ widget = (element, engine, market, params, options = {}) ->
     make_row_droppable = (row) ->
         row.droppable({
           hoverClass: 'droppable',
-          accept: (draggable) ->
-            console.log 'decline' unless $(this).data('key') != draggable.data('key')
-            $(this).data('key') != draggable.data('key')
+          #accept: (draggable) ->
+          #  console.log 'decline' unless $(this).data('key') != draggable.data('key')
+          #  $(this).data('key') != draggable.data('key')
           drop: (event, ui) ->
             $(this).data 'compare-key', ui.draggable.data('key')
             console.log 'dropped on row: ', $(this).data('compare-key'), " in ", $(this).data('key')
-            activate_row row
+            refresh_chart $(this).next("tr.chart")
         })
 
     make_chart_row_droppable = (chart_row) ->
         chart_row.droppable({
           hoverClass: 'droppable',
-          accept: (draggable) ->
-            row = $(this).prev('tr.row')
-            row.data('key') != draggable.data('key')
+          #accept: (draggable) ->
+          #  row = $(this).prev('tr.row')
+          #  row.data('key') != draggable.data('key')
           drop: (event, ui) ->
             row = $(this).prev("tr.row")
             row.data('compare-key', ui.draggable.data('key'))
             console.log 'dropped on chart: ', row.data('compare-key'), ' in ', row.data('key')
-            activate_row row
+            refresh_chart $(this)
         })
+
+    update_compare_toolbox = (chart_row) ->
+        $(chart_row, "div.toolbox") || chart_row.append($("<div>").addClass("toolbox"))
+        container    = $(chart_row, "div.toolbox")
+        row          = chart_row.prev("td.row")
+        compare_key  = row.data("compare-key")
+        container.html(compare_key + $(""))
 
 
     # end: drag and drop methods
