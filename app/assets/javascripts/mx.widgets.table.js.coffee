@@ -225,13 +225,21 @@ widget = (element, engine, market, params, options = {}) ->
             current_row_key = $("tr.row.current", old_table).data('key') || current_row_key
             
             records_size = _.size(data)
+
+            header_row   = $("<tr>").addClass("header")
             
             for record, record_index in data
+
                 [engine, market] = [record['ENGINE'], record['MARKET']]
-                
-                _filters    = filters["#{engine}:#{market}"][options.filter_name || filter_name]
+
                 _columns    = columns["#{engine}:#{market}"]
-                
+
+                if _.isArray(options.filter_name)
+                  _filters    = ({ alias: col.name, filter_name: 'custom', id: col.id, name: col.name } for col in _.filter _columns, (obj) -> (_.include options.filter_name, obj.name))
+                  _filters    = _.sortBy(_filters, (obj) -> (_.indexOf(options.filter_name, obj.name )) )
+                else
+                  _filters    = filters["#{engine}:#{market}"][options.filter_name || filter_name]
+
                 record = mx.utils.process_record record, _columns
                 
                 record_key = [record['ENGINE'], record['MARKET'], record['BOARDID'], record['SECID']].join(":")
@@ -244,7 +252,7 @@ widget = (element, engine, market, params, options = {}) ->
                     .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
-                        
+
                 for field, index in _filters
                     
                     column  = _columns[field.id]
@@ -252,6 +260,15 @@ widget = (element, engine, market, params, options = {}) ->
                     trend   = record.trends[column.name]
                     
                     value = record[column.name]
+
+                    if record_index == 0
+                        header_cell = $("<td>")
+                            .attr
+                                'data-name':    column.name
+                                'title':        column.title
+                            .addClass(column.type)
+                            .html(column.short_title)
+                        header_row.append header_cell
                     
                     if value == 0 or value == null
                         if column.trend_by == field.id
@@ -289,7 +306,10 @@ widget = (element, engine, market, params, options = {}) ->
                         if url = $("img", old_chart_row).attr('src')
                             $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
                         chart_row.data('defunct', old_chart_row.data('defunct'))
+
             
+            table_head.append header_row if options.show_header
+
             element.children().remove()
             element.html table
 
