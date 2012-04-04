@@ -169,6 +169,7 @@ widget = (element, engine, market, params, options = {}) ->
         
         parts   = key.split(":")
         cell    = $("td", chart_row)
+        cell.html("").css('height', 0) if refresh_options.force
         
         if compare_key
           compare_key_parts = compare_key.split(":")
@@ -176,7 +177,7 @@ widget = (element, engine, market, params, options = {}) ->
           url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width, compare: compare_key_parts.join(":") }, options.chart_option))
         else
           url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
-        
+
         cell.addClass('loading') unless _.size($("img", cell)) > 0
         
         write_cache(element, cache_key) if cacheable
@@ -216,13 +217,13 @@ widget = (element, engine, market, params, options = {}) ->
     # begin: drag and drop methods
     make_row_draggable = (row) ->
         row.draggable({
-          cursorAt: { left: 5, top: 5 },
-          helper:   (event) ->
-            el      = $(event.currentTarget)
-            title   = el.data('title')
-            $('<div>')
-              .addClass('security-drag-helper')
-              .html(title);
+            cursorAt: { left: 5, top: 5 },
+            helper:   (event) ->
+                el      = $(event.currentTarget)
+                title   = el.data('title')
+                $('<div>')
+                    .addClass('security-drag-helper')
+                    .html(title);
         })
 
     make_row_droppable = (row) ->
@@ -233,7 +234,6 @@ widget = (element, engine, market, params, options = {}) ->
             drop: (event, ui) ->
                 $(this).data 'compare-key',   ui.draggable.data('key')
                 $(this).data 'compare-title', ui.draggable.data('title')
-                console.log 'dropped on row: ', $(this).data('compare-key'), " in ", $(this).data('key')
                 refresh_chart $(this).next("tr.chart"), { force: true }
                 activate_row row
         })
@@ -241,32 +241,37 @@ widget = (element, engine, market, params, options = {}) ->
     make_chart_row_droppable = (chart_row) ->
         chart_row.droppable({
             hoverClass: 'droppable',
+            over:   (event, ui) ->
+                $(this).prev("tr.row").addClass("droppable")
+            out:    (event, ui) ->
+                $(this).prev("tr.row").removeClass("droppable")
             accept: (draggable) ->
               row = $(this).prev('tr.row')
-              row.data('key') != draggable.data('key')
+              row.data('key') != draggable.data('key') and draggable.hasClass('row')
             drop: (event, ui) ->
                 row = $(this).prev("tr.row")
+                row.removeClass("droppable")
                 row.data 'compare-key',   ui.draggable.data('key')
                 row.data 'compare-title', ui.draggable.data('title')
-                console.log 'dropped on chart: ', row.data('compare-key'), ' in ', row.data('key')
                 refresh_chart $(this), { force: true }
         })
 
     update_compare_toolbox = (chart_row) ->
         $("td div.toolbox", chart_row).length || $("td", chart_row).append($("<div>").addClass("toolbox"))
-        container     = $("div.toolbox", chart_row)
-        row           = chart_row.prev("tr.row")
+        container      = $("div.toolbox", chart_row)
+        row            = chart_row.prev("tr.row")
+        desc           = row.data("compare-key").split(":")
+        desc           = "engine: <em>#{desc[0]}</em> | market: <em>#{desc[1]}</em> | security: <em>#{desc[3]}</em>"
         container.html   row.data("compare-title")
+        container.append $("<span>").addClass("description").html(desc)
         container.append $("<a hred=\"#\">").addClass("remove_comparable").html(localization.remove_compare[mx.locale()])
+        container.draggable({ containment: "parent" });
 
     remove_compare = (chart_row) ->
-        console.log "remove compare"
         row     = chart_row.prev("tr.row")
         $("div.toolbox", chart_row).remove()
         row.removeData "compare-key"
         row.removeData "compare-title"
-
-        console.log row, row.data("compare-key"), row.data("compare-title")
         refresh_chart chart_row, { force: true }
 
 
@@ -277,7 +282,6 @@ widget = (element, engine, market, params, options = {}) ->
             activate_row $(event.currentTarget)
 
         element.on 'click', 'div.toolbox a', (event) ->
-            console.log    $(event.currentTarget).closest("tr.chart")
             remove_compare $(event.currentTarget).closest("tr.chart")
         
         element.on 'click', 'a', (event) ->
