@@ -44,7 +44,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             value = emitter[field.name]
             if value and field.name == 'URL'
                 value = value.replace(url_re, (args...) ->
-                    schema = args[2] ? "http://"
+                    schema = args[2] || "http://"
                     domain = args[4].replace(/([^\/])\/$/, "$1")
                     "<a href=\"#{schema + domain}\">#{domain}</a>"
                 )
