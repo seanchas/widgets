@@ -113,7 +113,6 @@ widget = (element, engine, market, params, options = {}) ->
     
     read_cache(element, cache_key) if cacheable
 
-
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
 
@@ -229,12 +228,16 @@ widget = (element, engine, market, params, options = {}) ->
     make_row_droppable = (row) ->
         row.droppable({
             hoverClass: 'droppable',
+            over: (event, ui) ->
+                $(this).next("tr.chart").addClass("droppable")
+            out:  (event, ui) ->
+                $(this).next("tr.chart").removeClass("droppable")
             accept: (draggable) ->
                 $(this).data('key') != draggable.data('key')
             drop: (event, ui) ->
                 $(this).data 'compare-key',   ui.draggable.data('key')
                 $(this).data 'compare-title', ui.draggable.data('title')
-                refresh_chart $(this).next("tr.chart"), { force: true }
+                refresh_chart $(this).next("tr.chart").removeClass("droppable"), { force: true }
                 activate_row row
         })
 
@@ -261,9 +264,8 @@ widget = (element, engine, market, params, options = {}) ->
         container      = $("div.toolbox", chart_row)
         row            = chart_row.prev("tr.row")
         desc           = row.data("compare-key").split(":")
-        desc           = "engine: <em>#{desc[0]}</em> | market: <em>#{desc[1]}</em> | security: <em>#{desc[3]}</em>"
         container.html   row.data("compare-title")
-        container.append $("<span>").addClass("description").html(desc)
+        container.append $("<span>").addClass("description").html(desc[3])
         container.append $("<a hred=\"#\">").addClass("remove_comparable").html(localization.remove_compare[mx.locale()])
         container.draggable({ containment: "parent" });
 
@@ -373,6 +375,10 @@ widget = (element, engine, market, params, options = {}) ->
 
                     if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
                         if url = $("img", old_chart_row).attr('src')
+                            console.log "url", url
+                            console.log old_chart_row
+                            console.log chart_row.prev("td.row").data("compare-key")
+                            cell = $("td", chart_row)
                             $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
                         chart_row.data('defunct', old_chart_row.data('defunct'))
 
@@ -400,6 +406,7 @@ widget = (element, engine, market, params, options = {}) ->
         
         refresh = ->
             rds = records_data_source(params, options).then (data) ->
+                console.log "element: #{element.attr 'id'}, delay: #{delay}"
                 data = _.reduce data, (memo, records, key) ->
                     [engine, market] = key.split(":")
                     for record in records
