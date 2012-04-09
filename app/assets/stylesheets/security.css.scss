@@ -150,7 +150,8 @@ table.mx-widget-turnovers {
 
     div.toolbox {
         background-color: rgba(255, 255, 255, 0.5);
-        border: 1px solid #4ac;
+        //border: 1px solid #4ac;
+        color: #96807e;
         font-weight: bold;
         position: absolute;
         top:  0.5em;
@@ -184,6 +185,7 @@ table.mx-widget-turnovers {
         border: 1px solid #4ac;
         color: #fff;
         padding: 0.5em 2em;
+        z-index: 9999;
     }
     
     thead {

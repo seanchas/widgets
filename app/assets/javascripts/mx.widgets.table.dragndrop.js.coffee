@@ -13,6 +13,10 @@ global.mx.widgets   ||= {}
 
 scope = global.mx.widgets
 
+$ = jQuery
+
+#### localization ####
+
 localization = {
   remove_compare: {
     ru: 'Убрать сравнение'
@@ -21,20 +25,29 @@ localization = {
 }
 
 
-$ = jQuery
 
+
+#### cache functionality ####
+
+# set cache namespace
 cache = kizzy('widgets.table')
 
+# read widget representation from cache and insert it to page element
 read_cache = (element, key) ->
     element.html cache.get key
 
+# write whole widget html elements in cache store
 write_cache = (element, key) ->
     cache.set key, element.html()
 
+# clear cache by current cache key
 remove_cache = (key) ->
     cache.remove key
 
 
+
+
+# default filter name
 filter_name = 'widget'
 
 
@@ -42,16 +55,22 @@ escape_selector = (string) ->
     string.replace /([\W])/g, "\\$1"
 
 
-default_delay       = 60 * 1000
-min_delay           =  5 * 1000
-chart_refresh_delay =  5 * 1000
+# default values for calculating delay between refreshing
+default_delay       = 60 * 1000    # default delay between data refreshing
+min_delay           =  5 * 1000    # min delay between data refreshing
+chart_refresh_delay =  5 * 1000    # min delay between chart refreshing
 
+# function that calculates delay timeout between refreshing data,
+# uses user delay based on option 'refresh_timeout' or uses default timeout delay if option does not exists
 calculate_delay = (delay) ->
     delay = + delay
     delay = default_delay if _.isNaN delay
     delay = _.max [delay, min_delay] unless delay == 0
 
 
+
+
+# deffered objects for filters, columns and records
 filters_data_source = (params) ->
     deferred = new $.Deferred
     
@@ -101,18 +120,24 @@ records_data_source = (params, options) ->
     
     deferred
 
-# entry point
+
+
+
+#### widget entry point ####
 
 widget = (element, engine, market, params, options = {}) ->
     
+    # element on page in which table will be rendered
     element = $ element; return if _.size(element) == 0
 
-
+    # cache that stores whole table elements
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     cacheable = options.cache == true
     
+    # render table from cache if cache is turned on
     read_cache(element, cache_key) if cacheable
 
+    # calculate delay timeout between refreshing data, uses user delay base on options.refresh_timeout or default timeout
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
 
@@ -123,10 +148,14 @@ widget = (element, engine, market, params, options = {}) ->
     
     order = []
     
+    # flag for rendering chart (true - render; false - don't render)
     has_chart   = options.chart? and options.chart != false
+    # chart width
     chart_width = 0
 
+    # flag: is widget rows draggable?
     is_draggable  = options.dragndrop != false
+    # flag: is widget rows droppable?
     is_droppable  = has_chart and options.dragndrop != false
     
     params = _.reduce params, (memo, param) ->
@@ -150,33 +179,37 @@ widget = (element, engine, market, params, options = {}) ->
                 [record['ENGINE'], record['MARKET'], record['SECTYPE']].join(':')
     
     
+    # hash of refreshing times of charts in widget
     charts_times = {}
+    # hash of urls for secutities
     records_urls = {}
     
+    # make url for row - if options.url is function then call this function like function([ engine, market, board, security])
     make_url = (row) ->
         key = row.data('key')
-        
         records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
 
+    # refreshing chart
     refresh_chart = (chart_row, refresh_options = {}) ->
 
         row         = chart_row.prev("tr.row")
         key         = row.data('key')
         compare_key = row.data('compare-key')
-        
-        return if charts_times[key]? and charts_times[key] + chart_refresh_delay > + new Date and !refresh_options.force
+        chart_key   = if compare_key then "#{key}:#{compare_key}" else key
+
+        return if charts_times[chart_key]? and charts_times[chart_key] + chart_refresh_delay > + new Date and options.force != true
         
         parts   = key.split(":")
         cell    = $("td", chart_row)
-        cell.html("").css('height', 0) if refresh_options.force
         
         if compare_key
-          compare_key_parts = compare_key.split(":")
-          compare_key_parts.splice(2, 1)
-          url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width, compare: compare_key_parts.join(":") }, options.chart_option))
+            compare_parts = compare_key.split(":")
+            compare_parts.splice(2, 1)
+            url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width, compare: compare_parts.join(":") }, options.chart_option))
         else
-          url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
+            url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend({ width: chart_width }, options.chart_option))
 
+        cell.html("").css('height', 0) if refresh_options.force
         cell.addClass('loading') unless _.size($("img", cell)) > 0
         
         write_cache(element, cache_key) if cacheable
@@ -187,10 +220,10 @@ widget = (element, engine, market, params, options = {}) ->
             cell.removeClass('loading')
             cell.html(image)
             cell.css('height', cell.height())
-            update_compare_toolbox(chart_row) if compare_key
-            charts_times[key] = + new Date
+            charts_times[chart_key] = + new Date
+            update_compare_toolbox(chart_row)
             write_cache(element, cache_key) if cacheable
-        
+
         image.on 'error', ->
             row.removeClass("current")
             chart_row.data('defunct', true).hide()
@@ -213,10 +246,19 @@ widget = (element, engine, market, params, options = {}) ->
         if chart_row.is(":visible")
             refresh_chart chart_row
 
-    # begin: drag and drop methods
+
+
+
+    #### drag and drop ####
+
     make_row_draggable = (row) ->
         row.draggable({
             cursorAt: { left: 5, top: 5 },
+            start: (event, ui) ->
+                $("table.mx-widget-table[data-dragging]").attr("data-dragging", true)
+            stop:  (event, ui) ->
+                $("table.mx-widget-table[data-dragging]").attr("data-dragging", false)
+                $("div.security-drag-helper").remove()
             helper:   (event) ->
                 el      = $(event.currentTarget)
                 title   = el.data('title')
@@ -249,8 +291,8 @@ widget = (element, engine, market, params, options = {}) ->
             out:    (event, ui) ->
                 $(this).prev("tr.row").removeClass("droppable")
             accept: (draggable) ->
-              row = $(this).prev('tr.row')
-              row.data('key') != draggable.data('key') and draggable.hasClass('row')
+                row = $(this).prev('tr.row')
+                row.data('key') != draggable.data('key') and draggable.hasClass('row')
             drop: (event, ui) ->
                 row = $(this).prev("tr.row")
                 row.removeClass("droppable")
@@ -260,14 +302,14 @@ widget = (element, engine, market, params, options = {}) ->
         })
 
     update_compare_toolbox = (chart_row) ->
+        row            = chart_row.prev("tr.row")
+        return unless    row.data("compare-key")
         $("td div.toolbox", chart_row).length || $("td", chart_row).append($("<div>").addClass("toolbox"))
         container      = $("div.toolbox", chart_row)
-        row            = chart_row.prev("tr.row")
         desc           = row.data("compare-key").split(":")
         container.html   row.data("compare-title")
         container.append $("<span>").addClass("description").html(desc[3])
         container.append $("<a hred=\"#\">").addClass("remove_comparable").html(localization.remove_compare[mx.locale()])
-        container.draggable({ containment: "parent" });
 
     remove_compare = (chart_row) ->
         row     = chart_row.prev("tr.row")
@@ -277,7 +319,7 @@ widget = (element, engine, market, params, options = {}) ->
         refresh_chart chart_row, { force: true }
 
 
-    # end: drag and drop methods
+    #### add event listeners if widget with chart ####
     
     observe = _.once ->
         element.on 'click', 'tr.row', (event) ->
@@ -294,22 +336,35 @@ widget = (element, engine, market, params, options = {}) ->
     
     $.when(fds, cds).then (filters, columns) ->
         
+        # get key for current row
         if _.isNumber(options.chart)
             current_row_key = order[options.chart] || _.first(order)
-        
+
+
+        # render table
         render = (data) ->
+            # do not render if there is no data
             return if _.size(data) == 0
-            
+
+            # get element table rendered before
             old_table = $('table', element)
-            
+
+            # do not render if drag and drop is happening
+            return if old_table.attr("data-dragging") == "true"
+
+            # create new table and add classes
             table = $("<table>")
                 .addClass("mx-widget-table")
                 .toggleClass("chart", has_chart)
                 .html("<thead></thead><tbody></tbody>")
+
+            table.attr("data-dragging", false) if is_droppable
             
+            # get tbody and thead elements of new table
             table_head = $('thead', table)
             table_body = $('tbody', table)
             
+            # get key of active row in previously rendered table
             current_row_key = $("tr.row.current", old_table).data('key') || current_row_key
             
             records_size = _.size(data)
@@ -332,16 +387,20 @@ widget = (element, engine, market, params, options = {}) ->
                     .toggleClass('odd',     (record_index + 1) %  2 == 1)
                     .attr
                         'data-key': record_key
-                        
+
+
+                if old_table
+                    old_row = $("tr.row:eq(#{record_index})", old_table)
+                    row.data "compare-key",   old_row.data("compare-key")
+                    row.data "compare-title", old_row.data("compare-title")
+
                 for field, index in _filters
                     
                     column  = _columns[field.id]
-                    
                     trend   = record.trends[column.name]
-                    
-                    value = record[column.name]
+                    value   = record[column.name]
 
-                    row.data('title', record[column.name]) if index == 0
+                    row.data("title", record[column.name])  if index == 0
                     
                     if value == 0 or value == null
                         if column.trend_by == field.id
@@ -373,20 +432,17 @@ widget = (element, engine, market, params, options = {}) ->
                         .html($("<td>").attr({ 'colspan': _.size(row.children()) }).html("&nbsp;"))
                     row.after chart_row
 
-                    if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
+                    if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart", old_table)) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            console.log "url", url
-                            console.log old_chart_row
-                            console.log chart_row.prev("td.row").data("compare-key")
-                            cell = $("td", chart_row)
-                            $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
+                            $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url)).append($("div.toolbox", old_chart_row))
                         chart_row.data('defunct', old_chart_row.data('defunct'))
+
+                    make_chart_row_droppable chart_row if is_droppable
+
 
 
                 make_row_draggable(row) if is_draggable
-                if is_droppable
-                    make_row_droppable(row)
-                    make_chart_row_droppable(row.next(".chart"))
+                make_row_droppable(row) if is_droppable
 
             
             element.children().remove()
@@ -404,6 +460,8 @@ widget = (element, engine, market, params, options = {}) ->
             write_cache(element, cache_key) if cacheable
                 
         
+        # function 'refresh' call self in delay times, gets new data and makes call to rerender table
+
         refresh = ->
             rds = records_data_source(params, options).then (data) ->
                 console.log "element: #{element.attr 'id'}, delay: #{delay}"
