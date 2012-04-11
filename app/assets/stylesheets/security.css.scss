@@ -150,18 +150,23 @@ table.mx-widget-turnovers {
 
     div.toolbox {
         background-color: rgba(255, 255, 255, 0.5);
-        //border: 1px solid #4ac;
-        color: #96807e;
-        font-weight: bold;
+        border: 1px solid #86706e;
+        padding:  0.5em;
         position: absolute;
-        top:  0.5em;
-        left: 15%;
-        padding: 0.5em;
+        top: 10px;
+        left: 10px;
 
-        span {
+
+        span.title {
+            color: #86706e;
+            font-weight: bold;
+            padding: 0 0.5em 0 0;
+        }
+
+        span.desc {
+            color: #666;
             font-weight: normal;
-            color: #999;
-            padding: 0 1em;
+            padding: 0 0.5em 0 0;
         }
         
         a {
@@ -175,8 +180,8 @@ table.mx-widget-turnovers {
         }
     }
 
-    tr.current.droppable td,
-    .droppable {
+    tr.current.drophover td,
+    .drophover {
         background-color: #7cf;
     }
 

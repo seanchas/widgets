@@ -177,144 +177,40 @@
 
     $(function () {
 
-
-        // 3.
-        function show_chart_for_row(row) {
-            var chart_row = row.next('.chart');
-            if (chart_row.size() == 0) chart_row = make_chart_row(row);
-            chart_row.parent().children('.chart').not(chart_row).hide();
-            update_chart_row(chart_row, row);
-            chart_row.show();
-        }
-
-        function hide_chart_for_row(row) {
-            var chart_row = row.next('.chart');
-            if (chart_row.size() == 0) return;
-            chart_row.hide();
-        }
-
-        function toggle_chart_for_row(row) {
-            var chart_row = row.next('.chart');
-            if (chart_row.size() == 0) chart_row = make_chart_row(row);
-            chart_row.is(':visible') ? hide_chart_for_row(row) : show_chart_for_row(row);
-        }
-
-
-        // 3.1
-        function make_chart_row(element) {
-            var chart_row = chart_row = $('<tr>')
-                    .addClass('chart')
-                    .attr('data-param', element.data('param'))
-                    .html(
-                    $('<td>')
-                            .attr('colspan', $('td', element).size())
-                            .html('<span class="data"></span>')
-            )
-                    .insertAfter(element)
-                    .hide();
-            make_chart_row_droppable(chart_row);
-            return chart_row;
-        }
-
-        // 4.
-        function update_chart_row(chart_row, row) {
-            console.log('update');
-
-            $('td span.data', chart_row).html([row.data('param'), row.attr('data-compare-param')].join('<br />'));
-            $('td span.remove').toggle(!!row.attr('data-compare-param'));
-
-
-            mx.widgets.chart($('td span.data', chart_row).width('100%'), 'stock', 'index', row.attr('data-param'), { compare:'stock:index:' + row.attr('data-compare-param') });
-        }
-
-        $('#container table tr.security').on("click", function (event) {
-            toggle_chart_for_row($(event.currentTarget));
+        mx.widgets.table('#table_1', 'stock', 'shares', [
+            'EQBR:SBER',
+            'EQNE:GAZP',
+            'EQBR:LKOH',
+            'EQBS:GMNK',
+            'EQNL:VTBR'
+        ], {
+            chart:0,
+            cache:true,
+            refresh_timeout: 5 * 1000
         });
 
-
-        // 1. make row draggable
-        $('#container table tr.security').draggable({
-            cursorAt:{ left:5, top:5 },
-            helper:function (event) {
-                var element = $(event.currentTarget), param = element.data('param');
-                return $('<div>')
-                        .addClass('security-drag-helper')
-                        .html(param);
-            }
+        mx.widgets.table('#table_2', 'stock', 'index', [
+            'SNDX:RGBI',
+            'SNDX:MICEXSC',
+            'SNDX:MICEX10INDEX',
+            'RTSE:RTSSTD',
+            'RTSI:RGBI'
+        ], {
+            chart:1,
+            refresh_timeout: 7 * 1000
         });
 
-        // 2. make row droppable
-        $('#container table tr.security').droppable({
-            hoverClass:'droppable',
-            drop:function (event, ui) {
-                $(this).attr('data-compare-param', ui.draggable.data('param'));
-                show_chart_for_row($(this));
-            }
+        mx.widgets.table('#table_3', 'stock', 'index', [
+            'SNDX:RGBI',
+            'SNDX:MICEXSC',
+            'SNDX:MICEX10INDEX',
+            'RTSE:RTSSTD',
+            'RTSI:RGBI'
+        ], {
+            chart: false,
+            refresh_timeout: 3 * 1000
         });
 
-        // 3.2
-        function make_chart_row_droppable(chart_row) {
-            chart_row.droppable({
-                hoverClass:'droppable',
-                accept:function (draggable) {
-                    return $(this).data('param') != draggable.data('param');
-                },
-                drop:function (event, ui) {
-                    var row = $(this).prev('.security');
-                    row.attr('data-compare-param', ui.draggable.data('param'));
-                    show_chart_for_row(row);
-                }
-            });
-        }
-
-    });
-
-    /*mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
-        compare:'stock:index:RTSI',
-    });
-
-    mx.widgets.table('#stock_1', 'stock', 'shares', [
-        'EQBR:SBER',
-        'EQNE:GAZP',
-        'EQBR:LKOH',
-        'EQBS:GMNK',
-        'EQNL:VTBR'
-    ], {
-        chart:0,
-        refresh_timeout:5 * 1000
-    });*/
-
-    mx.widgets.table_dragndrop('#table_1', 'stock', 'shares', [
-        'EQBR:SBER',
-        'EQNE:GAZP',
-        'EQBR:LKOH',
-        'EQBS:GMNK',
-        'EQNL:VTBR'
-    ], {
-        chart:0,
-        refresh_timeout: 5 * 1000
-    });
-
-    mx.widgets.table_dragndrop('#table_2', 'stock', 'index', [
-        'SNDX:RGBI',
-        'SNDX:MICEXSC',
-        'SNDX:MICEX10INDEX',
-        'RTSE:RTSSTD',
-        'RTSI:RGBI'
-    ], {
-        chart:0,
-        refresh_timeout: 120 * 1000
-    });
-
-    mx.widgets.table_dragndrop('#table_3', 'stock', 'index', [
-        'SNDX:RGBI',
-        'SNDX:MICEXSC',
-        'SNDX:MICEX10INDEX',
-        'RTSE:RTSSTD',
-        'RTSI:RGBI'
-    ], {
-        chart: false,
-        refresh_timeout: 120 * 1000
     });
 
 
