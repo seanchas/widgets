@@ -185,6 +185,22 @@ widget = (element, engine, market, params, options = {}) ->
                 $("<div>").addClass("security-drag-helper").html($("td:first", event.currentTarget).html())
         })
 
+    make_charts_draggable = (chart_rows) ->
+        table = $("table", element)
+        chart_rows.addClass("draggable-row")
+        chart_rows.draggable({
+            start: () ->
+                table.data("drag-lock", true)
+            stop:  () ->
+                table.data("drag-lock", false)
+            cursor: "move"
+            cursorAt:
+                top:  5
+                left: 5
+            helper: (event) ->
+                $("<div>").addClass("security-drag-helper").html( $(this).prev("tr.row").find("td:first").html() )
+        })
+
     make_rows_droppable = (rows) ->
         table = $("table", element)
         rows.droppable({
@@ -201,6 +217,7 @@ widget = (element, engine, market, params, options = {}) ->
             drop: (event, ui) ->
                 target = $(this)
                 source = ui.draggable
+                source = source.prev("tr.row") if source.hasClass("chart")
                 target.removeClass("drophover").next("tr.chart").removeClass("drophover")
                 target.attr
                     "data-compare-key":   source.attr "data-key"
@@ -225,6 +242,7 @@ widget = (element, engine, market, params, options = {}) ->
             drop: (event, ui) ->
                 target = $(this).prev("tr.row")
                 source = ui.draggable
+                source = source.prev("tr.row") if source.hasClass("chart")
                 target.removeClass("drophover").next("tr.chart").removeClass("drophover")
                 target.attr
                     "data-compare-key":   source.attr "data-key"
@@ -482,6 +500,7 @@ widget = (element, engine, market, params, options = {}) ->
 
             if is_draggable
                 make_rows_draggable    $("tr.row",   table)
+                make_charts_draggable  $("tr.chart", table)
             if is_droppable
                 make_rows_droppable    $("tr.row",   table)
                 make_charts_droppable  $("tr.chart", table)
