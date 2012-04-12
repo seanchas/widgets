@@ -287,7 +287,17 @@ widget = (element, engine, market, params, options = {}) ->
         parts   = row.attr("data-key").split(":")
         cell    = $("td", chart_row)
 
-        chart_options = if compare_key then { width: chart_width, compare: _.without(compare_key.split(":"), compare_key.split(":")[2]).join(":") } else { width: chart_width }
+        chart_options = {}
+        if compare_key
+            cparts   = compare_key.split(":")
+            cparts.splice(2, 1)
+            chart_options =
+                width: chart_width
+                compare: cparts.join(":")
+        else
+            chart_options =
+                width: chart_width
+
         url           = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend(chart_options, options.chart_option))
 
         cell.html("").css("height", 0) if refresh_options.force
