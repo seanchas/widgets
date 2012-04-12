@@ -144,17 +144,10 @@ table.mx-widget-turnovers {
     	padding: 25px 0;
     }
 
-    tr.chart td {
-        position: relative;
-    }
-
+    // begin: drag and drop decoration
     div.toolbox {
         background-color: rgba(255, 255, 255, 0.5);
-        border: 1px solid #86706e;
-        padding:  0.5em;
-        position: absolute;
-        top: 10px;
-        left: 10px;
+        padding:  0.2em;
 
 
         span.title {
@@ -182,16 +175,22 @@ table.mx-widget-turnovers {
 
     tr.current.drophover td,
     .drophover {
-        background-color: #7cf;
+        background-color: #d1d3dd;
     }
 
     .security-drag-helper {
-        background-color: #7cf;
-        border: 1px solid #4ac;
-        color: #fff;
+        background-color: #e9eaed;
+        border: 1px solid #369;
+        color: #369;
         padding: 0.5em 2em;
         z-index: 9999;
     }
+
+    .security-drag-helper * {
+        color: #369;
+        text-decoration: none;
+    }
+    // end: drag and drop decoration
     
     thead {
         

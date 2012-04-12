@@ -50,8 +50,8 @@ chart_refresh_delay =  5 * 1000
 dropover_delay      =  1 * 1000
 
 default_toolbox_position =
-    top:  10
-    left: 10
+    top:   10
+    right: 10
 
 
 calculate_delay = (delay) ->
@@ -165,7 +165,6 @@ widget = (element, engine, market, params, options = {}) ->
     
     make_url = (row) ->
         key = row.data('key')
-        
         records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
 
 
@@ -181,8 +180,8 @@ widget = (element, engine, market, params, options = {}) ->
             cursorAt:
                 top:  5
                 left: 5
-            helper:   (event) ->
-                $("<div>").addClass("security-drag-helper").html($("td:first", event.currentTarget).html())
+            helper: () ->
+                $("<div>").addClass("security-drag-helper").html($("td:first", $(this)).html())
         })
 
     make_charts_draggable = (chart_rows) ->
@@ -197,7 +196,7 @@ widget = (element, engine, market, params, options = {}) ->
             cursorAt:
                 top:  5
                 left: 5
-            helper: (event) ->
+            helper: (f) ->
                 $("<div>").addClass("security-drag-helper").html( $(this).prev("tr.row").find("td:first").html() )
         })
 
@@ -265,12 +264,21 @@ widget = (element, engine, market, params, options = {}) ->
         desc    = $("span.desc",  toolbox).html(row.attr("data-compare-key").split(":")[3])
         ctrl    = $("a",          toolbox).attr("data-control", "remove").html(localization.toolbox.remove[mx.locale()])
 
-        cell.append toolbox
-        position = if (position = chart_row.data("compare-toolbox-position")) then position else default_toolbox_position
+        cell.css('position', 'relative').append toolbox
+        toolbox.css('position', 'absolute')
+
+        position = chart_row.data("compare-toolbox-position")
+        unless position
+            position =
+                top:  default_toolbox_position.top
+                left: (if default_toolbox_position.right then (row.width() - toolbox.width() - default_toolbox_position.right) else default_toolbox_position.left)
+            chart_row.data("compare-toolbox-position", position)
+
         toolbox.css({
-            top:  position.top
-            left: position.left
+            top:       position.top
+            left:      position.left
         })
+
 
     make_toolbox_draggable = (toolbox) ->
         table = $("table", element)
@@ -327,6 +335,8 @@ widget = (element, engine, market, params, options = {}) ->
         
         image.on 'load', ->
             return if toolbox.hasClass("ui-draggable-dragging")
+            compare_key = row.attr("data-compare-key")
+
             cell.removeClass('loading')
             cell.html(image)
             cell.css('height', cell.height())
