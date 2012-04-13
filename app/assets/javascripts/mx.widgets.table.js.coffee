@@ -46,7 +46,7 @@ escape_selector = (string) ->
 
 default_delay       = 60 * 1000
 min_delay           =  5 * 1000
-chart_refresh_delay =  5 * 1000
+chart_refresh_delay =  15 * 1000
 dropover_delay      =  1 * 1000
 
 default_toolbox_position =
@@ -250,18 +250,26 @@ widget = (element, engine, market, params, options = {}) ->
                 if target.hasClass("current") then refresh_chart($(this), { force: true }) else activate_row(target)
         })
 
+
+
     is_accept_draggable = (target, source) ->
         !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row")
+
+
 
     add_compare_toolbox = (chart_row) ->
         return if _.size( $("div.toolbox", chart_row) ) > 0
 
-        cell    = $("td:first", chart_row)
-        row     = chart_row.prev("tr.row")
+        cell        = $("td:first", chart_row)
+        row         = chart_row.prev("tr.row")
+        compare_key = row.attr("data-compare-key")
 
+        return unless compare_key
+
+        table   = $("table", element)
         toolbox = $("<div class=\"toolbox\"><span class=\"title\"></span><span class=\"desc\"></span><a href=\"#\"></a></div>")
         title   = $("span.title", toolbox).html(_.truncate(row.attr("data-compare-title"), 16, "&hellip;"))
-        desc    = $("span.desc",  toolbox).html(row.attr("data-compare-key").split(":")[3])
+        desc    = $("span.desc",  toolbox).html(compare_key.split(":")[3])
         ctrl    = $("a",          toolbox).attr("data-control", "remove").html(localization.toolbox.remove[mx.locale()])
 
         cell.css('position', 'relative').append toolbox
@@ -271,13 +279,24 @@ widget = (element, engine, market, params, options = {}) ->
         unless position
             position =
                 top:  default_toolbox_position.top
-                left: (if default_toolbox_position.right then (row.width() - toolbox.width() - default_toolbox_position.right) else default_toolbox_position.left)
+                left: (if default_toolbox_position.right then (row.width() - toolbox.outerWidth() - default_toolbox_position.right) else default_toolbox_position.left)
             chart_row.data("compare-toolbox-position", position)
 
         toolbox.css({
             top:       position.top
             left:      position.left
         })
+
+        toolbox.draggable({
+            start: () ->
+                table.data("drag-lock", true)
+            stop:  () ->
+                table.data("drag-lock", false).data("dropover-time", + new Date)
+            drag:  (event, ui) ->
+                $(this).closest("tr.chart").data("compare-toolbox-position", $(this).position())
+            containment: "parent"
+        })
+
 
 
     make_toolbox_draggable = (toolbox) ->
@@ -297,6 +316,7 @@ widget = (element, engine, market, params, options = {}) ->
     remove_comparable_security = (chart_row) ->
         row = chart_row.prev("tr.row")
         row.removeAttr("data-compare-key").removeAttr("data-compare-title")
+        chart_row.removeData("compare-toolbox-position")
         refresh_chart(chart_row, { force: true })
 
 
@@ -306,7 +326,11 @@ widget = (element, engine, market, params, options = {}) ->
         compare_key = row.attr("data-compare-key")
         toolbox     = $("div.toolbox", cell)
 
-        if compare_key then chart_key = [key, compare_key].join(':') else chart_key = key
+        if compare_key
+            chart_key = [key, compare_key].join(':')
+            add_compare_toolbox(chart_row)
+        else
+            chart_key = key
 
         return if charts_times[chart_key]? and charts_times[chart_key] + chart_refresh_delay > + new Date and !refresh_options.force
         
@@ -324,7 +348,7 @@ widget = (element, engine, market, params, options = {}) ->
             chart_options =
                 width: chart_width
 
-        url           = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend(chart_options, options.chart_option))
+        url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend(chart_options, options.chart_option))
 
         cell.html("").css("height", 0) if refresh_options.force
         cell.addClass('loading') unless _.size($("img", cell)) > 0
@@ -334,7 +358,7 @@ widget = (element, engine, market, params, options = {}) ->
         image   = $("<img>").attr('src', url)
         
         image.on 'load', ->
-            return if toolbox.hasClass("ui-draggable-dragging")
+            return if chart_row.data("drag-lock")
             compare_key = row.attr("data-compare-key")
 
             cell.removeClass('loading')
@@ -343,7 +367,6 @@ widget = (element, engine, market, params, options = {}) ->
             
             if compare_key
                 add_compare_toolbox(chart_row)
-                make_toolbox_draggable( $("div.toolbox"), chart_row )
                 
             charts_times[chart_key] = + new Date
             write_cache(element, cache_key) if cacheable
@@ -368,7 +391,7 @@ widget = (element, engine, market, params, options = {}) ->
         row.toggleClass("current", chart_row.is(":visible"))
         
         if chart_row.is(":visible")
-            refresh_chart chart_row
+            refresh_chart(chart_row)
     
     observe = _.once ->
         element.on 'click', 'tr.row', (event) ->
@@ -493,9 +516,6 @@ widget = (element, engine, market, params, options = {}) ->
                         chart_row.data('defunct',                  old_chart_row.data('defunct'))
                         chart_row.data('compare-toolbox-position', old_chart_row.data('compare-toolbox-position'))
 
-                        if _.size( $("div.toolbox", old_chart_row) ) > 0
-                            add_compare_toolbox(chart_row)
-
             
             table_head.append header_row if options.show_header
 
@@ -514,7 +534,6 @@ widget = (element, engine, market, params, options = {}) ->
             if is_droppable
                 make_rows_droppable    $("tr.row",   table)
                 make_charts_droppable  $("tr.chart", table)
-                make_toolbox_draggable $("div.toolbox", table)
             if has_chart
                 observe()
             
