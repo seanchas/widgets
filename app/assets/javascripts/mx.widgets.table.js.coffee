@@ -46,7 +46,7 @@ escape_selector = (string) ->
 
 default_delay       = 60 * 1000
 min_delay           =  5 * 1000
-chart_refresh_delay =  15 * 1000
+chart_refresh_delay =  5 * 1000
 dropover_delay      =  1 * 1000
 
 default_toolbox_position =
@@ -118,9 +118,42 @@ widget = (element, engine, market, params, options = {}) ->
 
     cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
     cacheable = options.cache == true
-    
+
+    has_chart    = options.chart? and options.chart != false
+    chart_width  = 0
+    chart_height = 0
+
+    options.chart_option = options.chart_options || {}
+
+
+    add_spinner    = (wrapper) ->
+        return if _.size $("div.spinner", wrapper) > 0
+        wrapper.css("position", "relative")
+        wrapper.append $("<div>").addClass("spinner")
+        wrapper.addClass("loading")
+
+
+    remove_spinner = (wrapper) ->
+        wrapper.removeClass("loading")
+        $("div.spinner", wrapper).remove()
+
+
     read_cache(element, cache_key) if cacheable
 
+    if cacheable and has_chart
+        $("tr.chart img", element).each ->
+            old_image    = $(this)
+            wrapper      = old_image.parent()
+            chart_width  = chart_width  || wrapper.width()
+            chart_height = chart_height || wrapper.height()
+            image        = $("<img>").attr("src", old_image.attr("src"))
+
+            old_image.remove()
+            add_spinner(wrapper)
+
+            image.on "load", ->
+                wrapper.prepend(image)
+                remove_spinner(wrapper)
 
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
@@ -131,9 +164,6 @@ widget = (element, engine, market, params, options = {}) ->
         market  = null
     
     order = []
-    
-    has_chart   = options.chart? and options.chart != false
-    chart_width = 0
 
     is_draggable  = options.dragndrop != false
     is_droppable  = has_chart and options.dragndrop != false
@@ -162,7 +192,8 @@ widget = (element, engine, market, params, options = {}) ->
     
     charts_times = {}
     records_urls = {}
-    
+
+
     make_url = (row) ->
         key = row.data('key')
         records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
@@ -184,6 +215,7 @@ widget = (element, engine, market, params, options = {}) ->
                 $("<div>").addClass("security-drag-helper").html($("td:first", $(this)).html())
         })
 
+
     make_charts_draggable = (chart_rows) ->
         table = $("table", element)
         chart_rows.addClass("draggable-row")
@@ -199,6 +231,7 @@ widget = (element, engine, market, params, options = {}) ->
             helper: (f) ->
                 $("<div>").addClass("security-drag-helper").html( $(this).prev("tr.row").find("td:first").html() )
         })
+
 
     make_rows_droppable = (rows) ->
         table = $("table", element)
@@ -222,8 +255,9 @@ widget = (element, engine, market, params, options = {}) ->
                     "data-compare-key":   source.attr "data-key"
                     "data-compare-title": source.attr "data-title"
 
-                if target.hasClass("current") then refresh_chart(target.next("tr.chart"), { force: true }) else activate_row(target)
+                if target.hasClass("current") then refresh_chart(target.next("tr.chart"), { force: true }) else activate_row(target, { force: true })
         })
+
 
     make_charts_droppable = (chart_rows) ->
         table = $("table", element)
@@ -247,21 +281,19 @@ widget = (element, engine, market, params, options = {}) ->
                     "data-compare-key":   source.attr "data-key"
                     "data-compare-title": source.attr "data-title"
 
-                if target.hasClass("current") then refresh_chart($(this), { force: true }) else activate_row(target)
+                if target.hasClass("current") then refresh_chart($(this), { force: true }) else activate_row(target, { force: true })
         })
 
 
-
     is_accept_draggable = (target, source) ->
-        !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row")
-
+        !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row")# and !target.data("chart-is-loading")
 
 
     add_compare_toolbox = (chart_row) ->
         return if _.size( $("div.toolbox", chart_row) ) > 0
 
-        cell        = $("td:first", chart_row)
         row         = chart_row.prev("tr.row")
+        wrapper     = $("td:first div.wrapper", chart_row)
         compare_key = row.attr("data-compare-key")
 
         return unless compare_key
@@ -272,15 +304,17 @@ widget = (element, engine, market, params, options = {}) ->
         desc    = $("span.desc",  toolbox).html(compare_key.split(":")[3])
         ctrl    = $("a",          toolbox).attr("data-control", "remove").html(localization.toolbox.remove[mx.locale()])
 
-        cell.css('position', 'relative').append toolbox
+        wrapper.css('position', 'relative').append toolbox
         toolbox.css('position', 'absolute')
 
         position = chart_row.data("compare-toolbox-position")
         unless position
             position =
                 top:  default_toolbox_position.top
-                left: (if default_toolbox_position.right then (row.width() - toolbox.outerWidth() - default_toolbox_position.right) else default_toolbox_position.left)
+                left: (if default_toolbox_position.right then (wrapper.width() - toolbox.outerWidth() - default_toolbox_position.right) else default_toolbox_position.left)
             chart_row.data("compare-toolbox-position", position)
+
+        if position.left + toolbox.outerWidth() > wrapper.width() then position.left = wrapper.width() - toolbox.outerWidth()
 
         toolbox.css({
             top:       position.top
@@ -298,33 +332,19 @@ widget = (element, engine, market, params, options = {}) ->
         })
 
 
-
-    make_toolbox_draggable = (toolbox) ->
-        table = $("table", element)
-        toolbox.draggable({
-            start: () ->
-                table.data("drag-lock", true)
-            stop:  () ->
-                table.data("drag-lock", false).data("dropover-time", + new Date)
-            drag:  (event, ui) ->
-                $(this).closest("tr.chart").data("compare-toolbox-position", $(this).position())
-            containment: "parent"
-        })
-
-
-
     remove_comparable_security = (chart_row) ->
         row = chart_row.prev("tr.row")
         row.removeAttr("data-compare-key").removeAttr("data-compare-title")
-        chart_row.removeData("compare-toolbox-position")
-        refresh_chart(chart_row, { force: true })
+        if row.hasClass("current") then refresh_chart(chart_row, { force: true })
+
 
 
     refresh_chart = (chart_row, refresh_options = {}) ->
         row         = chart_row.prev("tr.row")
         key         = row.attr("data-key")
         compare_key = row.attr("data-compare-key")
-        toolbox     = $("div.toolbox", cell)
+        wrapper     = $("div.wrapper", chart_row)
+        toolbox     = $("div.toolbox", wrapper)
 
         if compare_key
             chart_key = [key, compare_key].join(':')
@@ -335,35 +355,38 @@ widget = (element, engine, market, params, options = {}) ->
         return if charts_times[chart_key]? and charts_times[chart_key] + chart_refresh_delay > + new Date and !refresh_options.force
         
         parts   = row.attr("data-key").split(":")
-        cell    = $("td", chart_row)
+        wrapper  = $("td:first div.wrapper", chart_row)
 
         chart_options = {}
         if compare_key
             cparts   = compare_key.split(":")
             cparts.splice(2, 1)
             chart_options =
-                width: chart_width
+                width:   chart_width
+                height:  chart_height
                 compare: cparts.join(":")
         else
             chart_options =
-                width: chart_width
+                width:   chart_width
+                height:  chart_height
+                compare: ""
 
-        url = mx.widgets.chart_url(cell, parts[0], parts[1], parts[3], _.extend(chart_options, options.chart_option))
+        url = mx.widgets.chart_url(wrapper, parts[0], parts[1], parts[3], _.extend(options.chart_option, chart_options))
 
-        cell.html("").css("height", 0) if refresh_options.force
-        cell.addClass('loading') unless _.size($("img", cell)) > 0
+        wrapper.css("height", chart_height)
+        add_spinner(wrapper) if refresh_options.force or !(_.size($("img", wrapper)) > 0)
         
         write_cache(element, cache_key) if cacheable
 
+        row.data("chart-is-loading", true)
         image   = $("<img>").attr('src', url)
         
         image.on 'load', ->
             return if chart_row.data("drag-lock")
             compare_key = row.attr("data-compare-key")
 
-            cell.removeClass('loading')
-            cell.html(image)
-            cell.css('height', cell.height())
+            row.removeData("chart-is-loading")
+            wrapper.html(image)
             
             if compare_key
                 add_compare_toolbox(chart_row)
@@ -372,15 +395,15 @@ widget = (element, engine, market, params, options = {}) ->
             write_cache(element, cache_key) if cacheable
         
         image.on 'error', ->
+            row.removeData("chart-is-loading")
             chart_row.prev("tr.row").removeClass("current")
             chart_row.data('defunct', true).hide()
-            cell.removeClass('loading')
-            cell.empty()
+            wrapper.empty()
             write_cache(element, cache_key) if cacheable
 
         
     
-    activate_row = (row) ->
+    activate_row = (row, refresh_options = {}) ->
         chart_row   = row.next("tr.chart")
         
         $("tr.row", element).not(row).removeClass("current")
@@ -391,7 +414,7 @@ widget = (element, engine, market, params, options = {}) ->
         row.toggleClass("current", chart_row.is(":visible"))
         
         if chart_row.is(":visible")
-            refresh_chart(chart_row)
+            refresh_chart(chart_row, refresh_options)
     
     observe = _.once ->
         element.on 'click', 'tr.row', (event) ->
@@ -504,14 +527,16 @@ widget = (element, engine, market, params, options = {}) ->
                 if has_chart
                     chart_row = $("<tr>")
                         .addClass("chart")
-                        .attr
-                            'data-key': record_key
-                        .html($("<td>").attr({ 'colspan': _.size(row.children()) }).html("&nbsp;"))
+                        .html( $("<td>")
+                                .attr('colspan', _.size( row.children() ))
+                                .append($("<div>").addClass("wrapper")) )
                     row.after chart_row
 
                     if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            $("td", chart_row).css('height', $("td", old_chart_row).height()).html($("<img>").attr('src', url))
+                            $("div.wrapper", chart_row)
+                                .css('height', $("div.wrapper", old_chart_row).height())
+                                .html($("<img>").attr('src', url))
 
                         chart_row.data('defunct',                  old_chart_row.data('defunct'))
                         chart_row.data('compare-toolbox-position', old_chart_row.data('compare-toolbox-position'))
@@ -520,9 +545,13 @@ widget = (element, engine, market, params, options = {}) ->
             table_head.append header_row if options.show_header
 
             element.children().remove()
-            element.html table
+            element.html(table)
 
-            chart_width = $("tr.chart td", table).width()
+
+            chart_width  = $("tr.chart div.wrapper", table).width()
+            chart_height = if chart_width then chart_width / 2 else 0
+            if options.chart_option then (chart_height = if options.chart_option.proportions then chart_width / options.chart_option.proportions else options.chart_option.height || chart_width / 2)
+
             $("tr.chart", table).hide()
 
             activate_row $("tr.row[data-key=#{escape_selector current_row_key}]", table) if current_row_key
@@ -561,7 +590,6 @@ widget = (element, engine, market, params, options = {}) ->
                 else
                     render data if _.size(data) > 0
                     delay = calculate_delay refresh_timeout
-
 
             timeout = _.delay refresh, delay if delay > 0
                 
