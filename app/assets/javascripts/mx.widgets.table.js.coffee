@@ -127,7 +127,7 @@ widget = (element, engine, market, params, options = {}) ->
 
 
     add_spinner    = (wrapper) ->
-        return if _.size $("div.spinner", wrapper) > 0
+        return if _.size($("div.spinner", wrapper)) > 0
         wrapper.css("position", "relative")
         wrapper.append $("<div>").addClass("spinner")
         wrapper.addClass("loading")
