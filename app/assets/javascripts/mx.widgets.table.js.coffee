@@ -146,7 +146,14 @@ widget = (element, engine, market, params, options = {}) ->
     read_cache(element, cache_key) if cacheable
 
     if cacheable and has_chart
-        $("tr.chart div.toolbox", element).remove()
+        $("div.toolbox", element).each ->
+            toolbox  = $(this)
+            wrapper  = toolbox.parent()
+            toolbox.css
+                top:  default_toolbox_position.top
+                left: (if default_toolbox_position.right then (wrapper.width() - toolbox.outerWidth() - default_toolbox_position.right) else default_toolbox_position.left)
+
+
         $("tr.chart img", element).each ->
             old_image    = $(this)
             wrapper      = old_image.parent()
