@@ -127,15 +127,20 @@ widget = (element, engine, market, params, options = {}) ->
 
 
     add_spinner    = (wrapper) ->
-        return if _.size($("div.spinner", wrapper)) > 0
+        return if _.size($("div.spinner_wrapper", wrapper)) > 0
         wrapper.css("position", "relative")
-        wrapper.append $("<div>").addClass("spinner")
-        wrapper.addClass("loading")
+        container = $("<div>").addClass("spinner_wrapper")
+        container.append $("<div>").addClass("spinner_background")
+        container.append $("<div>").addClass("spinner")
+        wrapper.append   container
+        wrapper.addClass "loading"
 
 
     remove_spinner = (wrapper) ->
+        spinner = $("div.spinner_wrapper", wrapper)
+        return unless _.size(spinner) > 0
         wrapper.removeClass("loading")
-        $("div.spinner", wrapper).remove()
+        spinner.remove()
 
 
     read_cache(element, cache_key) if cacheable
@@ -154,6 +159,7 @@ widget = (element, engine, market, params, options = {}) ->
             image.on "load", ->
                 wrapper.prepend(image)
                 remove_spinner(wrapper)
+
 
     delay   = calculate_delay(options.refresh_timeout)
     timeout = null
@@ -203,16 +209,17 @@ widget = (element, engine, market, params, options = {}) ->
         table = $("table", element)
         rows.addClass("draggable-row")
         rows.draggable({
-            start:  () ->
+            start:  ->
                 table.data("drag-lock", true)
-            stop:   () ->
+            stop:   ->
                 table.data("drag-lock", false)
             cursor: "move"
             cursorAt:
                 top:  5
                 left: 5
-            helper: () ->
+            helper: ->
                 $("<div>").addClass("security-drag-helper").html($("td:first", $(this)).html())
+            appendTo: "body"
         })
 
 
@@ -220,16 +227,17 @@ widget = (element, engine, market, params, options = {}) ->
         table = $("table", element)
         chart_rows.addClass("draggable-row")
         chart_rows.draggable({
-            start: () ->
+            start:  ->
                 table.data("drag-lock", true)
-            stop:  () ->
+            stop:   ->
                 table.data("drag-lock", false)
             cursor: "move"
             cursorAt:
                 top:  5
                 left: 5
-            helper: (f) ->
+            helper: ->
                 $("<div>").addClass("security-drag-helper").html( $(this).prev("tr.row").find("td:first").html() )
+            appendTo: "body"
         })
 
 
@@ -238,13 +246,13 @@ widget = (element, engine, market, params, options = {}) ->
         rows.droppable({
             accept: (draggable) ->
                 is_accept_draggable $(this), draggable
-            over: () ->
+            over: ->
                 table.data("drop-lock", true)
                 $(this).addClass("drophover").next("tr.chart").addClass("drophover")
-            out:  () ->
+            out:  ->
                 table.data("drop-lock", false).data("dropover-time", + new Date)
                 $(this).removeClass("drophover").next("tr.chart").removeClass("drophover")
-            deactivate: () ->
+            deactivate: ->
                 table.data("drop-lock", false).data("dropover-time", + new Date)
             drop: (event, ui) ->
                 target = $(this)
@@ -264,13 +272,13 @@ widget = (element, engine, market, params, options = {}) ->
         chart_rows.droppable({
             accept: (draggable) ->
                 is_accept_draggable $(this).prev("tr.row"), draggable
-            over: () ->
+            over: ->
                 table.data("drop-lock", true)
                 $(this).addClass("drophover").prev("tr.row").addClass("drophover")
-            out:  () ->
+            out:  ->
                 table.data("drop-lock", false).data("dropover-time", + new Date)
                 $(this).removeClass("drophover").prev("tr.row").removeClass("drophover")
-            deacticate: () ->
+            deacticate: ->
                 table.data("drop-lock", false).data("dropover-time", + new Date)
             drop: (event, ui) ->
                 target = $(this).prev("tr.row")
@@ -286,7 +294,7 @@ widget = (element, engine, market, params, options = {}) ->
 
 
     is_accept_draggable = (target, source) ->
-        !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row")# and !target.data("chart-is-loading")
+        !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row") and !target.data("chart-is-loading")
 
 
     add_compare_toolbox = (chart_row) ->
@@ -314,7 +322,11 @@ widget = (element, engine, market, params, options = {}) ->
                 left: (if default_toolbox_position.right then (wrapper.width() - toolbox.outerWidth() - default_toolbox_position.right) else default_toolbox_position.left)
             chart_row.data("compare-toolbox-position", position)
 
-        if position.left + toolbox.outerWidth() > wrapper.width() then position.left = wrapper.width() - toolbox.outerWidth()
+        if position.left + toolbox.outerWidth()  > wrapper.width()  then position.left = wrapper.width()  - toolbox.outerWidth()
+        if position.top  + toolbox.outerHeight() > wrapper.height() then position.top  = wrapper.height() - toolbox.outerHeight()
+        if position.left < 0 then position.left = 0
+        if position.top  < 0 then position.top  = 0
+
 
         toolbox.css({
             top:       position.top
@@ -386,6 +398,7 @@ widget = (element, engine, market, params, options = {}) ->
             compare_key = row.attr("data-compare-key")
 
             row.removeData("chart-is-loading")
+            remove_spinner(wrapper)
             wrapper.html(image)
             
             if compare_key
