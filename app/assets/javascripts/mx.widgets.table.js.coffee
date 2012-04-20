@@ -146,6 +146,7 @@ widget = (element, engine, market, params, options = {}) ->
     read_cache(element, cache_key) if cacheable
 
     if cacheable and has_chart
+        $("tr.chart div.toolbox", element).remove()
         $("tr.chart img", element).each ->
             old_image    = $(this)
             wrapper      = old_image.parent()
@@ -323,7 +324,7 @@ widget = (element, engine, market, params, options = {}) ->
             chart_row.data("compare-toolbox-position", position)
 
         if position.left + toolbox.outerWidth()  > wrapper.width()  then position.left = wrapper.width()  - toolbox.outerWidth()
-        if position.top  + toolbox.outerHeight() > wrapper.height() then position.top  = wrapper.height() - toolbox.outerHeight()
+        if position.top  + toolbox.outerHeight() > wrapper.height() then position.top  = default_toolbox_position.top
         if position.left < 0 then position.left = 0
         if position.top  < 0 then position.top  = 0
 
