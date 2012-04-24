@@ -130,16 +130,22 @@ widget = (element, params, options = {}) ->
         animate()
     
 
-    toggle_animation = ->
-        screens = $("ul", element)
-        animated = not screens.is(":animated")
-        if screens.is(":animated") then screens.stop() else animate()
-        cache.set cache_key, animated
+    toggle_animation = (event) ->
+        screens  = $("ul", element)
+        switch event.type
+            when "click"
+                animated = not animated
+                if screens.is(":animated") then screens.stop() else animate()
+                cache.set cache_key, animated
+            when "mouseleave"
+                animate()      if animated
+            when "mouseenter"
+                screens.stop() if animated
 
 
     $.when(fetch_filters(), fetch_columns()).then (filters, columns) ->
         
-        element.on "click", toggle_animation
+        element.on "click mouseenter mouseleave", toggle_animation
         
         for id, filter of filters
             filter = _.reduce filter.widget, (memo, field) ->
