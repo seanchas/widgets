@@ -1,4 +1,5 @@
 ##= require jquery
+##= require jquery-ui
 ##= require json
 ##= require underscore
 ##= require highstock
