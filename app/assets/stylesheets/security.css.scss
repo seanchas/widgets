@@ -165,10 +165,11 @@ table.mx-widget-turnovers {
 
             div.spinner_background {
                 background-color: #e9eaed;
-                filter:progid:DXImageTransform.Microsoft.Alpha(opacity=50);
-                -moz-opacity: 0.5;
-                -khtml-opacity: 0.5;
-                opacity: 0.5;
+                opacity:        .50;                 /* Standard: FF gt 1.5, Opera, Safari */
+                filter:         alpha(opacity=50);   /* IE lt 8 */
+                -ms-filter:     "alpha(opacity=50)"; /* IE 8 */
+                -khtml-opacity: .50;                 /* Safari 1.x */
+                -moz-opacity:   .50;                 /* FF lt 1.5, Netscape */
                 margin:  0;
                 padding: 0;
                 height:  100%;
