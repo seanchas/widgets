@@ -399,8 +399,8 @@ widget = (element, engine, market, params, options = {}) ->
         write_cache(element, cache_key) if cacheable
 
         row.data("chart-is-loading", true)
-        image   = $("<img>").attr('src', url)
-        
+        image = $("<img>")
+
         image.on 'load', ->
             return if chart_row.data("drag-lock")
             compare_key = row.attr("data-compare-key")
@@ -421,6 +421,8 @@ widget = (element, engine, market, params, options = {}) ->
             chart_row.data('defunct', true).hide()
             wrapper.empty()
             write_cache(element, cache_key) if cacheable
+
+        image.attr('src', url)
 
         
     
@@ -457,7 +459,7 @@ widget = (element, engine, market, params, options = {}) ->
         
         render = (data) ->
             return if _.size(data) == 0
-            
+
             old_table = $('table', element)
             
             table = $("<table>")
@@ -555,9 +557,12 @@ widget = (element, engine, market, params, options = {}) ->
 
                     if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            $("div.wrapper", chart_row)
+                            wrapper = $("div.wrapper", chart_row)
                                 .css('height', $("div.wrapper", old_chart_row).height())
                                 .html($("<img>").attr('src', url))
+                        if old_chart_row.prev("tr.row").data("chart-is-loading")
+                            wrapper.append $("div.toolbox", old_chart_row)
+                            add_spinner wrapper
 
                         chart_row.data('defunct',                  old_chart_row.data('defunct'))
                         chart_row.data('compare-toolbox-position', old_chart_row.data('compare-toolbox-position'))
