@@ -561,7 +561,9 @@ widget = (element, engine, market, params, options = {}) ->
                                 .css('height', $("div.wrapper", old_chart_row).height())
                                 .html($("<img>").attr('src', url))
                         if old_chart_row.prev("tr.row").data("chart-is-loading")
-                            wrapper.append $("div.toolbox", old_chart_row)
+                            if _.size(old_toolbox = $("div.toolbox", old_chart_row)) > 0
+                                wrapper.append(old_toolbox)
+                            row.data("chart-is-loading", true)
                             add_spinner wrapper
 
                         chart_row.data('defunct',                  old_chart_row.data('defunct'))
