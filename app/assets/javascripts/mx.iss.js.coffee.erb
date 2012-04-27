@@ -178,7 +178,7 @@ request_meta =
         data: ->
             'iss.meta': 'off'
         parse: (json) ->
-            _.first(iss_merge_columns_and_data(json?.capitalization))?['CAPITALIZATION']
+            _.first(iss_merge_columns_and_data(json?.issuecapitalization))?['ISSUECAPITALIZATION']
         key: ->
             []
     
