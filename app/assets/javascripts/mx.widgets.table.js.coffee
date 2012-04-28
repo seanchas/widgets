@@ -548,18 +548,17 @@ widget = (element, engine, market, params, options = {}) ->
                 table_body.append row
                 
                 if has_chart
+                    wrapper   = $("<div>").addClass("wrapper")
                     chart_row = $("<tr>")
                         .addClass("chart")
                         .html( $("<td>")
                                 .attr('colspan', _.size( row.children() ))
-                                .append($("<div>").addClass("wrapper")) )
+                                .append(wrapper) )
                     row.after chart_row
 
                     if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
                         if url = $("img", old_chart_row).attr('src')
-                            wrapper = $("div.wrapper", chart_row)
-                                .css('height', $("div.wrapper", old_chart_row).height())
-                                .html($("<img>").attr('src', url))
+                            wrapper.css('height', $("div.wrapper", old_chart_row).height()).html($("<img>").attr('src', url))
                         if old_chart_row.prev("tr.row").data("chart-is-loading")
                             if _.size(old_toolbox = $("div.toolbox", old_chart_row)) > 0
                                 wrapper.append(old_toolbox)
@@ -616,7 +615,17 @@ widget = (element, engine, market, params, options = {}) ->
                 if table.data("drag-lock") or table.data("drop-lock") or ( table.data("dropover-time") + dropover_delay > + new Date )
                     delay = calculate_delay(refresh_timeout) + dropover_delay
                 else
-                    render data if _.size(data) > 0
+                    if _.size(data) > 0
+                        table.data
+                            "drop-lock": true
+                            "drag-lock": true
+
+                        render data
+
+                        table.data
+                            "drop-lock": false
+                            "drag-lock": false
+
                     delay = calculate_delay refresh_timeout
 
             timeout = _.delay refresh, delay if delay > 0
