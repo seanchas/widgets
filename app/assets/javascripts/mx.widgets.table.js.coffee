@@ -253,6 +253,7 @@ widget = (element, engine, market, params, options = {}) ->
         table = $("table", element)
         rows.droppable({
             accept: (draggable) ->
+                if draggable.hasClass("chart") then draggable = draggable.prev("tr.row")
                 is_accept_draggable $(this), draggable
             over: ->
                 table.data("drop-lock", true)
@@ -279,6 +280,7 @@ widget = (element, engine, market, params, options = {}) ->
         table = $("table", element)
         chart_rows.droppable({
             accept: (draggable) ->
+                if draggable.hasClass("chart") then draggable = draggable.prev("tr.row")
                 is_accept_draggable $(this).prev("tr.row"), draggable
             over: ->
                 table.data("drop-lock", true)
