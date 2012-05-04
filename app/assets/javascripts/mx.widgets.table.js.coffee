@@ -115,9 +115,8 @@ widget = (element, engine, market, params, options = {}) ->
     
     element = $ element; return if _.size(element) == 0
 
-
-    cache_key = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
-    cacheable = options.cache == true
+    cache_key       = mx.utils.sha1(JSON.stringify(_.rest(arguments).join("/")) + mx.locale())
+    cacheable       = options.cache == true
 
     has_chart    = options.chart? and options.chart != false
     chart_width  = 0
@@ -128,12 +127,13 @@ widget = (element, engine, market, params, options = {}) ->
 
     add_spinner    = (wrapper) ->
         return if _.size($("div.spinner_wrapper", wrapper)) > 0
-        wrapper.css("position", "relative")
         container = $("<div>").addClass("spinner_wrapper")
         container.append $("<div>").addClass("spinner_background")
         container.append $("<div>").addClass("spinner")
-        wrapper.append   container
-        wrapper.addClass "loading"
+        wrapper
+            .css("position", "relative")
+            .addClass("loading")
+            .append(container)
 
 
     remove_spinner = (wrapper) ->
@@ -213,98 +213,62 @@ widget = (element, engine, market, params, options = {}) ->
         records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
 
 
-    make_rows_draggable = (rows) ->
-        table = $("table", element)
-        rows.addClass("draggable-row")
-        rows.draggable({
-            start:  ->
-                table.data("drag-lock", true)
-            stop:   ->
-                table.data("drag-lock", false)
-            cursor: "move"
+    make_draggable = ->
+        table   = $("table", element)
+        rows    = $("tbody tr", table)
+        rows.draggable
+            start: ->
+                table.data "drag-lock", true
+            stop:  ->
+                table.data "drag-lock", false
+            helper: ->
+                source_el = $(@)
+                source_el = $(@).prev("tr.row") if source_el.hasClass("chart")
+                $("<div>")
+                    .addClass("security-drag-helper")
+                    .html(source_el.attr "data-title")
+                    .data
+                        key:   source_el.attr "data-key"
+                        title: source_el.attr "data-title"
+            appendTo: "body"
+            cursor:   "move"
             cursorAt:
                 top:  5
                 left: 5
-            helper: ->
-                $("<div>").addClass("security-drag-helper").html($("td:first", $(this)).html())
-            appendTo: "body"
-        })
 
 
-    make_charts_draggable = (chart_rows) ->
+    make_droppable = ->
         table = $("table", element)
-        chart_rows.addClass("draggable-row")
-        chart_rows.draggable({
-            start:  ->
-                table.data("drag-lock", true)
-            stop:   ->
-                table.data("drag-lock", false)
-            cursor: "move"
-            cursorAt:
-                top:  5
-                left: 5
-            helper: ->
-                $("<div>").addClass("security-drag-helper").html( $(this).prev("tr.row").find("td:first").html() )
-            appendTo: "body"
-        })
-
-
-    make_rows_droppable = (rows) ->
-        table = $("table", element)
-        rows.droppable({
-            accept: (draggable) ->
-                if draggable.hasClass("chart") then draggable = draggable.prev("tr.row")
-                is_accept_draggable $(this), draggable
-            over: ->
-                table.data("drop-lock", true)
-                $(this).addClass("drophover").next("tr.chart").addClass("drophover")
-            out:  ->
-                table.data("drop-lock", false).data("dropover-time", + new Date)
-                $(this).removeClass("drophover").next("tr.chart").removeClass("drophover")
+        rows  = $("tbody tr", table)
+        rows.droppable
+            accept: ->
+                target = $(@)
+                target = target.prev("tr.row") if target.hasClass("chart")
+                source = $("body > .security-drag-helper:first")
+                (_.size(source) > 0) and !(source.data("key") == target.attr("data-key") or source.data("key") == target.attr("data-compare-key")) and !target.data("chart-is-loading")
+            over:   ->
+                table.data "drop-lock", true
+                (if $(@).hasClass("chart") then $(@).prev("tr.row")   else $(@)).addClass("drophover")
+                (if $(@).hasClass("row")   then $(@).next("tr.chart") else $(@)).addClass("drophover")
+            out:    ->
+                table.data
+                    "drop-lock":     false
+                    "dropover-time": + new Date
+                (if $(@).hasClass("chart") then $(@).prev("tr.row")   else $(@)).removeClass("drophover")
+                (if $(@).hasClass("row")   then $(@).next("tr.chart") else $(@)).removeClass("drophover")
             deactivate: ->
-                table.data("drop-lock", false).data("dropover-time", + new Date)
+                table.data
+                    "drop-lock":     false
+                    "dropover-time": + new Date
             drop: (event, ui) ->
-                target = $(this)
-                source = ui.draggable
-                source = source.prev("tr.row") if source.hasClass("chart")
-                target.removeClass("drophover").next("tr.chart").removeClass("drophover")
-                target.attr
-                    "data-compare-key":   source.attr "data-key"
-                    "data-compare-title": source.attr "data-title"
-
-                if target.hasClass("current") then refresh_chart(target.next("tr.chart"), { force: true }) else activate_row(target, { force: true })
-        })
-
-
-    make_charts_droppable = (chart_rows) ->
-        table = $("table", element)
-        chart_rows.droppable({
-            accept: (draggable) ->
-                if draggable.hasClass("chart") then draggable = draggable.prev("tr.row")
-                is_accept_draggable $(this).prev("tr.row"), draggable
-            over: ->
-                table.data("drop-lock", true)
-                $(this).addClass("drophover").prev("tr.row").addClass("drophover")
-            out:  ->
-                table.data("drop-lock", false).data("dropover-time", + new Date)
-                $(this).removeClass("drophover").prev("tr.row").removeClass("drophover")
-            deacticate: ->
-                table.data("drop-lock", false).data("dropover-time", + new Date)
-            drop: (event, ui) ->
-                target = $(this).prev("tr.row")
-                source = ui.draggable
-                source = source.prev("tr.row") if source.hasClass("chart")
-                target.removeClass("drophover").next("tr.chart").removeClass("drophover")
-                target.attr
-                    "data-compare-key":   source.attr "data-key"
-                    "data-compare-title": source.attr "data-title"
-
-                if target.hasClass("current") then refresh_chart($(this), { force: true }) else activate_row(target, { force: true })
-        })
-
-
-    is_accept_draggable = (target, source) ->
-        !(source.attr("data-key") == target.attr("data-key") or source.attr("data-key") == target.attr("data-compare-key")) and source.hasClass("draggable-row") and !target.data("chart-is-loading")
+                row       = (if $(@).hasClass("chart") then $(@).prev("tr.row")   else $(@)).removeClass("drophover")
+                chart_row = (if $(@).hasClass("row")   then $(@).next("tr.chart") else $(@)).removeClass("drophover")
+                source    = $("body > .security-drag-helper:first")
+                if _.size(source) > 0
+                    row.attr
+                        "data-compare-key":   source.data("key")
+                        "data-compare-title": source.data("title")
+                    if row.hasClass("current") then refresh_chart(chart_row, { force: true }) else activate_row(row, { force: true })
 
 
     add_compare_toolbox = (chart_row) ->
@@ -463,6 +427,9 @@ widget = (element, engine, market, params, options = {}) ->
             return if _.size(data) == 0
 
             old_table = $('table', element)
+
+            old_table.data "drop-lock", true if is_droppable
+            old_table.data "drag-lock", true if is_draggable
             
             table = $("<table>")
                 .addClass("mx-widget-table")
@@ -586,16 +553,10 @@ widget = (element, engine, market, params, options = {}) ->
             activate_row $("tr.row[data-key=#{escape_selector current_row_key}]", table) if current_row_key
             current_row_key = undefined
 
-            if is_draggable
-                make_rows_draggable    $("tr.row",   table)
-                make_charts_draggable  $("tr.chart", table)
-            if is_droppable
-                make_rows_droppable    $("tr.row",   table)
-                make_charts_droppable  $("tr.chart", table)
-            if has_chart
-                observe()
-            
-            write_cache(element, cache_key) if cacheable
+            make_draggable $("tbody tr", table) if is_draggable
+            make_droppable $("tbody tr", table) if is_droppable
+            observe()                           if has_chart
+            write_cache(element, cache_key)     if cacheable
                 
         
         refresh = ->
@@ -617,17 +578,7 @@ widget = (element, engine, market, params, options = {}) ->
                 if table.data("drag-lock") or table.data("drop-lock") or ( table.data("dropover-time") + dropover_delay > + new Date )
                     delay = calculate_delay(refresh_timeout) + dropover_delay
                 else
-                    if _.size(data) > 0
-                        table.data
-                            "drop-lock": true
-                            "drag-lock": true
-
-                        render data
-
-                        table.data
-                            "drop-lock": false
-                            "drag-lock": false
-
+                    render data
                     delay = calculate_delay refresh_timeout
 
             timeout = _.delay refresh, delay if delay > 0
