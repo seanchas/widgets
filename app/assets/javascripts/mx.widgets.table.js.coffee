@@ -208,15 +208,6 @@ widget = (element, engine, market, params, options = {}) ->
     records_urls = {}
 
 
-    calculate_chart_dimensions = _.once ->
-        is_hidden = !element.is(":visible")
-        element.show() if is_hidden
-        chart_width  = $("tr.chart div.wrapper", element).width()
-        chart_height = if chart_width then chart_width / 2 else 0
-        if options.chart_option then (chart_height = if options.chart_option.proportions then chart_width / options.chart_option.proportions else options.chart_option.height || chart_width / 2)
-        element.hide() if is_hidden
-
-
     make_url = (row) ->
         key = row.data('key')
         records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
@@ -377,7 +368,6 @@ widget = (element, engine, market, params, options = {}) ->
         image = $("<img>")
 
         image.on 'load', ->
-            console.log Math.random()
             return if chart_row.data("drag-lock")
             compare_key = row.attr("data-compare-key")
 
@@ -400,6 +390,11 @@ widget = (element, engine, market, params, options = {}) ->
 
         image.attr('src', url)
 
+
+    calculate_chart_dimensions = (chart_row) ->
+        chart_width  = $("div.wrapper", chart_row).width()
+        chart_height = if chart_width then chart_width / 2 else 0
+        if options.chart_option then (chart_height = if options.chart_option.proportions then chart_width / options.chart_option.proportions else options.chart_option.height || chart_width / 2)
         
     
     activate_row = (row, refresh_options = {}) ->
@@ -413,6 +408,7 @@ widget = (element, engine, market, params, options = {}) ->
         row.toggleClass("current", chart_row.is(":visible"))
         
         if chart_row.is(":visible")
+            calculate_chart_dimensions(chart_row)
             refresh_chart(chart_row, refresh_options)
 
 
@@ -537,11 +533,12 @@ widget = (element, engine, market, params, options = {}) ->
                     row.after chart_row
 
                     if _.size(old_chart_row = $("tr.row[data-key=#{escape_selector record_key}] + tr.chart")) > 0
+
                         #if url = $("img", old_chart_row).attr('src')
                         #    wrapper.css('height', $("div.wrapper", old_chart_row).height()).html($("<img>").attr('src', url))
+
                         if _.size(img = $("img", old_chart_row)) > 0
                             wrapper.css('height', $("div.wrapper", old_chart_row).height()).html(img)
-                            console.log Math.random(), "blink?"
                         if old_chart_row.prev("tr.row").data("chart-is-loading")
                             if _.size(old_toolbox = $("div.toolbox", old_chart_row)) > 0
                                 wrapper.append(old_toolbox)
@@ -557,7 +554,7 @@ widget = (element, engine, market, params, options = {}) ->
             element.children().remove()
             element.html(table)
 
-            calculate_chart_dimensions()
+
             $("tr.chart", table).hide()
 
             activate_row $("tr.row[data-key=#{escape_selector current_row_key}]", table) if current_row_key and element.is(':visible')
