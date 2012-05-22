@@ -7,18 +7,6 @@ scope = global.mx.security
 
 $ = jQuery
 
-
-fields = [
-    { name: 'SHORT_TITLE',              title: { ru: 'Краткое наименование', en: 'Shortname' } }
-    { name: 'TRANSLITERATION_TITLE',    title: { ru: 'Транслитерация'      , en: 'Transliteration' } }
-    { name: 'LEGAL_ADDRESS',            title: { ru: 'Юридический адрес'   , en: 'Legal address' } }
-    { name: 'POSTAL_ADDRESS',           title: { ru: 'Почтовый адрес'      , en: 'Postal address' } }
-    { name: 'OKPO',                     title: { ru: 'ОКПО'                , en: 'OKPO' } }
-    { name: 'OGRN',                     title: { ru: 'ОГРН'                , en: 'OGRN' } }
-    { name: 'INN',                      title: { ru: 'ИНН'                 , en: 'INN' } }
-    { name: 'URL',                      title: { ru: 'WEB-адрес'           , en: 'Web' } }
-]
-
 url_re = /(\b((https?|ftp|file):\/\/)*([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]))/ig
 
 widget = (element, engine, market, board, param, options = {}) ->
@@ -31,7 +19,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             .html("<thead></thead><tbody></tbody>")
 
 
-    render = (element, emitter) ->
+    render = (element, emitter, fields) ->
         table = create_table()
 
         table_head = $('thead', table)
@@ -48,17 +36,17 @@ widget = (element, engine, market, board, param, options = {}) ->
                     domain = args[4].replace(/([^\/])\/$/, "$1")
                     "<a href=\"#{schema + domain}\">#{domain}</a>"
                 )
-            table_body.append $("<tr><th>#{field.title[mx.locale()]}</th><td>#{value ? '&mdash;'}</td></tr>")
+            table_body.append $("<tr><th>#{field.short_title}</th><td>#{value ? '&mdash;'}</td></tr>")
 
         element.html table
 
     mx.iss.description(param).then (description) ->
         emitter_id = _.first(field.value for field in description when field.name == 'EMITTER_ID')
         if emitter_id?
-            mx.iss.emitter(emitter_id).then (emitter) ->
+            $.when(mx.iss.emitter(emitter_id), mx.iss.emitter_columns(emitter_id)).then (emitter, fields) ->
                 if emitter
                     element.trigger('render', { status: 'success' })
-                    render element, emitter
+                    render element, emitter, fields
                 else
                     element.trigger('render', { status: 'failure' })
         else

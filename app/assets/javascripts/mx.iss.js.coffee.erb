@@ -214,6 +214,16 @@ request_meta =
         key: ->
             []
 
+    emitter_columns:
+        url: (emitter_id) ->
+            "#{iss_host}/emitters/#{emitter_id}/columns.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.emitter)
+        key: ->
+            []
+
 
 request = (name, args...) ->
     meta    = request_meta[name]
@@ -379,6 +389,7 @@ _.extend scope,
     boards:             (args...) -> request('boards', args...)
     emitter:            emitter
     emitter_securities: emitter_securities
+    emitter_columns:    (args...) -> request('emitter_columns', args...)
     turnovers:          (args...) -> request('turnovers', args...)
     turnoverssectors:   (args...) -> request('turnoverssectors', args...)
     candle_borders:     candle_borders
