@@ -42,7 +42,7 @@ widget = (element, engine, market, board, param, options = {}) ->
 
     make_row = (b) ->
         row = $("<tr>")
-            .html("<th><a href=\"#{make_url b}\">#{b.title}</a></th><td>#{format_date b.history_from} &ndash; #{now[mx.locale()]}</td>")
+            .html("<th><a href=\"#{make_url b}\">#{b.title}</a></th><td>#{format_date b.listed_from} &ndash; #{now[mx.locale()]}</td>")
 
         cell = $('th', row)
         row.toggleClass('current', b.boardid == board)
