@@ -148,6 +148,19 @@ request_meta =
             iss_merge_columns_and_data(json?.turnoverssectors)
         key: (options = {}) ->
             [options]
+
+    market_turnovers:
+        url: (engine) ->
+            "#{iss_host}/engines/#{engine}/turnovers.jsonp?callback=?"
+        data: (engine, options) ->
+            'iss.meta': 'off'
+            'iss.only': 'turnovers,turnoversprevdate'
+            'is_tonight_session': if options.is_tonight_session == true then 1 else 0
+        parse: (json) ->
+            turnovers:         iss_merge_columns_and_data(json?.turnovers)
+            turnoversprevdate: iss_merge_columns_and_data(json?.turnoversprevdate)
+        key: (engine, options) ->
+            [engine, options]
     
     security_indices:
         url: (param) ->
@@ -392,6 +405,7 @@ _.extend scope,
     emitter_columns:    (args...) -> request('emitter_columns', args...)
     turnovers:          (args...) -> request('turnovers', args...)
     turnoverssectors:   (args...) -> request('turnoverssectors', args...)
+    market_turnovers:   (args...) -> request('market_turnovers', args...)
     candle_borders:     candle_borders
     filters:            (args...) -> request('filters', args...)
     capitalization:     (args...) -> request('capitalization',  args...)

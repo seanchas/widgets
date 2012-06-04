@@ -33,6 +33,10 @@
 <div id="rmfs">
 </div>
 
+<h2>RTS Spot: Объемы торгов</h2>
+<div id="spot_turnovers">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -313,6 +317,11 @@
                 url: false,
                 filter_name: ["SECNAME", "SHORTNAME", "SETTLEPRICE", "SETTLETOPREVSETTLE", "UPDATETIME"],
                 show_header: true
+            });
+
+            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', 'standard, classica, TOTALS', {
+                is_tonight_session: false,
+                usd: true
             });
             
         });
