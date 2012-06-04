@@ -29,6 +29,10 @@
 <div id="commodity_1">
 </div>
 
+<h2>ОФЗ</h2>
+<div id="rmfs">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -237,6 +241,20 @@
                 params_name: 'sectypes',
                 refresh_timeout: 5 * 1000,
                 nearest: 1
+            });
+
+            mx.widgets.table("#rmfs", 'stock', 'bonds', [
+                'EQOB:SU25072RMFS8',
+                'EQOB:SU25076RMFS9',
+                'EQOB:SU25077RMFS7',
+                'EQOB:SU26204RMFS6',
+                'EQOB:SU26205RMFS3'
+            ], {
+                show_header: true,
+                cache: true,
+                refresh_timeout: 60 * 1000,
+                filter_name: ['SHORTNAME', 'TIME', 'DURATION', 'YIELD', 'LAST', 'LASTCHANGE']
+
             });
 
             mx.widgets.turnovers('#turnovers', {
