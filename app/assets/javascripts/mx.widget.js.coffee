@@ -12,6 +12,7 @@
 ##= require mx.widgets.security.emitter
 ##= require mx.widgets.security.chart
 ##= require mx.widgets.turnovers
+##= require mx.widgets.market_turnovers
 ##= require mx.widgets.repo.dealers
 ##= require mx.widgets.cb.transactions
 ##= require mx.widgets.ticker

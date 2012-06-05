@@ -33,6 +33,10 @@
 <div id="rmfs">
 </div>
 
+<h2>Объемы торгов (stock)</h2>
+<div id="spot_turnovers">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -313,6 +317,13 @@
                 url: false,
                 filter_name: ["SECNAME", "SHORTNAME", "SETTLEPRICE", "SETTLETOPREVSETTLE", "UPDATETIME"],
                 show_header: true
+            });
+
+            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', [/* 'standard', 'classica' */], {
+                is_tonight_session: false,
+                show_prev_date: true,
+                usd: true,
+                afterRefresh: function(time) { /* console.log(time) */ }
             });
             
         });
