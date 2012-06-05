@@ -20,7 +20,7 @@ localization =
       rub: "RUB"
   sector_prefix:
     ru: "в т.ч."
-    en: "inc."
+    en: "incl."
 
 cache = kizzy('mx.widgets.turnovers')
 
