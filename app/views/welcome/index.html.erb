@@ -33,7 +33,7 @@
 <div id="rmfs">
 </div>
 
-<h2>RTS Spot: Объемы торгов</h2>
+<h2>Объемы торгов (stock)</h2>
 <div id="spot_turnovers">
 </div>
 
@@ -319,9 +319,11 @@
                 show_header: true
             });
 
-            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', 'standard, classica, TOTALS', {
+            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', [/* 'standard', 'classica' */], {
                 is_tonight_session: false,
-                usd: true
+                show_prev_date: true,
+                usd: true,
+                afterRefresh: function(time) { /* console.log(time) */ }
             });
             
         });

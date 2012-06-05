@@ -53,6 +53,7 @@
 }
 
 .mx-widget-turnovers,
+.mx-widget-market-turnovers,
 .mx-widget-repo-dealers,
 .mx-widget-cb-transactions {
     border-collapse: collapse;
@@ -62,6 +63,20 @@
     
     margin: 2em 0 0;
     width: 100%;
+
+    thead {
+        th {
+            background-color: #f0f0f0;
+            text-align: right;
+            padding: 5px;
+        }
+        th.current {
+            background-color: #e7e7e7;
+        }
+        th.previous {
+            background-color: #e0e0e0;
+        }
+    }
     
     td {
         padding: 5px;
