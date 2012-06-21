@@ -50,12 +50,15 @@ Widgets::Application.routes.draw do
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
 
+  root :to => 'welcome#index'
+
   scope "widgets" do
 
     root :to             => 'welcome#index'
     get 'docs'           => 'welcome#widget_docs'
     get 'tiny/docs'      => 'welcome#tiny_docs'
     get 'widget'         => 'welcome#widget'
+    get 'ticker'         => 'welcome#ticker'
     get 'examples'       => 'welcome#examples'
 
     scope "security" do
