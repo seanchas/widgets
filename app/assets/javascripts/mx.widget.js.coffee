@@ -16,6 +16,7 @@
 ##= require mx.widgets.repo.dealers
 ##= require mx.widgets.cb.transactions
 ##= require mx.widgets.ticker
+##= require mx.widgets.vertical_ticker
 ##= require mx.widgets.indices
 ##= require mx.widgets.shares
 ##= require mx.widgets.tiny
