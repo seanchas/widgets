@@ -43,6 +43,9 @@
     <div id="ticker">
     </div>
 
+    <div id="vertical_ticker">
+    </div>
+
 <%- end -%>
 
 <%- content_for :left_content do -%>
@@ -139,6 +142,27 @@
             ], {
                 speed: 25,
                 toggleable: true,
+                url: function(engine, market, board, security) {
+                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
+                }
+            });
+
+            mx.widgets.vertical_ticker("#vertical_ticker", [
+                'stock:index:SNDX:MICEXINDEXCF',
+                'stock:index:RTSI:RTSI',
+                'stock:shares:EQNE:GAZP',
+                'stock:shares:EQBR:AFLT',
+                'stock:shares:EQBR:LKOH',
+                'stock:shares:EQNL:VTBR',
+                'stock:shares:EQBR:HYDR',
+                'stock:index:SNDX:MICEXO&G',
+                'state:index:GNDX:RGBI'
+            ], {
+                flip_speed:       500,       // flip time 0.5 sec
+                flip_delay:       8  * 1000, // flip delay 8 sec
+                refresh_timeout:  10 * 1000, // data refresh every 10 sec
+                outer_margin:     10,        // border margins 10px
+                intercell_margin: 10,        // margins between cells 10px
                 url: function(engine, market, board, security) {
                     return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
                 }

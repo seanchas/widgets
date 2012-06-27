@@ -1,24 +1,28 @@
-.mx-widget-ticker {
+.mx-widget-vertical-ticker {
     background: #ccc;
     font-size: 11px;
     height: 3em;
     overflow: hidden;
     position: relative;
-    white-space: nowrap;
-    
+
     ul {
         line-height: 1em;
-		list-style: none;
+        list-style: none;
         margin: 0;
-        padding: 1em 0;
+        padding: 0;
         position: absolute;
-        
+
         li {
-            display: inline;
-			margin: 0 10px;
-			padding: 0
+            display: block;
+            float: left;
+            margin: 0;
+            padding: 1em 0 0;
         }
-        
+
+        li * {
+            white-space: nowrap;
+        }
+
         .last {
             color: #669;
             padding-left: 5px;
@@ -28,7 +32,7 @@
             color: #666;
             padding-left: 5px;
         }
-        
+
         .trend_up {
             color: #060;
         }
@@ -38,7 +42,67 @@
         }
 
     }
-    
+
+    ul.container {
+        height: 0;
+        margin: 0;
+        left: 0;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        top: 0;
+        width: 0;
+    }
+
+}
+
+.mx-widget-vertical-ticker.loading {
+    background-image: image-url('facebook-ajax-loader.gif');
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
+.mx-widget-ticker {
+     background: #ccc;
+     font-size: 11px;
+     height: 3em;
+     overflow: hidden;
+     position: relative;
+     white-space: nowrap;
+
+     ul {
+         line-height: 1em;
+         list-style: none;
+         margin: 0;
+         padding: 1em 0;
+         position: absolute;
+
+         li {
+             display: inline;
+             margin: 0 10px;
+             padding: 0
+         }
+
+         .last {
+             color: #669;
+             padding-left: 5px;
+         }
+
+         .change {
+             color: #666;
+             padding-left: 5px;
+         }
+
+         .trend_up {
+             color: #060;
+         }
+
+         .trend_down {
+             color: #900;
+         }
+
+     }
+
 }
 
 .mx-widget-ticker.loading {
