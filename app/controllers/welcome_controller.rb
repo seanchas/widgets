@@ -25,8 +25,5 @@ class WelcomeController < ApplicationController
   def security_docs
     render :layout => "docs"
   end
-
-  def ticker
-  end
   
 end

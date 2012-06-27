@@ -56,6 +56,12 @@
 
 }
 
+.mx-widget-vertical-ticker.loading {
+    background-image: image-url('facebook-ajax-loader.gif');
+    background-position: center center;
+    background-repeat: no-repeat;
+}
+
 .mx-widget-ticker {
      background: #ccc;
      font-size: 11px;
