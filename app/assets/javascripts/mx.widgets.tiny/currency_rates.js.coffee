@@ -73,7 +73,7 @@ widget = (element) ->
             )
 
             containers["#{type}_change"].html(
-                mx.utils.render(change, { type: 'number', precision: 4, is_signed: 1, has_percent: 1 })
+                mx.utils.render(change, { type: 'number', precision: 4, is_signed: 1 })
             )
         
     
