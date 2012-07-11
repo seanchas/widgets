@@ -186,7 +186,10 @@ widget = (element, engine, market, params, options = {}) ->
     params = _.reduce params, (memo, param) ->
         parts = param.split(":")
         parts.unshift engine, market if _.size(parts) < 3
-        order.push parts.join(':')
+        if _.size(parts) == 3 and options.board?
+            order.push [parts[0], parts[1], options.board, parts[2]].join(':')
+        else if _.size(parts) == 4
+            order.push parts.join(':')
         (memo[_.first(parts, 2).join(":")] ?= []).push(_.rest(parts, 2).join(":"))
         memo
     , {}
@@ -577,9 +580,10 @@ widget = (element, engine, market, params, options = {}) ->
                         memo.push record
                     memo
                 , []
-                
-                data = _.sortBy data, (record) ->
-                    _.indexOf order, make_record_order_key(record)
+
+                unless _.size(order) == 0 or options.sort_column?
+                    data = _.sortBy data, (record) ->
+                        _.indexOf order, make_record_order_key(record)
 
                 table = $("table", element)
                 if table.data("drag-lock") or table.data("drop-lock") or ( table.data("dropover-time") + dropover_delay > + new Date )
