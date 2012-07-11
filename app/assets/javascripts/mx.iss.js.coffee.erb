@@ -56,7 +56,7 @@ request_meta =
         url: (engine, market, params, options = {}) ->
             "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
         data: (engine, market, params, options = {}) ->
-            known_keys = ['nearest', 'leaders']
+            known_keys = ['nearest', 'leaders', 'sort_order', 'sort_column', 'first']
 
             params_name = options.params_name || 'securities'
 
