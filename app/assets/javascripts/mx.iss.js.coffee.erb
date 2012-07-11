@@ -54,8 +54,8 @@ request_meta =
     
     securities:
         url: (engine, market, params, options = {}) ->
-            if options.board?
-                "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{options.board}/securities.jsonp?callback=?"
+            if options.boardid?
+                "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{options.boardid}/securities.jsonp?callback=?"
             else
                 "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
         data: (engine, market, params, options = {}) ->

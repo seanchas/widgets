@@ -186,8 +186,8 @@ widget = (element, engine, market, params, options = {}) ->
     params = _.reduce params, (memo, param) ->
         parts = param.split(":")
         parts.unshift engine, market if _.size(parts) < 3
-        if _.size(parts) == 3 and options.board?
-            order.push [parts[0], parts[1], options.board, parts[2]].join(':')
+        if _.size(parts) == 3 and options.boardid?
+            order.push [parts[0], parts[1], options.boardid, parts[2]].join(':')
         else if _.size(parts) == 4
             order.push parts.join(':')
         (memo[_.first(parts, 2).join(":")] ?= []).push(_.rest(parts, 2).join(":"))
