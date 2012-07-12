@@ -81,8 +81,8 @@ request_meta =
         parse: (json) ->
             iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
 
-        key: (engine, market, params) ->
-            [engine, market, params]
+        key: (engine, market, params, options = {}) ->
+            [engine, market, params, options.boardid]
 
     security:
         url: (engine, market, board, param) ->
