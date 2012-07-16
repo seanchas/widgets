@@ -101,7 +101,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             security = _.first(security)
         
             if security or description
-                render element, description, security, columns, filters['full'], indices, index_securities, options
+                render element, description, security, columns, (filters['description'] || filters['full']), indices, index_securities, options
                 element.trigger('render', { status: 'success' })
             else
                 element.trigger('render', { status: 'failure' })
