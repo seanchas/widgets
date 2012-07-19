@@ -9,8 +9,6 @@ _.mixin(_.str.exports());
 locale = if mx.locale?      then mx.locale()      else 'ru'
 server = if mx.auth.server? then mx.auth.server() else 'beta'
 
-console.log mx.auth.server()
-
 subdomains =
     web:   ''
     beta:  'beta.'
@@ -21,50 +19,30 @@ domains = ["passport.#{subdomain}micex.ru", "passport.#{subdomain}micex.com"]
 
 l10n =
     ru:
-        login_url:    'Вход'
+        login:        'Вход'
         logout:       'Выход из системы'
         registration: 'Регистрация'
+        user:         'Пользователь:'
         auth_domain:  "passport.#{subdomain}micex.ru"
         portals_urls: [
-            ['Профиль пользователя на сайте ММВБ', "http://passport.#{subdomain}micex.ru/user"]
+            ['Профиль пользователя на сайте', "http://passport.#{subdomain}micex.ru/user"]
+            ['Профиль пользователя на форуме',       "http://forums.#{subdomain}micex.ru/user"]
             ['Платежные реквизиты',                "http://services.#{subdomain}micex.ru/requisite"]
-            ['Настройка профиля на форумах',       "http://forums.#{subdomain}micex.ru/user"]
         ]
 
+    en:
+        login:        'Login'
+        logout:       'Logout'
+        registration: 'Registration'
+        user:         'User:'
+        auth_domain:  "passport.#{subdomain}micex.com"
+        portals_urls: [
+            ['MICEX user profile',      "http://passport.#{subdomain}micex.com/user"]
+            ['Payment requisites',      "http://services.#{subdomain}micex.com/requisite"]
+            ['Forums profile settings', "http://forums.#{subdomain}micex.com/user"]
+        ]
 
-
-
-CookieJar =
-
-    options:
-        expires: 300
-        path:    ''
-        domain:  ''
-        secure:  ''
-
-    get: (key) ->
-        cookies = document.cookie.match("#{escape(String(key))}=(.*?)(;|$)")
-        if cookies then unescape(cookies[1]) else null
-
-    put: (key, value, options) ->
-        try
-            document.cookie = "#{escape(String(key))}=#{escape(String(value)) + @cookie_options(options)}"
-            true
-        catch error
-            false
-
-    remove: (key) ->
-        @put(key, null, { expires: - 3600 })
-
-    cookie_options: (options) ->
-        result = Object.extend(Object.clone(@options), options || {})
-
-        result.expires = if result.expires then "; expires=#{new Date(new Date().getTime() + result.expires * 1000).toGMTString()}" else ''
-        result.path    = if result.path then "; path=#{escape(result.path)}" else ''
-        result.domain  = if result.domain then "; domain=#{escape(result.domain)}" else ''
-        result.secure  = if result.secure == 'secure' then '; secure' else '';
-
-        result.expires + result.path + result.domain + result.secure;
+cache = kizzy('cu')
 
 
 
@@ -74,6 +52,7 @@ class PassportManager
 
     constructor: (container, @options = {}) ->
         @container = $(container) ; unless @container then return
+        @container.addClass('mx-passport')
         @setup();
         @start();
 
@@ -87,17 +66,34 @@ class PassportManager
         @registration_url = [l10n[locale].registration, "http://#{l10n[locale].auth_domain}/registration"]
         @portals_urls     =  l10n[locale].portals_urls
 
-        @portals_container = $("<div>").attr({ id: 'authentication_portals' }).css({ display: 'none' })
+        @portals_container = $("<div>")
+            .attr({ id: 'authentication_portals' })
+            .addClass('mx-passport-portals')
+            .css({ display: 'none' })
         $(document.body).append(@portals_container)
 
-        @container.click (e) =>
-            if _.size $(e.target).parent("li.user") > 0 then e.stop
-            @portals_container.show()
+        $(document).click (e) =>
+            if $(e.current) then ''
+            if _.size( $("li.user", $(e.currentTarget)) ) > 0 then @toggle()
+        @portals_container.click (e) => @hide()
 
-        @portals_container.click (e) =>
-            console.log e.currentTarget
-            @portals_container.hide()
 
+    toggle: () ->
+        if @portals_container.is(":visible") then @hide() else @show()
+
+    show: () ->
+        @portals_container.slideDown(150)
+
+    hide: () ->
+        @portals_container.slideUp(150)
+
+    positioning: () ->
+        container_position       = @container.offset()
+        container_position.top  += @container.outerHeight()
+        container_position.left += @container.outerWidth() - @portals_container.outerWidth()
+        @portals_container.css
+            top:  container_position.top
+            left: container_position.left
 
 
     start: () ->
@@ -121,11 +117,11 @@ class PassportManager
             @authenticated_user.last_name
             @authenticated_user.first_name
             @authenticated_user.middle_name
-        ]).join(' ')
+        ]).join(' ') || @authenticated_user.nickname
 
 
     prerender: () ->
-        user_screen_name = CookieJar.get('MicexPassportUser')
+        user_screen_name = cache.get('MicexPassportUser')
         if user_screen_name?
             @authenticated_user =
                 nickname: user_screen_name
@@ -137,11 +133,12 @@ class PassportManager
 
         if @authenticated()
             @portals_container.html(@portals_html())
+            @positioning()
             @container.html(@authenticated_html())
-            CookieJar.put("MicexPassportUser", @user_screen_name())
+            cache.set("MicexPassportUser", @user_screen_name(), 86400 * 1000)
         else
             @container.html(@unauthenticated_html())
-            CookieJar.remove("MicexPassportUser")
+            cache.remove("MicexPassportUser")
 
 
     cleanup: () ->
@@ -177,7 +174,7 @@ class PassportManager
 
 
     authenticated_html: () ->
-        @_authenticated_html ||= $("<ul>").append( $("<li>").addClass("user").append(@to_link([@user_screen_name(), '#'])) )
+        @_authenticated_html ||= $("<ul>").append( $("<li>").addClass("user").append( $("<span>") ).append(@to_link([@user_screen_name(), '#'])) )
 
 
     unauthenticated_html: () ->
@@ -185,16 +182,16 @@ class PassportManager
 
 
     portals_html: () ->
-        @_portals_html ||= $("<ul>").append( $("<li>").addClass("user").append(@to_link([@user_screen_name(), '#'])) )
+        @_portals_html ||= $("<ul>")#.append( $("<li>").addClass("user").append(@to_link([@user_screen_name(), '#'])) )
         _.map(@portals_urls, (portal) => @_portals_html.append(@to_list_link(portal)) )
-        @_portals_html.append( $("<li>").addClass("footer").append(@to_link(@logout_url) ) )
+        @_portals_html.append( $("<li>").addClass("htube").append( $("<span>").html("&nbsp;") ) )
+        @_portals_html.append( $("<li>").addClass("logout").append(@to_link(@logout_url) ) )
 
 
 
 
 widget = (element) ->
     manager = new PassportManager(element)
-    console.log "Ok! It works!"
 
 
 _.extend scope,
