@@ -1,7 +1,5 @@
-##= require jquery
-##= require underscore
-##= require underscore.string
-##= require kizzy
+##= require base64
+##= require monster
 ##= require_self
 ##= require mx.auth.passport
 

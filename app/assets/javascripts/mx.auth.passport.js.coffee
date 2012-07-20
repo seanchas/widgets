@@ -22,7 +22,6 @@ l10n =
         login:        'Вход'
         logout:       'Выход из системы'
         registration: 'Регистрация'
-        user:         'Пользователь:'
         auth_domain:  "passport.#{subdomain}micex.ru"
         portals_urls: [
             ['Профиль пользователя на сайте', "http://passport.#{subdomain}micex.ru/user"]
@@ -34,15 +33,12 @@ l10n =
         login:        'Login'
         logout:       'Logout'
         registration: 'Registration'
-        user:         'User:'
         auth_domain:  "passport.#{subdomain}micex.com"
         portals_urls: [
             ['MICEX user profile',      "http://passport.#{subdomain}micex.com/user"]
             ['Payment requisites',      "http://services.#{subdomain}micex.com/requisite"]
             ['Forums profile settings', "http://forums.#{subdomain}micex.com/user"]
         ]
-
-cache = kizzy('cu')
 
 
 
@@ -72,20 +68,15 @@ class PassportManager
             .css({ display: 'none' })
         $(document.body).append(@portals_container)
 
-        $(document).click (e) =>
-            if $(e.current) then ''
-            if _.size( $("li.user", $(e.currentTarget)) ) > 0 then @toggle()
-        @portals_container.click (e) => @hide()
-
 
     toggle: () ->
         if @portals_container.is(":visible") then @hide() else @show()
 
     show: () ->
-        @portals_container.slideDown(150)
+        if @portals_container.not(":visible") then @portals_container.slideDown(150)
 
     hide: () ->
-        @portals_container.slideUp(150)
+        if @portals_container.is(":visible") then @portals_container.slideUp(150)
 
     positioning: () ->
         container_position       = @container.offset()
@@ -98,8 +89,12 @@ class PassportManager
 
     start: () ->
         @prerender()
+        @start_event_listeners()
         @fetch_authenticated_user()
 
+    start_event_listeners: () ->
+        $(document).click (e) =>
+            if $(e.target).closest('.mx-passport li.user').length then @toggle() else @hide()
 
     authenticated: () ->
         !!@authenticated_user
@@ -121,10 +116,10 @@ class PassportManager
 
 
     prerender: () ->
-        user_screen_name = cache.get('MicexPassportUser')
+        user_screen_name = monster.get('MicexPassportUser')
         if user_screen_name?
             @authenticated_user =
-                nickname: user_screen_name
+                nickname: Base64.decode(user_screen_name)
         @update()
 
 
@@ -135,10 +130,10 @@ class PassportManager
             @portals_container.html(@portals_html())
             @positioning()
             @container.html(@authenticated_html())
-            cache.set("MicexPassportUser", @user_screen_name(), 86400 * 1000)
+            monster.set("MicexPassportUser", Base64.encode(@user_screen_name()), 365, '/')
         else
             @container.html(@unauthenticated_html())
-            cache.remove("MicexPassportUser")
+            monster.remove("MicexPassportUser")
 
 
     cleanup: () ->
@@ -182,7 +177,7 @@ class PassportManager
 
 
     portals_html: () ->
-        @_portals_html ||= $("<ul>")#.append( $("<li>").addClass("user").append(@to_link([@user_screen_name(), '#'])) )
+        @_portals_html ||= $("<ul>")
         _.map(@portals_urls, (portal) => @_portals_html.append(@to_list_link(portal)) )
         @_portals_html.append( $("<li>").addClass("htube").append( $("<span>").html("&nbsp;") ) )
         @_portals_html.append( $("<li>").addClass("logout").append(@to_link(@logout_url) ) )
