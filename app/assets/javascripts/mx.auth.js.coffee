@@ -1,5 +1,6 @@
 ##= require base64
 ##= require monster
+##= require mx.locale
 ##= require_self
 ##= require mx.auth.passport
 
