@@ -1,6 +1,6 @@
 .mx-passport {
 
-    font-family: Helvetica, Arial, serif;
+    font-family: Helvetica, Arial, sans-serif;
     font-size:   13px;
     overflow:    hidden;
 
@@ -45,14 +45,14 @@
 
 .mx-passport-portals {
 
-    font-family: Helvetica, Arial, serif;
+    font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
 
     position: absolute;
     margin-top: 6px;
 
     a, a:visited, a:link {
-        display: block;
+        //display: block;
         padding: 4px 8px;
         color: #369;
         text-decoration: none;
@@ -71,15 +71,14 @@
 
         margin:  0;
         min-width: 48px;
+        max-width: 400px;
         padding: 6px 0;
 
         li {
             list-style: none;
             margin: 4px;
             padding:  0;
-        }
-
-        li.user {
+            text-align: left;
         }
 
         li.htube {

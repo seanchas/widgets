@@ -73,10 +73,10 @@ class PassportManager
         if @portals_container.is(":visible") then @hide() else @show()
 
     show: () ->
-        if @portals_container.not(":visible") then @portals_container.slideDown(150)
+        if @portals_container.not(":visible") then @portals_container.show() # @portals_container.slideDown(150)
 
     hide: () ->
-        if @portals_container.is(":visible") then @portals_container.slideUp(150)
+        if @portals_container.is(":visible") then @portals_container.hide() # @portals_container.slideUp(150)
 
     positioning: () ->
         container_position       = @container.offset()
