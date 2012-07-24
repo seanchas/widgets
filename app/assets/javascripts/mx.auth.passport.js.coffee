@@ -41,10 +41,6 @@ l10n =
         ]
 
 
-console ||= {}
-console.log = if console.log then console.log else ((log) -> true)
-
-
 
 
 class PassportManager
@@ -83,11 +79,8 @@ class PassportManager
         if @portals_container.is(":visible") then @portals_container.hide() # @portals_container.slideUp(150)
 
     positioning: () ->
-        console.log "container offset:", @container.offset()
         container_position       = @container.offset()
-        console.log "container outer height:", @container.outerHeight()
         container_position.top  += @container.outerHeight()
-        console.log "portals outer width:", @portals_container.outerWidth()
         container_position.left += @container.outerWidth() - @portals_container.outerWidth()
         @portals_container.css
             top:  container_position.top
