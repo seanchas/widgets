@@ -6,7 +6,7 @@ scope            = global.mx.auth
 # underscore.string mixin
 _.mixin(_.str.exports());
 
-locale = if mx.locale?      then mx.locale()      else 'ru'
+locale = () -> if mx.locale? then mx.locale() else 'ru'
 server = if mx.auth.server? then mx.auth.server() else 'beta'
 
 subdomains =
@@ -57,10 +57,10 @@ class PassportManager
         @domains          = domains
         @return_to        = if _.include( @domains, _.first(window.location.host.split(':')) ) then '' else "?return_to=#{window.location.href}"
 
-        @login_url        = [l10n[locale].login,        "http://#{l10n[locale].auth_domain}/login#{@return_to}"]
-        @logout_url       = [l10n[locale].logout,       "http://#{l10n[locale].auth_domain}/logout#{@return_to}"]
-        @registration_url = [l10n[locale].registration, "http://#{l10n[locale].auth_domain}/registration"]
-        @portals_urls     =  l10n[locale].portals_urls
+        @login_url        = [l10n[locale()].login,        "http://#{l10n[locale()].auth_domain}/login#{@return_to}"]
+        @logout_url       = [l10n[locale()].logout,       "http://#{l10n[locale()].auth_domain}/logout#{@return_to}"]
+        @registration_url = [l10n[locale()].registration, "http://#{l10n[locale()].auth_domain}/registration"]
+        @portals_urls     =  l10n[locale()].portals_urls
 
         @portals_container = $("<div>")
             .attr({ id: 'authentication_portals' })
