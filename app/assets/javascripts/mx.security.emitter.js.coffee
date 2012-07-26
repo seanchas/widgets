@@ -99,8 +99,8 @@ securities_widget = (element, engine, market, board, param, options = {}) ->
                 _.indexOf secids, record.secid
             
             table_body.append create_row(engine.title, records) if _.size(records) > 0
-        
-        element.html table
+
+        element.html( if !!$("tr", table_body).length then table else "&mdash;" )
         
 
     $.when(mx.iss.defaults(), mx.iss.description(param)).then (defaults, description) ->
