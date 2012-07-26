@@ -169,7 +169,7 @@ class PassportManager
 
 
     authenticated_html: () ->
-        @_authenticated_html ||= $("<ul>").append( $("<li>").addClass("user").append( $("<span>") ).append(@to_link([@user_screen_name(), '#'])) )
+        @_authenticated_html ||= $("<ul>").append( $("<li>").addClass("user").append(@to_link([@user_screen_name(), '#'])) )
 
 
     unauthenticated_html: () ->
@@ -179,8 +179,9 @@ class PassportManager
     portals_html: () ->
         @_portals_html ||= $("<ul>")
         _.map(@portals_urls, (portal) => @_portals_html.append(@to_list_link(portal)) )
-        @_portals_html.append( $("<li>").addClass("htube").append( $("<span>").html("&nbsp;") ) )
+        @_portals_html.append( $("<li>").addClass("htube").html("&nbsp;") )
         @_portals_html.append( $("<li>").addClass("logout").append(@to_link(@logout_url) ) )
+        @_portals_html.before( $("<div>").addClass("arrow") )
 
 
 
