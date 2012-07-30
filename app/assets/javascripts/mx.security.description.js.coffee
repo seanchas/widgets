@@ -86,16 +86,18 @@ widget = (element, engine, market, board, param, options = {}) ->
     element = $ element
     
     return unless element.length > 0
-    
+
+    options.only_actual ||= true
+
     cds = mx.iss.columns(engine, market, { only: 'securities' })
     fds = mx.iss.filters(engine, market)
     sds = mx.iss.security(engine, market, board, param, { only: 'securities' })
     dds = mx.iss.description(param)
-    ids = mx.iss.security_indices(param)
+    ids = mx.iss.security_indices(param, options)
     isds = if engine == 'stock' and market == 'index' then mx.iss.index_securities(engine, market, param) else []
     
     $.when(dds, sds, cds, fds, ids, isds).then (description, security, columns, filters, indices, index_securities) ->
-        
+
         unless _.isEmpty(filters)
 
             security = _.first(security)

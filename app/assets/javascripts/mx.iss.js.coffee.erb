@@ -168,13 +168,14 @@ request_meta =
     security_indices:
         url: (param) ->
             "#{iss_host}/securities/#{param}/indices.jsonp?callback=?"
-        data: ->
+        data: (param, options = {}) ->
             'iss.meta': 'off'
             'iss.only': 'indices'
+            'only_actual': (if options.only_actual == true then '1' else '0')
         parse: (json) ->
             iss_merge_columns_and_data(json?.indices)
-        key: (param) ->
-            [param]
+        key: (param, options) ->
+            [param, options]
 
     index_securities:
         url: (engine, market, param) ->
@@ -251,7 +252,7 @@ request = (name, args...) ->
         return cache[key].promise() unless options.force == true
     
     cache[key] = new $.Deferred
-    
+
     $.ajax
         url: meta.url(args...)
         data: _.extend(meta.data(args...), { lang: mx.locale() })
