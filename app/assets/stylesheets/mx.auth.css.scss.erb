@@ -1,0 +1,132 @@
+<% assets_host = Rails.application.config.assets_host %>
+
+.mx-passport {
+
+    font-family: Helvetica, Arial, sans-serif;
+    font-size:   13px;
+    overflow:    hidden;
+
+    a {
+        border: none;
+        padding: 0 0 0 6px;
+
+        &:visited, &:link {
+            color: #369;
+
+            text-decoration: none;
+        }
+
+        &:hover, &:active, &:focus {
+            color: #f00;
+            text-decoration: underline;
+            outline: none;
+        }
+    }
+
+    ul {
+        margin: 0;
+        padding: 0;
+
+        overflow: hidden;
+
+        li {
+            float: right;
+            list-style: none;
+            margin:  0;
+            padding: 0 5px;
+        }
+
+        li.user {
+            background-image:    url("<%= assets_host + image_path("passport-iconset.png")%>");
+            background-repeat:   no-repeat;
+            background-position: 0 -6px;
+            padding-left: 12px;
+        }
+    }
+
+}
+
+.mx-passport-portals {
+
+    display: block;
+
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+
+    position: absolute;
+    margin: 6px auto 0;
+
+    background-color: #eee;
+
+    .arrow {
+        display: block;
+        position: absolute;
+        top: -6px;
+        right: 20px;
+        width:  11px;
+        height: 6px;
+        border: none;
+        background-image:    url("<%= assets_host + image_path("passport-iconset.png")%>");
+        background-repeat:   no-repeat;
+        background-position: 0 -56px;
+    }
+
+    a {
+        display: block;
+        padding: 0;
+        border: none;
+
+        &:visited, &:link {
+            color: #369;
+            text-decoration: none;
+        }
+
+        &:hover, &:active, &:focus {
+            color: #f00;
+            text-decoration: underline;
+            outline: none;
+        }
+    }
+
+    ul {
+        background-color: #fff;
+        border: 1px solid #cdcacb;
+        border-radius: 4px;
+        box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.25);
+
+
+        list-style: none;
+        list-style-image: none;
+        margin: 0;
+        min-width: 48px;
+        max-width: 400px;
+        padding: 6px 0;
+
+        li {
+            margin:   0 12px;
+            padding:  6px 0;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        li.htube {
+            display: block;
+            line-height: 0;
+            border-top:    1px solid #d8d8d8;
+            border-bottom: 1px solid #fff;
+            padding: 0;
+            margin: 6px 12px;
+        }
+
+        li.logout {
+
+            a {
+                background-image:    url("<%= assets_host + image_path("passport-iconset.png")%>");
+                background-repeat:   no-repeat;
+                background-position: 0 -30px;
+                padding-left: 20px;
+            }
+        }
+
+    }
+}
