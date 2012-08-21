@@ -132,7 +132,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             count   = 2
             if filter
                 for index in [0 ... _.size(filter)] by count
-                    container.append make_cell record, (columns[field.id] for field in filter[index ... index + count])
+                    container.append make_cell record, _.compact(columns[field.id] for field in filter[index ... index + count])
                     
             trigger_render_event(element, 'success', iss)
 
