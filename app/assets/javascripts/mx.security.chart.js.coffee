@@ -1,5 +1,3 @@
-##= require highstock
-
 global = module?.exports ? ( exports ? this )
 
 global.mx           ||= {}

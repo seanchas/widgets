@@ -1,8 +1,5 @@
-##= require jquery
-##= require underscore
 ##= require mx.utils
 ##= require mx.iss
-##= require kizzy
 
 $ = jQuery
 

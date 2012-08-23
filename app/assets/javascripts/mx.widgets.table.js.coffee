@@ -1,11 +1,6 @@
-##= require jquery
-##= require underscore
-##= require underscore.string
-##= require backbone
 ##= require mx.utils
 ##= require mx.iss
 ##= require mx.widgets.chart
-##= require kizzy
 
 global = module?.exports ? ( exports ? this )
 

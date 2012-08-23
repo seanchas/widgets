@@ -1,7 +1,3 @@
-##= require jquery
-##= require underscore
-##= require json
-##= require kizzy
 ##= require_self
 ##= require mx.utils
 ##= require mx.iss

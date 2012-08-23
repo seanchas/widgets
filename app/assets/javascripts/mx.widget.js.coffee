@@ -1,8 +1,3 @@
-##= require jquery
-##= require jquery-ui
-##= require json
-##= require underscore
-##= require highstock
 ##= require_self
 ##= require mx.widgets.table
 ##= require mx.widgets.chart
