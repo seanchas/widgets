@@ -13,7 +13,7 @@ subdomains =
     web:   ''
     beta:  'beta.'
 
-subdomain = subdomains[server] ? 'beta.'
+subdomain = subdomains[server] ? ''
 
 domains = ["passport.#{subdomain}micex.ru", "passport.#{subdomain}micex.com"]
 
