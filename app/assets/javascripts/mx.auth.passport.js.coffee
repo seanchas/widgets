@@ -34,7 +34,7 @@ l10n =
         registration: 'Registration'
         auth_domain:  "passport.#{subdomain}micex.com"
         portals_urls: [
-            ['Paid services management', "http://forums.#{subdomain}micex.com/user"]
+            ['Paid services management', "http://services.#{subdomain}micex.com/requisite"]
             ['Settings',                 "http://passport.#{subdomain}micex.com/user"]
         ]
 
