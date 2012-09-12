@@ -24,9 +24,8 @@ l10n =
         registration: 'Регистрация'
         auth_domain:  "passport.#{subdomain}micex.ru"
         portals_urls: [
-            ['Профиль пользователя на сайте', "http://passport.#{subdomain}micex.ru/user"]
-            ['Профиль пользователя на форуме',       "http://forums.#{subdomain}micex.ru/user"]
-            ['Платежные реквизиты',                "http://services.#{subdomain}micex.ru/requisite"]
+            ['Настройки',                    "http://passport.#{subdomain}micex.ru/user"]
+            ['Управление платными услугами', "http://services.#{subdomain}micex.ru/requisite"]
         ]
 
     en:
@@ -35,9 +34,8 @@ l10n =
         registration: 'Registration'
         auth_domain:  "passport.#{subdomain}micex.com"
         portals_urls: [
-            ['MICEX user profile',      "http://passport.#{subdomain}micex.com/user"]
-            ['Payment requisites',      "http://services.#{subdomain}micex.com/requisite"]
-            ['Forums profile settings', "http://forums.#{subdomain}micex.com/user"]
+            ['Settings',                 "http://passport.#{subdomain}micex.com/user"]
+            ['Paid services management', "http://forums.#{subdomain}micex.com/user"]
         ]
 
 

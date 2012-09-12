@@ -45,7 +45,7 @@ Widgets::Application.configure do
   # config.action_controller.asset_host = "http://assets.example.com"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
-  config.assets.precompile += %w( table.css mx.widget.js )
+  config.assets.precompile += %w( examples.css security.page.css widgets.css docs.css mx.auth.css mx.assets.js mx.widget.js mx.security.js mx.auth.js prettify.js  )
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
