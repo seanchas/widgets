@@ -15,6 +15,7 @@
 ##= require mx.widgets.indices
 ##= require mx.widgets.shares
 ##= require mx.widgets.tiny
+##= require mx.widgets.state_rates
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

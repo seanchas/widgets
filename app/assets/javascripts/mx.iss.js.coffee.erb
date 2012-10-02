@@ -238,6 +238,27 @@ request_meta =
             iss_merge_columns_and_data(json?.emitter)
         key: ->
             []
+    
+    state_rates:
+        url: ->
+            "#{iss_host}/statistics/engines/state/rates.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            auctions: iss_merge_columns_and_data(json?.auctions)
+            fixed: iss_merge_columns_and_data(json?.fixed)
+        key: ->
+            []
+
+    state_rates_columns:
+        url: ->
+            "#{iss_host}/statistics/engines/state/rates/columns.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.columns)
+        key: ->
+            []
 
 
 request = (name, args...) ->
@@ -414,3 +435,5 @@ _.extend scope,
     currency_rates:     (args...) -> request('currency_rates',  args...)
     repo_dealers:       (args...) -> request('repo_dealers',    args...)
     cb_transactions:    (args...) -> request('cb_transactions', args...)
+    state_rates:        (args...) -> request('state_rates', args...)
+    state_rates_columns:(args...) -> request('state_rates_columns', args...)
