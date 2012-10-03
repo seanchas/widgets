@@ -65,7 +65,7 @@ make_table_body_row = (container, columns, record, index) ->
         value = record[column.name]
         
         if column.name == 'DAYS'
-            value = locales.days[value][mx.locale()] || value
+            value = locales.days[value]?[mx.locale()] || value
         
         $('<td>')
             .addClass(column.type)
