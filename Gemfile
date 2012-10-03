@@ -11,6 +11,7 @@ end
 gem 'jquery-rails'
 
 gem 'capistrano'
+gem 'rvm-capistrano'
 
 gem 'rack', '1.3.3'
 
