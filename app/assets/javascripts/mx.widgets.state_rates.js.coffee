@@ -18,6 +18,16 @@ locales =
         fixed:
             ru: 'Фиксированные ставки по операциям Банка России'
             en: 'Fixed Rates for Bank of Russia Operations'
+    days:
+        '1_DAY':
+            ru: '1 день'
+            en: '1 day'
+        '1_WEEK':
+            ru: '1 неделя'
+            en: '1 week'
+        '30_DAYS':
+            ru: '4 недели'
+            en: '4 weeks'
         
 
 data_keys = ['auctions', 'fixed']
@@ -52,9 +62,14 @@ make_table_body_row = (container, columns, record, index) ->
         .toggleClass('odd',     index % 2 == 1)
 
     for column in columns
+        value = record[column.name]
+        
+        if column.name == 'DAYS'
+            value = locales.days[value][mx.locale()] || value
+        
         $('<td>')
             .addClass(column.type)
-            .html(mx.utils.render(record[column.name], column) or '&mdash;')
+            .html(mx.utils.render(value, column) or '&mdash;')
             .appendTo(row)
     
     row
@@ -86,6 +101,7 @@ widget = (container, options = {}) ->
 
 
     ready.then (data, columns) ->
+        console.log columns
         render(container, columns, key, data[key]) for key in data_keys
 
 
