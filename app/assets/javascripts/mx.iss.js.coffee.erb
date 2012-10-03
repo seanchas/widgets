@@ -259,6 +259,37 @@ request_meta =
             iss_merge_columns_and_data(json?.columns)
         key: ->
             []
+    
+    repo_rates_securities:
+        url: ->
+            "#{iss_host}/securitygroups/stock_index/collections/stock_index_repo/securities.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.securities)
+        key: ->
+            []
+
+    repo_rates_marketdata:
+        url: ->
+            "#{iss_host}/engines/stock/markets/index/boards/SNDX/securities.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_prepare_records iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata)
+        key: ->
+            []
+
+    repo_rates_history:
+        url: ->
+            "#{iss_host}/history/engines/stock/markets/index/securities.jsonp?date=today&callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.history)
+        key: ->
+            []
+
 
 
 request = (name, args...) ->
@@ -414,26 +445,29 @@ candle_borders = (engine, market, param) ->
 
 
 _.extend scope,
-    defaults:           (args...) -> request('defaults', args...)
-    columns:            (args...) -> request('columns', args...)
-    records:            (args...) -> request('securities', args...)
-    security:           (args...) -> request('security', args...)
-    security_indices:   (args...) -> request('security_indices', args...)
-    index_securities:   (args...) -> request('index_securities', args...)
-    orderbook:          (args...) -> request('orderbook', args...)
-    description:        (args...) -> request('description', args...)
-    boards:             (args...) -> request('boards', args...)
-    emitter:            emitter
-    emitter_securities: emitter_securities
-    emitter_columns:    (args...) -> request('emitter_columns', args...)
-    turnovers:          (args...) -> request('turnovers', args...)
-    turnoverssectors:   (args...) -> request('turnoverssectors', args...)
-    market_turnovers:   (args...) -> request('market_turnovers', args...)
-    candle_borders:     candle_borders
-    filters:            (args...) -> request('filters', args...)
-    capitalization:     (args...) -> request('capitalization',  args...)
-    currency_rates:     (args...) -> request('currency_rates',  args...)
-    repo_dealers:       (args...) -> request('repo_dealers',    args...)
-    cb_transactions:    (args...) -> request('cb_transactions', args...)
-    state_rates:        (args...) -> request('state_rates', args...)
-    state_rates_columns:(args...) -> request('state_rates_columns', args...)
+    defaults:               (args...) -> request('defaults', args...)
+    columns:                (args...) -> request('columns', args...)
+    records:                (args...) -> request('securities', args...)
+    security:               (args...) -> request('security', args...)
+    security_indices:       (args...) -> request('security_indices', args...)
+    index_securities:       (args...) -> request('index_securities', args...)
+    orderbook:              (args...) -> request('orderbook', args...)
+    description:            (args...) -> request('description', args...)
+    boards:                 (args...) -> request('boards', args...)
+    emitter:                emitter
+    emitter_securities:     emitter_securities
+    emitter_columns:        (args...) -> request('emitter_columns', args...)
+    turnovers:              (args...) -> request('turnovers', args...)
+    turnoverssectors:       (args...) -> request('turnoverssectors', args...)
+    market_turnovers:       (args...) -> request('market_turnovers', args...)
+    candle_borders:         candle_borders
+    filters:                (args...) -> request('filters', args...)
+    capitalization:         (args...) -> request('capitalization',  args...)
+    currency_rates:         (args...) -> request('currency_rates',  args...)
+    repo_dealers:           (args...) -> request('repo_dealers',    args...)
+    cb_transactions:        (args...) -> request('cb_transactions', args...)
+    state_rates:            (args...) -> request('state_rates', args...)
+    state_rates_columns:    (args...) -> request('state_rates_columns', args...)
+    repo_rates_securities:  (args...) -> request('repo_rates_securities', args...)
+    repo_rates_marketdata:  (args...) -> request('repo_rates_marketdata', args...)
+    repo_rates_history:     (args...) -> request('repo_rates_history', args...)

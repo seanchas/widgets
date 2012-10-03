@@ -1,6 +1,9 @@
 <div id="state_rates">
 </div>
 
+<div id="repo_rates">
+</div>
+
 
 <script type="text/javascript" charset="utf-8">
     
@@ -10,6 +13,8 @@
         mx.locale('<%= params['locale'] %>');
     
         mx.widgets.state_rates($('#state_rates'));
+        
+        mx.widgets.repo_rates($('#repo_rates'));
     
     })
     
