@@ -48,7 +48,7 @@ columns = [
         has_percent: true
     }
     {
-        id: 'LASTCHANGEBP'
+        id: 'TRENDCLOSEBP'
         title:
             ru: 'Изменение к закрытию предыдущего торгового дня, базисных пунктов'
             en: 'Change from the close of previous day, basis point'
@@ -108,6 +108,7 @@ marketdata_2_history =
     'CLOSE':        'CURRENTVALUE'
     'VALUE':        'VALTODAY'
     'TRADEDATE':    'TIME'
+    'TRENDCLOSEBP': 'LASTCHANGEBP'
 
 
 make_header_view = (container) ->
