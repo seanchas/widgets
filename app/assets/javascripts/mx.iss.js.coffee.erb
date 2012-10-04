@@ -282,7 +282,7 @@ request_meta =
 
     repo_rates_history:
         url: ->
-            "#{iss_host}/history/engines/stock/markets/index/securities.jsonp?date=today&include_repo_indices_values=1&callback=?"
+            "#{iss_host}/history/engines/stock/markets/index/securities.jsonp?date=last&include_repo_indices_values=1&callback=?"
         data: ->
             'iss.meta': 'off'
         parse: (json) ->
