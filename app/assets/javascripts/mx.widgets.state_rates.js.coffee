@@ -101,7 +101,6 @@ widget = (container, options = {}) ->
 
 
     ready.then (data, columns) ->
-        console.log columns
         render(container, columns, key, data[key]) for key in data_keys
 
 

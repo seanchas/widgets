@@ -192,14 +192,10 @@ widget = (container, options = {}) ->
             marketdata  = _.sortBy(marketdata, (record) -> _.indexOf(securities, record.SECID))
             history     = _.filter(history, (record) -> _.include(securities, record.SECID))
             
-            console.log history
-            
             for record in marketdata
                 unless record.VALTODAY
                     history_record = _.find(history, (history_record) -> history_record.SECID == record.SECID)
                     _.extend(record, history_record)
-            
-            console.log marketdata
             
             render_table_head(table_head_view)
             render_table_body(table_body_view, marketdata)

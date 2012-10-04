@@ -262,7 +262,7 @@ request_meta =
     
     repo_rates_securities:
         url: ->
-            "#{iss_host}/securitygroups/stock_index/collections/stock_index_repo/securities.jsonp?callback=?"
+            "#{iss_host}/securitygroups/stock_index/collections/stock_index_repo/securities.jsonp?sort_order=collection&callback=?"
         data: ->
             'iss.meta': 'off'
         parse: (json) ->
