@@ -17,6 +17,7 @@
 ##= require mx.widgets.tiny
 ##= require mx.widgets.state_rates
 ##= require mx.widgets.repo_rates
+##= require mx.widgets.money_market_turnovers
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

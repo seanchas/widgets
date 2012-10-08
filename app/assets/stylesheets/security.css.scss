@@ -111,8 +111,11 @@ table.mx-widget-turnovers {
     }
     
     td.time {
-        color: #4d4d4d;
         text-align: right;
+    }
+    
+    tbody td.time {
+        color: #4d4d4d;
     }
     
     td.number {
@@ -227,6 +230,9 @@ table.mx-widget-turnovers {
         
         td {
             background-color: #ccc;
+            font-size: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
             vertical-align: top;
         }
         
@@ -296,4 +302,14 @@ ul.mx-widget-chart-periods {
 div.chart-container {
     margin-top: -1px;
     z-index: 1;
+}
+
+table.mx-widget-money-market-turnovers {
+    
+    tbody th {
+        font-weight: normal;
+        font-style: italic;
+        text-align: left;
+    }
+    
 }

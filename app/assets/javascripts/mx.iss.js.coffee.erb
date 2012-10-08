@@ -289,6 +289,17 @@ request_meta =
             iss_merge_columns_and_data(json?.history)
         key: ->
             []
+    
+    money_market_turnovers:
+        url: (group) ->
+            "#{iss_host}/turnovers.jsonp?group=#{group}&callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'turnoverssectors'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.turnoverssectors)
+        key: (group) ->
+            [group]
 
 
 
@@ -471,3 +482,4 @@ _.extend scope,
     repo_rates_securities:  (args...) -> request('repo_rates_securities', args...)
     repo_rates_marketdata:  (args...) -> request('repo_rates_marketdata', args...)
     repo_rates_history:     (args...) -> request('repo_rates_history', args...)
+    money_market_turnovers: (args...) -> request('money_market_turnovers', args...)
