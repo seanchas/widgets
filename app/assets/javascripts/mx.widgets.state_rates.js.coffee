@@ -77,12 +77,18 @@ make_table_body_row = (container, columns, record, index) ->
 
 
 
-render = (container, columns, key, data) ->
-    $('<h4>')
-        .html(locales.title[key][mx.locale()])
+render = (container, columns, key, data, options = {}) ->
+    console.log options
+    
+    wrapper = $('<div>')
+        .addClass(options.wrapper_class || 'wrapper')
         .appendTo(container)
     
-    table = make_table(container)
+    $('<h4>')
+        .html(locales.title[key][mx.locale()])
+        .appendTo(wrapper)
+    
+    table = make_table(wrapper)
     
     table_head = $('thead', table)
     table_body = $('tbody', table)
@@ -101,7 +107,7 @@ widget = (container, options = {}) ->
 
 
     ready.then (data, columns) ->
-        render(container, columns, key, data[key]) for key in data_keys
+        render(container, columns, key, data[key], options) for key in data_keys
 
 
 _.extend scope,
