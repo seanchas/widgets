@@ -78,8 +78,6 @@ make_table_body_row = (container, columns, record, index) ->
 
 
 render = (container, columns, key, data, options = {}) ->
-    console.log options
-    
     wrapper = $('<div>')
         .addClass(options.wrapper_class || 'wrapper')
         .appendTo(container)
