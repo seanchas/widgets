@@ -11,11 +11,11 @@ $ = jQuery
 locales =
     money_market_mt:
         ru: 'Операции между участниками'
-        en: 'Operatsii mezhdu Uchastnikami'
+        en: 'Transactions of trading members'
 
     money_market_ck:
         ru: 'Операции с ЦК'
-        en: 'Operatsii s CK'
+        en: 'Transactions with the CCP'
 
 
 keys = ['money_market_mt', 'money_market_ck']
