@@ -18,6 +18,10 @@ locales =
         fixed:
             ru: 'Фиксированные ставки по операциям Банка России'
             en: 'Fixed Rates for Bank of Russia Operations'
+    reference:
+        fixed:
+            ru: '* для депозитов приведены данные по инструменту &laquo;овернайт&raquo;'
+            en: '* only overnight deposits are taken'
     days:
         '1_DAY':
             ru: '1 день'
@@ -94,6 +98,8 @@ render = (container, columns, key, data, options = {}) ->
     make_table_head_row(table_head, columns)
     
     make_table_body_row(table_body, columns, record, index + 1) for record, index in data
+
+    wrapper.append( $('<p>').addClass('reference').html(locales.reference[key][mx.locale()]) ) if key is 'fixed'
 
 
 
