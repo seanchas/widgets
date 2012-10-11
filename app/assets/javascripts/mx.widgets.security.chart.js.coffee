@@ -9,7 +9,7 @@ $ = jQuery
 
 periods =
     day:
-        name: 'Денёк'
+        name: 'День'
         interval: 10
         period: '2d'
         offset: 24 * 60 * 60 * 1000
@@ -163,6 +163,8 @@ render_widget = (element) ->
 widget = (element, engine, market, board, param, options = {}) ->
     
     element = $(element); return if element.length == 0
+
+    chart = undefined
 
     render_widget(element)
     
