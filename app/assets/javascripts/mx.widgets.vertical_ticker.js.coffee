@@ -47,7 +47,9 @@ widget = (element, params, options = {}) ->
 
         _.each queries, (params, key) ->
             [engine, market] = key.split(":")
-            mx.iss.records(engine, market, params, { force: true }).then (json) ->
+            records_options = { force: true }
+            _.extend(records_options, { nearest: 1, params_name: 'sectypes' }) if engine is 'futures' and options.nearest
+            mx.iss.records(engine, market, params, records_options).then (json) ->
                 for record in json
                     record['ENGINE'] = engine
                     record['MARKET'] = market

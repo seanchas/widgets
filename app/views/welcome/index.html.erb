@@ -130,7 +130,7 @@
     		}
 
             mx.auth.passport('#auth');
-    		
+
             mx.widgets.ticker('#ticker', [
                 'stock:index:SNDX:MICEXINDEXCF',
                 'stock:index:RTSI:RTSI',
@@ -158,8 +158,16 @@
                 'stock:shares:EQNL:VTBR',
                 'stock:shares:EQBR:HYDR',
                 'stock:index:SNDX:MICEXO&G',
-                'state:index:GNDX:RGBI'
+                'state:index:GNDX:RGBI',
+                'futures:forts:RFUD:Si',
+                'futures:forts:RFUD:GZ',
+                'futures:forts:RFUD:MX',
+                'futures:forts:RFUD:RI',
+                'futures:forts:RFUD:SR',
+                'futures:forts:RFUD:VX',
+                'futures:forts:RFUD:CU'
             ], {
+                nearest:          1,         //
                 flip_speed:       500,       // flip time 0.5 sec
                 flip_delay:       8  * 1000, // flip delay 8 sec
                 refresh_timeout:  10 * 1000, // data refresh every 10 sec
@@ -215,7 +223,7 @@
                 chart: 0,
                 refresh_timeout: 5 * 1000
             });
-            
+
             mx.widgets.table('#stock_2', 'stock', 'standard', [
                 'STMR:SBER',
                 'STMR:GAZP',
@@ -226,7 +234,7 @@
                 chart: 0,
                 refresh_timeout: 5 * 1000
             });
-            
+
             mx.widgets.table('#stock_3', 'stock', 'classica', [
                 'CLMR:SBER',
                 'CLMR:GAZP',
@@ -236,7 +244,7 @@
             ], {
                 refresh_timeout: 5 * 1000
             });
-            
+
             mx.widgets.table('#futures_1', 'futures', 'forts', [
                 'RFUD:RI',
                 'RFUD:MX',
@@ -248,7 +256,7 @@
                 params_name: 'sectypes',
                 nearest: 1
             });
-            
+
             mx.widgets.table('#futures_2', 'futures', 'forts', [
                 'RFUD:GD',
                 'RFUD:BR',
@@ -293,14 +301,14 @@
                 afterRefresh: function(time) {
                 }
             });
-            
+
             var amounts = {
                 3:      'Тыс.',
                 6:      'Млн.',
                 9:      'Млрд.',
                 12:     'Трлн.'
             };
-            
+
             mx.iss.capitalization().then(function(value) {
                 var digits      = Math.ceil(Math.log(value) / Math.LN10);
                 var max_amount  = 0;
@@ -313,10 +321,10 @@
                 }
 
                 value = value / Math.pow(10, max_amount)
-                
+
                 $("#capitalization").html(mx.utils.render(value, { type: 'number', precision: 2 }) + ' ' + amounts[max_amount]);
             });
-            
+
             mx.widgets.indices('#main_indices', {
                 url: function(engine, market, board, security) {
                     return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
@@ -334,7 +342,7 @@
             mx.widgets.turnovers('#main_turnovers', {
                 refresh_timeout:    60 * 1000
             });
-            
+
             mx.widgets.tiny.currency_rates($("#currency_rates"));
 
             mx.widgets.table("#commodity_1", "commodity", "futures", [
