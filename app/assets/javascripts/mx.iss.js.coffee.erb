@@ -230,8 +230,8 @@ request_meta =
             []
 
     emitter_columns:
-        url: (emitter_id) ->
-            "#{iss_host}/emitters/#{emitter_id}/columns.jsonp?callback=?"
+        url:  ->
+            "#{iss_host}/emitters/columns.jsonp?callback=?"
         data: ->
             'iss.meta': 'off'
         parse: (json) ->

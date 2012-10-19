@@ -43,7 +43,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     mx.iss.description(param).then (description) ->
         emitter_id = _.first(field.value for field in description when field.name == 'EMITTER_ID')
         if emitter_id?
-            $.when(mx.iss.emitter(emitter_id), mx.iss.emitter_columns(emitter_id)).then (emitter, fields) ->
+            $.when(mx.iss.emitter(emitter_id), mx.iss.emitter_columns()).then (emitter, fields) ->
                 if emitter
                     element.trigger('render', { status: 'success' })
                     render element, emitter, fields
