@@ -106,7 +106,7 @@ process_record = (record, columns, by_name = false) ->
             when 'date'
                 parse_date value
             when 'time'
-                _.first(value.split(':'), 2).join(':')
+                if value? then _.first(value.split(':'), 2).join(':') else value
     
     record.trends = {}
 
