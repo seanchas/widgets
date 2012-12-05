@@ -46,7 +46,7 @@ dropover_delay      =  1 * 1000
 
 default_toolbox_position =
     top:   10
-    right: 10
+    right: 18
 
 
 calculate_delay = (delay) ->
