@@ -19,8 +19,8 @@ localization =
       usd: "USD"
       rub: "RUB"
   sector_prefix:
-    ru: "в т.ч."
-    en: "incl."
+    ru: ""
+    en: ""
 
 cache = kizzy('mx.widgets.turnovers')
 
