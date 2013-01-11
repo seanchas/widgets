@@ -8,8 +8,8 @@
 ##= require mx.widgets.security.chart
 ##= require mx.widgets.turnovers
 ##= require mx.widgets.market_turnovers
-##= require mx.widgets.repo.dealers
-##= require mx.widgets.cb.transactions
+##= require mx.widgets.repo_dealers
+##= require mx.widgets.cb_transactions
 ##= require mx.widgets.ticker
 ##= require mx.widgets.vertical_ticker
 ##= require mx.widgets.indices
@@ -18,6 +18,8 @@
 ##= require mx.widgets.state_rates
 ##= require mx.widgets.repo_rates
 ##= require mx.widgets.money_market_turnovers
+##= require mx.widgets.ranks
+##= require mx.widgets.ranks_calendar
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

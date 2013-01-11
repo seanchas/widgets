@@ -301,6 +301,17 @@ request_meta =
         key: (group) ->
             [group]
 
+    market_makers_ranks:
+        url: () ->
+            "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'marketmakersranks'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.marketmakersranks)
+        key: (date) ->
+            []
+
 
 
 request = (name, args...) ->
@@ -483,3 +494,4 @@ _.extend scope,
     repo_rates_marketdata:  (args...) -> request('repo_rates_marketdata', args...)
     repo_rates_history:     (args...) -> request('repo_rates_history', args...)
     money_market_turnovers: (args...) -> request('money_market_turnovers', args...)
+    market_makers_ranks:    (args...) -> request('market_makers_ranks', args...)

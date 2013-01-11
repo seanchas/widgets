@@ -37,6 +37,10 @@
 <div id="spot_turnovers">
 </div>
 
+<h2>Market Makers Ranks</h2>
+<div id="mmakers">
+</div>
+
 
 <%- content_for :top_content do -%>
 
@@ -358,6 +362,12 @@
                 show_prev_date: true,
                 usd: true,
                 afterRefresh: function(time) { /* console.log(time) */ }
+            });
+
+            mx.widgets.ranks("#mmakers", {
+                cache: true,
+                show_header: true,
+                afterRefresh: function(time) {console.log(time)}
             });
             
         });
