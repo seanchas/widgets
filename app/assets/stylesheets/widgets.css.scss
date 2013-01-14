@@ -175,3 +175,19 @@
     }
 
 }
+
+.mx-widget-ranks-calendar {
+    .datepicker-alternate {
+        display: block;
+        width: 205px;
+    }
+
+    .xml, .csv {
+        background-color: #f0f0f0;
+        display: inline-block;
+        width: 80px;
+        padding: 8px;
+        margin:  5px 19px 5px 0;
+        text-align: center;
+    }
+}

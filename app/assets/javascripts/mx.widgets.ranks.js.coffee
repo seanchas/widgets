@@ -92,11 +92,17 @@ widget = (element, options = {}) ->
 
     refresh = () ->
 
-        $.when(mx.iss.market_makers_ranks({force: true})).then (ranks) ->
+        deffered = $.when mx.iss.mmakers_ranks({ force: true}), mx.iss.mmakers_ranks_columns()
+
+        deffered.then (ranks, columns) ->
+            console.log ranks, columns
             render(ranks)
             write_cache(element, cache_key) if cacheable
 
-            options.afterRefresh(new Date(ranks[0]["TRADEDATE"])) if is_callback_present
+            if is_callback_present
+                date = new Date [ ranks[0]["TRADEDATE"], ranks[0]["UPDATETIME"] ].join(" ")
+                options.afterRefresh(date)
+
             setTimeout refresh, refresh_timout
 
     refresh()

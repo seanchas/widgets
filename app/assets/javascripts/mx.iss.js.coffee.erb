@@ -301,15 +301,24 @@ request_meta =
         key: (group) ->
             [group]
 
-    market_makers_ranks:
+    mmakers_ranks:
         url: () ->
             "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?callback=?"
         data: ->
             'iss.meta': 'off'
-            'iss.only': 'marketmakersranks'
         parse: (json) ->
-            iss_merge_columns_and_data(json?.marketmakersranks)
+            iss_merge_columns_and_data(json?.ranks)
         key: (date) ->
+            []
+
+    mmakers_ranks_columns:
+        url: ->
+            "#{iss_host}/statistics/engines/stock/mmakers/ranks/columns.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.columns)
+        key: ->
             []
 
 
@@ -467,6 +476,7 @@ candle_borders = (engine, market, param) ->
 
 
 _.extend scope,
+    iss_host:               iss_host
     defaults:               (args...) -> request('defaults', args...)
     columns:                (args...) -> request('columns', args...)
     records:                (args...) -> request('securities', args...)
@@ -494,4 +504,5 @@ _.extend scope,
     repo_rates_marketdata:  (args...) -> request('repo_rates_marketdata', args...)
     repo_rates_history:     (args...) -> request('repo_rates_history', args...)
     money_market_turnovers: (args...) -> request('money_market_turnovers', args...)
-    market_makers_ranks:    (args...) -> request('market_makers_ranks', args...)
+    mmakers_ranks:          (args...) -> request('mmakers_ranks', args...)
+    mmakers_ranks_columns:  (args...) -> request('mmakers_ranks_columns', args...)

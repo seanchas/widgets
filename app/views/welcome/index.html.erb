@@ -41,6 +41,11 @@
 <div id="mmakers">
 </div>
 
+<h2>Market Makers Ranks Calendar</h2>
+<div id="mmakers_calendar">
+</div>
+
+
 
 <%- content_for :top_content do -%>
 
@@ -369,6 +374,8 @@
                 show_header: true,
                 afterRefresh: function(time) {console.log(time)}
             });
+
+            mx.widgets.ranks_calendar("#mmakers_calendar");
             
         });
     
