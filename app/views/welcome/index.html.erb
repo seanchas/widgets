@@ -40,6 +40,7 @@
 <h2>Market Makers Ranks</h2>
 <div id="mmakers">
 </div>
+<p>Время последнего обновления данных: <span id="mmakers_update_time"></span></p>
 
 <h2>Market Makers Ranks Calendar</h2>
 <div id="mmakers_calendar">
@@ -372,7 +373,21 @@
             mx.widgets.ranks("#mmakers", {
                 cache: true,
                 show_header: true,
-                afterRefresh: function(time) {console.log(time)}
+                refresh_timeout: 10 * 1000,
+                afterRefresh: function(time) {
+                    var formated_time, hours, minutes, seconds;
+                    hours   = time.getHours();
+                    minutes = time.getMinutes();
+                    seconds = time.getSeconds();
+
+                    if(hours < 10)   hours   = "0" + hours;
+                    if(minutes < 10) minutes = "0" + minutes;
+                    if(seconds < 10) seconds = "0" + seconds;
+
+                    formated_time = hours + ":" + minutes + ":" + seconds;
+
+                    $("#mmakers_update_time").html(formated_time)
+                }
             });
 
             mx.widgets.ranks_calendar("#mmakers_calendar");
