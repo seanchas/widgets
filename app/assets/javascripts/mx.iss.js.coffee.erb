@@ -301,15 +301,27 @@ request_meta =
         key: (group) ->
             [group]
 
-    mmakers_ranks:
-        url: () ->
+    mmakers_ranks_securities:
+        url: ->
             "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?callback=?"
         data: ->
             'iss.meta': 'off'
+            'iss.only': 'ranks.securities'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?['ranks.securities'])
+        key: ->
+            []
+
+    mmakers_ranks:
+        url: (securities) ->
+            "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?securities=#{securities.join(",")}&callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'ranks'
         parse: (json) ->
             iss_merge_columns_and_data(json?.ranks)
-        key: (date) ->
-            []
+        key: (securities) ->
+            [securities]
 
     mmakers_ranks_columns:
         url: ->
@@ -476,33 +488,34 @@ candle_borders = (engine, market, param) ->
 
 
 _.extend scope,
-    iss_host:               iss_host
-    defaults:               (args...) -> request('defaults', args...)
-    columns:                (args...) -> request('columns', args...)
-    records:                (args...) -> request('securities', args...)
-    security:               (args...) -> request('security', args...)
-    security_indices:       (args...) -> request('security_indices', args...)
-    index_securities:       (args...) -> request('index_securities', args...)
-    orderbook:              (args...) -> request('orderbook', args...)
-    description:            (args...) -> request('description', args...)
-    boards:                 (args...) -> request('boards', args...)
-    emitter:                emitter
-    emitter_securities:     emitter_securities
-    emitter_columns:        (args...) -> request('emitter_columns', args...)
-    turnovers:              (args...) -> request('turnovers', args...)
-    turnoverssectors:       (args...) -> request('turnoverssectors', args...)
-    market_turnovers:       (args...) -> request('market_turnovers', args...)
-    candle_borders:         candle_borders
-    filters:                (args...) -> request('filters', args...)
-    capitalization:         (args...) -> request('capitalization',  args...)
-    currency_rates:         (args...) -> request('currency_rates',  args...)
-    repo_dealers:           (args...) -> request('repo_dealers',    args...)
-    cb_transactions:        (args...) -> request('cb_transactions', args...)
-    state_rates:            (args...) -> request('state_rates', args...)
-    state_rates_columns:    (args...) -> request('state_rates_columns', args...)
-    repo_rates_securities:  (args...) -> request('repo_rates_securities', args...)
-    repo_rates_marketdata:  (args...) -> request('repo_rates_marketdata', args...)
-    repo_rates_history:     (args...) -> request('repo_rates_history', args...)
-    money_market_turnovers: (args...) -> request('money_market_turnovers', args...)
-    mmakers_ranks:          (args...) -> request('mmakers_ranks', args...)
-    mmakers_ranks_columns:  (args...) -> request('mmakers_ranks_columns', args...)
+    iss_host:                 iss_host
+    defaults:                 (args...) -> request('defaults', args...)
+    columns:                  (args...) -> request('columns', args...)
+    records:                  (args...) -> request('securities', args...)
+    security:                 (args...) -> request('security', args...)
+    security_indices:         (args...) -> request('security_indices', args...)
+    index_securities:         (args...) -> request('index_securities', args...)
+    orderbook:                (args...) -> request('orderbook', args...)
+    description:              (args...) -> request('description', args...)
+    boards:                   (args...) -> request('boards', args...)
+    emitter:                  emitter
+    emitter_securities:       emitter_securities
+    emitter_columns:          (args...) -> request('emitter_columns', args...)
+    turnovers:                (args...) -> request('turnovers', args...)
+    turnoverssectors:         (args...) -> request('turnoverssectors', args...)
+    market_turnovers:         (args...) -> request('market_turnovers', args...)
+    candle_borders:           candle_borders
+    filters:                  (args...) -> request('filters', args...)
+    capitalization:           (args...) -> request('capitalization',  args...)
+    currency_rates:           (args...) -> request('currency_rates',  args...)
+    repo_dealers:             (args...) -> request('repo_dealers',    args...)
+    cb_transactions:          (args...) -> request('cb_transactions', args...)
+    state_rates:              (args...) -> request('state_rates', args...)
+    state_rates_columns:      (args...) -> request('state_rates_columns', args...)
+    repo_rates_securities:    (args...) -> request('repo_rates_securities', args...)
+    repo_rates_marketdata:    (args...) -> request('repo_rates_marketdata', args...)
+    repo_rates_history:       (args...) -> request('repo_rates_history', args...)
+    money_market_turnovers:   (args...) -> request('money_market_turnovers', args...)
+    mmakers_ranks:            (args...) -> request('mmakers_ranks', args...)
+    mmakers_ranks_columns:    (args...) -> request('mmakers_ranks_columns', args...)
+    mmakers_ranks_securities: (args...) -> request('mmakers_ranks_securities', args...)
