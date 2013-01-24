@@ -9,8 +9,8 @@ $ = jQuery
 
 cache = kizzy("widgets.ranks")
 
-columns_to_show_in_thead = ["SECID", "UPDATETIME"]
-columns_to_show_in_tbody = ["RANK",  "VALUE"]
+thead_columns = ["SECID", "UPDATETIME"]
+tbody_columns = ["RANK",  "VALUE"]
 
 read_cache = (element, key) ->
     element.html cache.get key
@@ -48,7 +48,7 @@ widget = (element, options = {}) ->
         thead = $("<thead>")
         thead.addClass("finished") if security["STATUS"] is "F"
 
-        column_span  = columns_to_show_in_tbody.length - columns.length + 1
+        column_span  = tbody_columns.length - columns.length + 1
 
         title_row = $("<tr>").addClass("header")
         data_row  = $("<tr>").addClass("data")
@@ -82,7 +82,7 @@ widget = (element, options = {}) ->
 
         tbody = $("<tbody>")
 
-        column_span  = columns_to_show_in_thead.length - columns.length + 1
+        column_span  = thead_columns.length - columns.length + 1
 
         title_row = $("<tr>").addClass("header")
         for column, col_index in columns
@@ -97,23 +97,24 @@ widget = (element, options = {}) ->
         tbody.append title_row if show_header
 
         for security, index in securities
-            row = $("<tr>")
-            row.addClass("first") if index is 0
-            row.addClass("last")  if index is (securities.length - 1)
-            row.addClass( ["odd", "even"][index % 2] )
-            row.addClass("threshold") if security["IS_THRESHOLD_AMOUNT"] is 1
+            if security["IS_THRESHOLD_AMOUNT"] is 1 and show_threshold
+                row = $("<tr>")
+                row.addClass("first") if index is 0
+                row.addClass("last")  if index is (securities.length - 1)
+                row.addClass( ["odd", "even"][index % 2] )
+                row.addClass("threshold") if security["IS_THRESHOLD_AMOUNT"] is 1
 
-            for column, col_index in columns
-                value =  mx.utils.render(security[column.name], column)
-                last  = col_index is (columns.length - 1)
-                cell  = $("<td>")
-                    .addClass(column.type)
-                    .addClass(column.name.toLowerCase())
-                    .attr("title", column.title)
-                    .html(value)
-                cell.attr("colspan", column_span) if last and column_span > 1
-                row.append cell
-            tbody.append row
+                for column, col_index in columns
+                    value =  mx.utils.render(security[column.name], column)
+                    last  = col_index is (columns.length - 1)
+                    cell  = $("<td>")
+                        .addClass(column.type)
+                        .addClass(column.name.toLowerCase())
+                        .attr("title", column.title)
+                        .html(value)
+                    cell.attr("colspan", column_span) if last and column_span > 1
+                    row.append cell
+                tbody.append row
 
         tbody
 
@@ -121,12 +122,12 @@ widget = (element, options = {}) ->
     render_tables = (securities, columns) ->
 
         securities_groups = _.groupBy securities, (sec) -> sec["SECID"]
-        thead_columns     = _.filter  columns,    (col) -> _.include(columns_to_show_in_thead, col.name)
-        tbody_columns     = _.filter  columns,    (col) -> _.include(columns_to_show_in_tbody, col.name)
+        thead_columns     = _.filter  columns,    (col) -> _.include(thead_columns, col.name)
+        tbody_columns     = _.filter  columns,    (col) -> _.include(tbody_columns, col.name)
 
         _.each securities_groups, (group, name) ->
 
-            table = $("<table>").addClass("mx-widget-table").attr("data-secid", name)
+            table = $("<table>").addClass("mx-widget-ranks-table").attr("data-secid", name)
 
 
             group_sorted_by_value = _.sortBy group, (sec) -> -sec["VALUE"]
@@ -157,7 +158,6 @@ widget = (element, options = {}) ->
 
     start_events = () ->
         $("ul.securities li", element).live "click", () ->
-            console.log "click"
             el    = $(this)
             secid = el.attr("data-secid")
             if _.include(active_securities, secid) and active_securities.length > 1

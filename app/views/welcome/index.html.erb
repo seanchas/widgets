@@ -37,14 +37,16 @@
 <div id="spot_turnovers">
 </div>
 
-<h2>Market Makers Ranks</h2>
+<h2>Рэнкинг маркет-мейкеров</h2>
+
+<h3>Архив рэнкингов</h3>
+<div id="mmakers_calendar">
+</div>
+
+<h3>Текущие значения</h3>
 <div id="mmakers">
 </div>
 <p>Время последнего обновления данных: <span id="mmakers_update_time"></span></p>
-
-<h2>Market Makers Ranks Calendar</h2>
-<div id="mmakers_calendar">
-</div>
 
 
 
@@ -141,238 +143,239 @@
 
             mx.auth.passport('#auth');
 
-            mx.widgets.ticker('#ticker', [
-                'stock:index:SNDX:MICEXINDEXCF',
-                'stock:index:RTSI:RTSI',
-                'stock:shares:EQNE:GAZP',
-                'stock:shares:EQBR:AFLT',
-            	'stock:shares:EQBR:LKOH',
-            	'stock:shares:EQNL:VTBR',
-            	'stock:shares:EQBR:HYDR',
-            	'stock:index:SNDX:MICEXO&G',
-                'state:index:GNDX:RGBI'
-            ], {
-                speed: 25,
-                toggleable: true,
-                url: function(engine, market, board, security) {
-                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
-                }
-            });
-
-            mx.widgets.vertical_ticker("#vertical_ticker", [
-                'stock:index:SNDX:MICEXINDEXCF',
-                'stock:index:RTSI:RTSI',
-                'stock:shares:EQNE:GAZP',
-                'stock:shares:EQBR:AFLT',
-                'stock:shares:EQBR:LKOH',
-                'stock:shares:EQNL:VTBR',
-                'stock:shares:EQBR:HYDR',
-                'stock:index:SNDX:MICEXO&G',
-                'state:index:GNDX:RGBI',
-                'futures:forts:RFUD:Si',
-                'futures:forts:RFUD:GZ',
-                'futures:forts:RFUD:MX',
-                'futures:forts:RFUD:RI',
-                'futures:forts:RFUD:SR',
-                'futures:forts:RFUD:VX',
-                'futures:forts:RFUD:CU'
-            ], {
-                nearest:          1,         //
-                flip_speed:       500,       // flip time 0.5 sec
-                flip_delay:       8  * 1000, // flip delay 8 sec
-                refresh_timeout:  10 * 1000, // data refresh every 10 sec
-                outer_margin:     10,        // border margins 10px
-                intercell_margin: 10,        // margins between cells 10px
-                url: function(engine, market, board, security) {
-                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
-                }
-            });
-
-            mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
-                compare: 'stock:index:RTSI'
-            });
-
-            mx.widgets.table('#index_1', 'stock', 'index', [
-                'SNDX:MICEXINDEXCF',
-                'RTSI:RTSI'
-            ], {
-                cache: true
-            });
-
-            mx.widgets.table('#index_2', 'stock', 'index', [
-                'SNDX:MICEXCBITR',
-                'SNDX:MICEXMBITR',
-                'SNDX:MICEXINNOV',
-                'state:index:GNDX:RGBI'
-            ], {
-                chart: true,
-                refresh_timeout: 5 * 1000,
-                url: function(engine, market, board, security) {
-                    return '#' + engine + ':' + market + ':' + board + ':' + security;
-                },
-                cache: true
-            });
-
-
-            mx.widgets.table('#currency_1', 'currency', 'selt', [
-                'CETS:USD000UTSTOM',
-                'CETS:EUR_RUB__TOM',
-                'CETS:EURUSD000TOM',
-                'currency:basket:BKT:USDEUR_BKT'
-            ], {
-            });
-
-
-            mx.widgets.table('#stock_1', 'stock', 'shares', [
-                'EQBR:SBER',
-                'EQNE:GAZP',
-                'EQBR:LKOH',
-                'EQBS:GMNK',
-                'EQNL:VTBR'
-            ], {
-                chart: 0,
-                refresh_timeout: 5 * 1000
-            });
-
-            mx.widgets.table('#stock_2', 'stock', 'standard', [
-                'STMR:SBER',
-                'STMR:GAZP',
-                'STMR:LKOH',
-                'STMR:GMNK',
-                'STMR:VTBR'
-            ], {
-                chart: 0,
-                refresh_timeout: 5 * 1000
-            });
-
-            mx.widgets.table('#stock_3', 'stock', 'classica', [
-                'CLMR:SBER',
-                'CLMR:GAZP',
-                'CLMR:LKOH',
-                'CLMR:GMNK',
-                'CLMR:VTBR'
-            ], {
-                refresh_timeout: 5 * 1000
-            });
-
-            mx.widgets.table('#futures_1', 'futures', 'forts', [
-                'RFUD:RI',
-                'RFUD:MX',
-                'RFUD:VX',
-                'RFUD:SR',
-                'RFUD:GZ'
-            ], {
-                sortBy: sortBy_SECTYPE,
-                params_name: 'sectypes',
-                nearest: 1
-            });
-
-            mx.widgets.table('#futures_2', 'futures', 'forts', [
-                'RFUD:GD',
-                'RFUD:BR',
-                'RFUD:SV',
-                'RFUD:CU',
-                'RFUD:SA'
-            ], {
-                sortBy: sortBy_SECTYPE,
-                params_name: 'sectypes',
-                nearest: 1
-            });
-
-            mx.widgets.table('#futures_3', 'futures', 'forts', [
-                'RFUD:Si',
-                'RFUD:ED',
-                'RFUD:Eu',
-                'RFUD:O4',
-                'RFUD:O2'
-            ], {
-                params_name: 'sectypes',
-                refresh_timeout: 5 * 1000,
-                nearest: 1
-            });
-
-            mx.widgets.table("#rmfs", 'stock', 'bonds', [
-                'EQOB:SU25072RMFS8',
-                'EQOB:SU25076RMFS9',
-                'EQOB:SU25077RMFS7',
-                'EQOB:SU26204RMFS6',
-                'EQOB:SU26205RMFS3'
-            ], {
-                show_header: true,
-                cache: true,
-                refresh_timeout: 60 * 1000,
-                filter_name: ['SHORTNAME', 'TIME', 'DURATION', 'YIELD', 'LAST', 'LASTCHANGE']
-
-            });
-
-            mx.widgets.turnovers('#turnovers', {
-                usd: true,
-                is_tonight_session: false,
-                afterRefresh: function(time) {
-                }
-            });
-
-            var amounts = {
-                3:      'Тыс.',
-                6:      'Млн.',
-                9:      'Млрд.',
-                12:     'Трлн.'
-            };
-
-            mx.iss.capitalization().then(function(value) {
-                var digits      = Math.ceil(Math.log(value) / Math.LN10);
-                var max_amount  = 0;
-
-                for (amount in amounts) {
-                    amount = parseInt(amount)
-                    if (max_amount < amount && amount <= digits) {
-                        max_amount = amount;
-                    }
-                }
-
-                value = value / Math.pow(10, max_amount)
-
-                $("#capitalization").html(mx.utils.render(value, { type: 'number', precision: 2 }) + ' ' + amounts[max_amount]);
-            });
-
-            mx.widgets.indices('#main_indices', {
-                url: function(engine, market, board, security) {
-                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
-                },
-                refresh_timeout: 60 * 1000
-            });
-
-            mx.widgets.shares('#main_shares', {
-                url: function(engine, market, board, security) {
-                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
-                },
-                refresh_timeout: 60 * 1000
-            });
-
-            mx.widgets.turnovers('#main_turnovers', {
-                refresh_timeout:    60 * 1000
-            });
-
-            mx.widgets.tiny.currency_rates($("#currency_rates"));
-
-            mx.widgets.table("#commodity_1", "commodity", "futures", [
-                ""
-            ],{
-                url: false,
-                filter_name: ["SECNAME", "SHORTNAME", "SETTLEPRICE", "SETTLETOPREVSETTLE", "UPDATETIME"],
-                show_header: true
-            });
-
-            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', [/* 'standard', 'classica' */], {
-                is_tonight_session: false,
-                show_prev_date: true,
-                usd: true,
-                afterRefresh: function(time) { /* console.log(time) */ }
-            });
+//            mx.widgets.ticker('#ticker', [
+//                'stock:index:SNDX:MICEXINDEXCF',
+//                'stock:index:RTSI:RTSI',
+//                'stock:shares:EQNE:GAZP',
+//                'stock:shares:EQBR:AFLT',
+//            	'stock:shares:EQBR:LKOH',
+//            	'stock:shares:EQNL:VTBR',
+//            	'stock:shares:EQBR:HYDR',
+//            	'stock:index:SNDX:MICEXO&G',
+//                'state:index:GNDX:RGBI'
+//            ], {
+//                speed: 25,
+//                toggleable: true,
+//                url: function(engine, market, board, security) {
+//                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
+//                }
+//            });
+//
+//            mx.widgets.vertical_ticker("#vertical_ticker", [
+//                'stock:index:SNDX:MICEXINDEXCF',
+//                'stock:index:RTSI:RTSI',
+//                'stock:shares:EQNE:GAZP',
+//                'stock:shares:EQBR:AFLT',
+//                'stock:shares:EQBR:LKOH',
+//                'stock:shares:EQNL:VTBR',
+//                'stock:shares:EQBR:HYDR',
+//                'stock:index:SNDX:MICEXO&G',
+//                'state:index:GNDX:RGBI',
+//                'futures:forts:RFUD:Si',
+//                'futures:forts:RFUD:GZ',
+//                'futures:forts:RFUD:MX',
+//                'futures:forts:RFUD:RI',
+//                'futures:forts:RFUD:SR',
+//                'futures:forts:RFUD:VX',
+//                'futures:forts:RFUD:CU'
+//            ], {
+//                nearest:          1,         //
+//                flip_speed:       500,       // flip time 0.5 sec
+//                flip_delay:       8  * 1000, // flip delay 8 sec
+//                refresh_timeout:  10 * 1000, // data refresh every 10 sec
+//                outer_margin:     10,        // border margins 10px
+//                intercell_margin: 10,        // margins between cells 10px
+//                url: function(engine, market, board, security) {
+//                    return "<%= security_path %>#" + engine + ":" + market + ":" + board + ":" + security;
+//                }
+//            });
+//
+//            mx.widgets.chart('#chart_1', 'stock', 'index', 'MICEXINDEXCF', {
+//                compare: 'stock:index:RTSI'
+//            });
+//
+//            mx.widgets.table('#index_1', 'stock', 'index', [
+//                'SNDX:MICEXINDEXCF',
+//                'RTSI:RTSI'
+//            ], {
+//                cache: true
+//            });
+//
+//            mx.widgets.table('#index_2', 'stock', 'index', [
+//                'SNDX:MICEXCBITR',
+//                'SNDX:MICEXMBITR',
+//                'SNDX:MICEXINNOV',
+//                'state:index:GNDX:RGBI'
+//            ], {
+//                chart: true,
+//                refresh_timeout: 5 * 1000,
+//                url: function(engine, market, board, security) {
+//                    return '#' + engine + ':' + market + ':' + board + ':' + security;
+//                },
+//                cache: true
+//            });
+//
+//
+//            mx.widgets.table('#currency_1', 'currency', 'selt', [
+//                'CETS:USD000UTSTOM',
+//                'CETS:EUR_RUB__TOM',
+//                'CETS:EURUSD000TOM',
+//                'currency:basket:BKT:USDEUR_BKT'
+//            ], {
+//            });
+//
+//
+//            mx.widgets.table('#stock_1', 'stock', 'shares', [
+//                'EQBR:SBER',
+//                'EQNE:GAZP',
+//                'EQBR:LKOH',
+//                'EQBS:GMNK',
+//                'EQNL:VTBR'
+//            ], {
+//                chart: 0,
+//                refresh_timeout: 5 * 1000
+//            });
+//
+//            mx.widgets.table('#stock_2', 'stock', 'standard', [
+//                'STMR:SBER',
+//                'STMR:GAZP',
+//                'STMR:LKOH',
+//                'STMR:GMNK',
+//                'STMR:VTBR'
+//            ], {
+//                chart: 0,
+//                refresh_timeout: 5 * 1000
+//            });
+//
+//            mx.widgets.table('#stock_3', 'stock', 'classica', [
+//                'CLMR:SBER',
+//                'CLMR:GAZP',
+//                'CLMR:LKOH',
+//                'CLMR:GMNK',
+//                'CLMR:VTBR'
+//            ], {
+//                refresh_timeout: 5 * 1000
+//            });
+//
+//            mx.widgets.table('#futures_1', 'futures', 'forts', [
+//                'RFUD:RI',
+//                'RFUD:MX',
+//                'RFUD:VX',
+//                'RFUD:SR',
+//                'RFUD:GZ'
+//            ], {
+//                sortBy: sortBy_SECTYPE,
+//                params_name: 'sectypes',
+//                nearest: 1
+//            });
+//
+//            mx.widgets.table('#futures_2', 'futures', 'forts', [
+//                'RFUD:GD',
+//                'RFUD:BR',
+//                'RFUD:SV',
+//                'RFUD:CU',
+//                'RFUD:SA'
+//            ], {
+//                sortBy: sortBy_SECTYPE,
+//                params_name: 'sectypes',
+//                nearest: 1
+//            });
+//
+//            mx.widgets.table('#futures_3', 'futures', 'forts', [
+//                'RFUD:Si',
+//                'RFUD:ED',
+//                'RFUD:Eu',
+//                'RFUD:O4',
+//                'RFUD:O2'
+//            ], {
+//                params_name: 'sectypes',
+//                refresh_timeout: 5 * 1000,
+//                nearest: 1
+//            });
+//
+//            mx.widgets.table("#rmfs", 'stock', 'bonds', [
+//                'EQOB:SU25072RMFS8',
+//                'EQOB:SU25076RMFS9',
+//                'EQOB:SU25077RMFS7',
+//                'EQOB:SU26204RMFS6',
+//                'EQOB:SU26205RMFS3'
+//            ], {
+//                show_header: true,
+//                cache: true,
+//                refresh_timeout: 60 * 1000,
+//                filter_name: ['SHORTNAME', 'TIME', 'DURATION', 'YIELD', 'LAST', 'LASTCHANGE']
+//
+//            });
+//
+//            mx.widgets.turnovers('#turnovers', {
+//                usd: true,
+//                is_tonight_session: false,
+//                afterRefresh: function(time) {
+//                }
+//            });
+//
+//            var amounts = {
+//                3:      'Тыс.',
+//                6:      'Млн.',
+//                9:      'Млрд.',
+//                12:     'Трлн.'
+//            };
+//
+//            mx.iss.capitalization().then(function(value) {
+//                var digits      = Math.ceil(Math.log(value) / Math.LN10);
+//                var max_amount  = 0;
+//
+//                for (amount in amounts) {
+//                    amount = parseInt(amount)
+//                    if (max_amount < amount && amount <= digits) {
+//                        max_amount = amount;
+//                    }
+//                }
+//
+//                value = value / Math.pow(10, max_amount)
+//
+//                $("#capitalization").html(mx.utils.render(value, { type: 'number', precision: 2 }) + ' ' + amounts[max_amount]);
+//            });
+//
+//            mx.widgets.indices('#main_indices', {
+//                url: function(engine, market, board, security) {
+//                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
+//                },
+//                refresh_timeout: 60 * 1000
+//            });
+//
+//            mx.widgets.shares('#main_shares', {
+//                url: function(engine, market, board, security) {
+//                    return "<%= security_path %>#" + engine + ':' + market + ':' + board + ':' + security;
+//                },
+//                refresh_timeout: 60 * 1000
+//            });
+//
+//            mx.widgets.turnovers('#main_turnovers', {
+//                refresh_timeout:    60 * 1000
+//            });
+//
+//            mx.widgets.tiny.currency_rates($("#currency_rates"));
+//
+//            mx.widgets.table("#commodity_1", "commodity", "futures", [
+//                ""
+//            ],{
+//                url: false,
+//                filter_name: ["SECNAME", "SHORTNAME", "SETTLEPRICE", "SETTLETOPREVSETTLE", "UPDATETIME"],
+//                show_header: true
+//            });
+//
+//            mx.widgets.market_turnovers($("#spot_turnovers"), 'stock', [/* 'standard', 'classica' */], {
+//                is_tonight_session: false,
+//                show_prev_date: true,
+//                usd: true,
+//                afterRefresh: function(time) { /* console.log(time) */ }
+//            });
 
             mx.widgets.ranks("#mmakers", {
                 cache: true,
                 show_header: true,
+                show_threshold: true,
                 refresh_timeout: 5 * 1000,
                 afterRefresh: function(time) {
                     var formated_time, hours, minutes, seconds;
@@ -390,7 +393,7 @@
                 }
             });
 
-            mx.widgets.ranks_calendar("#mmakers_calendar");
+            mx.widgets.ranks_archive("#mmakers_calendar");
             
         });
     

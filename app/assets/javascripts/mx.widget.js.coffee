@@ -19,7 +19,7 @@
 ##= require mx.widgets.repo_rates
 ##= require mx.widgets.money_market_turnovers
 ##= require mx.widgets.ranks
-##= require mx.widgets.ranks_calendar
+##= require mx.widgets.ranks_archive
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )
