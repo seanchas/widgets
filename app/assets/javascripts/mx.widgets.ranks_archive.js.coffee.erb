@@ -9,7 +9,7 @@ $ = jQuery
 
 link_given_date    = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks"
 link_entire_period = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks/alltime"
-link_params        = "&lang=#{mx.locale()}&iss.only=ranks&ranks.columns=TRADEDATE,SECID,RANK,VALUE,IS_THRESHOLD_AMOUNT"
+link_params        = "lang=#{mx.locale()}&iss.only=ranks&ranks.columns=TRADEDATE,SECID,RANK,VALUE,IS_THRESHOLD_AMOUNT"
 
 localization =
     ru:
@@ -151,26 +151,24 @@ render_tempate = (el) ->
         <div id="csv-options">
             <fieldset>
                 <legend>#{l10n.csv_options_title}</legend>
-                <p>
-                    <label for="csv-dp">#{l10n.dp_label}</label>
-                    <select id="csv-dp">
-                    </select>
-                </p>
-                <p>
-                    <label for="csv-dl">#{l10n.dl_label}</label>
-                    <select id="csv-dl">
-                    </select>
-                </p>
-                <p>
-                    <label for="csv-df">#{l10n.df_label}</label>
-                    <select id="csv-df">
-                    </select>
-                </p>
-                <p>
-                    <label for="csv-tf">#{l10n.tf_label}</label>
-                    <select id="csv-tf">
-                    </select>
-                </p>
+                <table><tbody>
+                    <tr>
+                        <td><label for="csv-dp">#{l10n.dp_label}</label></td>
+                        <td><select id="csv-dp"></select></td>
+                    </tr>
+                    <tr>
+                        <td><label for="csv-dl">#{l10n.dl_label}</label></td>
+                        <td><select id="csv-dl"></select></td>
+                    </tr>
+                    <tr>
+                        <td><label for="csv-df">#{l10n.df_label}</label></td>
+                        <td><select id="csv-df"></select></td>
+                    </tr>
+                    <tr>
+                        <td><label for="csv-tf">#{l10n.tf_label}</label></td>
+                        <td><select id="csv-tf"></select></td>
+                    </tr>
+                </tbody></table>
             </fieldset>
         </div>
     """
@@ -218,6 +216,7 @@ widget = (element, options = {}) ->
         dateFormat:        "dd.mm.yy"
         showOn:            "button"
         buttonImageOnly:   true
+        buttonImage:       "<%= asset_path("blank.gif") %>"
         buttonText:        l10n.choose_date
         maxDate:           "-1D"
         beforeShow: (input, inst) ->
@@ -262,6 +261,14 @@ widget = (element, options = {}) ->
             iss_dl = $(this).find(":selected").val()
             update_links()
 
+        ctrls.select_df.change () ->
+            iss_df = $(this).find(":selected").val()
+            update_links()
+
+        ctrls.select_tf.change () ->
+            iss_tf = $(this).find(":selected").val()
+            update_links()
+
 
     update_links = () ->
         date   = check_date(controls.datepicker.attr("value"))
@@ -274,7 +281,7 @@ widget = (element, options = {}) ->
         if date
             controls.csv_options_link.removeClass("disabled")
             controls.link_to_csv.attr("href", [link_given_date, ".csv", "?date=#{date}&", params, "&#{link_params}"].join("")).html(l10n.csv_download)
-            controls.link_to_xml.attr("href", [link_given_date, ".xml", "?date=#{date}&", "&#{link_params}"].join("")).html(l10n.xml_download)
+            controls.link_to_xml.attr("href", [link_given_date, ".xml", "?date=#{date}&", link_params].join("")).html(l10n.xml_download)
         else
             controls.csv_options.hide()
             controls.csv_options_link.removeClass("active").addClass("disabled")
