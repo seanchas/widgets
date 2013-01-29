@@ -8,7 +8,7 @@ scope = global.mx.widgets
 $ = jQuery
 
 link_given_date    = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks"
-link_entire_period = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks/alltime"
+link_entire_period = mx.iss.iss_host + "/downloads/statistics/engines/stock/mmakers/ranks"
 link_params        = "lang=#{mx.locale()}&iss.only=ranks&ranks.columns=TRADEDATE,SECID,RANK,VALUE,IS_THRESHOLD_AMOUNT"
 
 localization =
@@ -285,8 +285,8 @@ widget = (element, options = {}) ->
         else
             controls.csv_options.hide()
             controls.csv_options_link.removeClass("active").addClass("disabled")
-            controls.link_to_csv.attr("href", [link_entire_period, ".csv"].join("")).html(l10n.csv_download)
-            controls.link_to_xml.attr("href", [link_entire_period, ".xml"].join("")).html(l10n.xml_download)
+            controls.link_to_csv.attr("href", [link_entire_period, ".csv.zip"].join("")).html(l10n.csv_download)
+            controls.link_to_xml.attr("href", [link_entire_period, ".xml.zip"].join("")).html(l10n.xml_download)
 
     start_events(controls) ; controls.reset_period_link.trigger("click") ; update_links()
 
