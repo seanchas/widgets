@@ -201,6 +201,13 @@ widget = (element, options = {}) ->
             write_cache(element, cache_key) if cacheable
 
 
+    render = (securities, ranks, columns) ->
+        element.empty()
+        render_controls() if show_controls
+        render_securities(securities)
+        render_tables(ranks, columns) if ranks? and columns?
+
+        write_cache(element, cache_key) if cacheable
 
 
     refresh = () ->
@@ -228,25 +235,16 @@ widget = (element, options = {}) ->
             cache.set securities_cache_key, active_securities
 
 
-            unless active_securities.length is 0
-
+            if active_securities.length is 0
+                render(securities)
+                refresh_timer = setTimeout refresh, refresh_timeout
+            else
                 deffered = $.when mx.iss.mmakers_ranks(active_securities, { force: true }), mx.iss.mmakers_ranks_columns()
-
                 deffered.then (ranks, columns) ->
-                    element.empty()
-                    render_controls() if show_controls
-                    render_securities(securities)
-                    render_tables(ranks, columns)
-
-                    write_cache(element, cache_key) if cacheable
+                    render(securities, ranks, columns)
                     refresh_timer = setTimeout refresh, refresh_timeout
 
-            else
-                element.empty()
-                render_controls() if show_controls
-                render_securities(securities)
 
-                write_cache(element, cache_key) if cacheable
 
     refresh()
     start_events()
