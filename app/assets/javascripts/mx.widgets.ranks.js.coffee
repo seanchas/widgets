@@ -56,9 +56,7 @@ widget = (element, options = {}) ->
 
     create_thead = (security, columns) ->
 
-        thead = $("<thead>")
-        thead.addClass("finished") if security["STATUS"] is "F"
-
+        thead        = $("<thead>")
         column_span  = tbody_columns.length + 1
 
         for column, index in columns
@@ -133,6 +131,7 @@ widget = (element, options = {}) ->
             group_sorted_by_value = _.sortBy group, (sec) -> -sec["VALUE"]
             security              = _.first(group)
 
+            table.addClass("finished") if security["STATUS"] is "F"
             table.append create_thead security,              thead_cols
             table.append create_tbody group_sorted_by_value, tbody_cols
 
@@ -241,6 +240,13 @@ widget = (element, options = {}) ->
 
                     write_cache(element, cache_key) if cacheable
                     refresh_timer = setTimeout refresh, refresh_timeout
+
+            else
+                element.empty()
+                render_controls() if show_controls
+                render_securities(securities)
+
+                write_cache(element, cache_key) if cacheable
 
     refresh()
     start_events()
