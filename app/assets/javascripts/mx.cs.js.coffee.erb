@@ -10,13 +10,13 @@ cs_host = "<%= Rails.application.config.cs_host %>"
 $ = jQuery
 
 
-data = (engine, market, param, options = {}) ->
+data = (engine, market, board_group_id, param, options = {}) ->
     deferred = new $.Deferred
     
     key = mx.utils.sha1 JSON.stringify ['chart', arguments...]
     
     $.ajax
-        url: "#{cs_host}/engines/#{engine}/markets/#{market}/securities/#{param}.json?callback=?"
+        url: "#{cs_host}/engines/#{engine}/markets/#{market}/boardgroups/#{board_group_id}/securities/#{param}.json?callback=?"
         data: options
         dataType: 'jsonp'
         jsonpCallback: "cs_jsonp_#{key}"

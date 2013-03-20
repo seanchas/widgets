@@ -89,9 +89,14 @@
     <div id="currency_1">
     </div>
     
-    <h3>Фондовый рынок</h3>
+    <h3>Фондовый рынок T+0</h3>
 
     <div id="stock_1">
+    </div>
+
+    <h3>Фондовый рынок T+2</h3>
+
+    <div id="stock_1_1">
     </div>
     
     <h3>Standard</h3>
@@ -230,6 +235,17 @@
                 'EQBR:LKOH',
                 'EQBS:GMNK',
                 'EQNL:VTBR'
+            ], {
+                chart: 0,
+                refresh_timeout: 5 * 1000
+            });
+
+            mx.widgets.table('#stock_1_1', 'stock', 'shares', [
+                'TQBR:SBER',
+                'TQNE:GAZP',
+                'TQBR:LKOH',
+                'TQBS:GMNK',
+                'TQNL:VTBR'
             ], {
                 chart: 0,
                 refresh_timeout: 5 * 1000

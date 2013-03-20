@@ -197,12 +197,14 @@ widget = (element, engine, market, board, param, options = {}) ->
         new Highcharts.StockChart(co);
     
 
-    mx.iss.candle_borders(engine, market, param).then (borders) ->
-        
+    $.when(mx.iss.market_boards(engine, market), mx.iss.candle_borders(engine, market, board, param)).then (boards, borders) ->
+
         borders = process_borders(borders)
         
         period = periods[default_period]
-        
+
+        board_group_id = _.find(boards, (brd) -> brd.boardid is board).board_group_id
+
         
         render = (series) ->
 
@@ -237,7 +239,7 @@ widget = (element, engine, market, board, param, options = {}) ->
             
             {begin, end} = borders[period.interval]
 
-            mx.cs.data(engine, market, param, {
+            mx.cs.data(engine, market, board_group_id, param, {
                 'interval': period.interval
                 's1.type':  type
                 'period':   period.period

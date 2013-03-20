@@ -333,6 +333,16 @@ request_meta =
         key: ->
             []
 
+    market_boards:
+        url: (engine, market) ->
+            "#{iss_host}/engines/#{engine}/markets/#{market}/boards.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.boards)
+        key: (engine, market) ->
+            [engine, market]
+
 
 
 request = (name, args...) ->
@@ -465,7 +475,7 @@ emitter_securities = (param) ->
     
     deferred.promise()
 
-candle_borders = (engine, market, param) ->
+candle_borders = (engine, market, board, param) ->
     deferred = new $.Deferred
     
     key     = mx.utils.sha1 JSON.stringify _.flatten(['candle_borders', arguments...])
@@ -475,7 +485,7 @@ candle_borders = (engine, market, param) ->
         'iss.only': 'borders'
     
     $.ajax
-        url: "#{iss_host}/engines/#{engine}/markets/#{market}/securities/#{param}/candleborders.jsonp?callback=?"
+        url: "#{iss_host}/engines/#{engine}/markets/#{market}/boards/#{board}/securities/#{param}/candleborders.jsonp?callback=?"
         data: data
         dataType: 'jsonp'
         jsonCallback: "callback_#{key}}"
@@ -519,3 +529,4 @@ _.extend scope,
     mmakers_ranks:            (args...) -> request('mmakers_ranks', args...)
     mmakers_ranks_columns:    (args...) -> request('mmakers_ranks_columns', args...)
     mmakers_ranks_securities: (args...) -> request('mmakers_ranks_securities', args...)
+    market_boards:            (args...) -> request('market_boards', args...)
