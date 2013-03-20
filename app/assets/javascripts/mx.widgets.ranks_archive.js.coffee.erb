@@ -16,7 +16,7 @@ localization =
         datepicker_locale: "ru"
         csv_options_link:  "&or;"
         csv_options_title: "Параметры выгрузки CSV"
-        dp_label:          "Разделитель для десятичных знаков:"
+        dp_label:          "Десятичный разделитель:"
         dp_options:        [
             [",", "(,) запятая"]
             [".", "(.) точка"]
@@ -54,12 +54,12 @@ localization =
         datepicker_locale: "en-GB"
         csv_options_link:  "&or;"
         csv_options_title: "CSV rendering options"
-        dp_label:          "Decimals separator:"
+        dp_label:          "Decimal mark:"
         dp_options:        [
             [".", "(.) point"]
             [",", "(,) comma"]
         ]
-        dl_label:          "Fields delimiter:"
+        dl_label:          "Fields separator:"
         dl_options:        [
             [";", "(;) semicolon"]
             [",", "(,) comma"]
@@ -153,12 +153,12 @@ render_tempate = (el) ->
                 <legend>#{l10n.csv_options_title}</legend>
                 <table><tbody>
                     <tr>
-                        <td><label for="csv-dp">#{l10n.dp_label}</label></td>
-                        <td><select id="csv-dp"></select></td>
-                    </tr>
-                    <tr>
                         <td><label for="csv-dl">#{l10n.dl_label}</label></td>
                         <td><select id="csv-dl"></select></td>
+                    </tr>
+                    <tr>
+                        <td><label for="csv-dp">#{l10n.dp_label}</label></td>
+                        <td><select id="csv-dp"></select></td>
                     </tr>
                     <tr>
                         <td><label for="csv-df">#{l10n.df_label}</label></td>
