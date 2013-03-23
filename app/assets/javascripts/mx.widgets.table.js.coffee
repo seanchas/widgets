@@ -355,38 +355,42 @@ widget = (element, engine, market, params, options = {}) ->
                 height:  chart_height
                 compare: ""
 
-        url = mx.widgets.chart_url(wrapper, parts[0], parts[1], parts[3], _.extend(options.chart_option, chart_options))
+        $.when(mx.iss.market_boards(parts[0], parts[1])).then (boards) ->
+            board_group_id = _.find(boards, (brd) -> brd.boardid is parts[2]).board_group_id
+            chart_options.board_group_id = board_group_id
 
-        wrapper.css("height", chart_height)
-        add_spinner(wrapper) if refresh_options.force or !(_.size($("img", wrapper)) > 0)
-        
-        write_cache(element, cache_key) if cacheable
+            url = mx.widgets.chart_url(wrapper, parts[0], parts[1], parts[3], _.extend(options.chart_option, chart_options))
 
-        row.data("chart-is-loading", true)
-        image = $("<img>")
+            wrapper.css("height", chart_height)
+            add_spinner(wrapper) if refresh_options.force or !(_.size($("img", wrapper)) > 0)
 
-        image.on 'load', ->
-            return if chart_row.data("drag-lock")
-            compare_key = row.attr("data-compare-key")
-
-            row.removeData("chart-is-loading")
-            remove_spinner(wrapper)
-            wrapper.html(image)
-            
-            if compare_key
-                add_compare_toolbox(chart_row)
-                
-            charts_times[chart_key] = + new Date
-            write_cache(element, cache_key) if cacheable
-        
-        image.on 'error', ->
-            row.removeData("chart-is-loading")
-            chart_row.prev("tr.row").removeClass("current")
-            chart_row.data('defunct', true).hide()
-            wrapper.empty()
             write_cache(element, cache_key) if cacheable
 
-        image.attr('src', url)
+            row.data("chart-is-loading", true)
+            image = $("<img>")
+
+            image.on 'load', ->
+                return if chart_row.data("drag-lock")
+                compare_key = row.attr("data-compare-key")
+
+                row.removeData("chart-is-loading")
+                remove_spinner(wrapper)
+                wrapper.html(image)
+
+                if compare_key
+                    add_compare_toolbox(chart_row)
+
+                charts_times[chart_key] = + new Date
+                write_cache(element, cache_key) if cacheable
+
+            image.on 'error', ->
+                row.removeData("chart-is-loading")
+                chart_row.prev("tr.row").removeClass("current")
+                chart_row.data('defunct', true).hide()
+                wrapper.empty()
+                write_cache(element, cache_key) if cacheable
+
+            image.attr('src', url)
 
 
     calculate_chart_dimensions = (chart_row) ->
