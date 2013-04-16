@@ -5,6 +5,9 @@ global.mx.security  ||= {}
 
 scope = global.mx.security
 
+custom_filters =
+    'stock:shares:FXRB': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ISSUECAPITALIZATION', 'ETFSETTLEPRICE']
+
 $ = jQuery
 
 cache       = kizzy('security.digest')
@@ -105,7 +108,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     
 
     $.when(ready).then (columns, filters) ->
-    
+
         consistent = not _.isEmpty(columns) and (_.size(filters['widget']) > 0 || _.size(filters['digest']) > 0)
 
         render = (data) ->
@@ -127,8 +130,15 @@ widget = (element, engine, market, board, param, options = {}) ->
                 
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
                 container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name]) if column
-            
-            filter  = filters['digest']
+
+            security = [engine, market, param].join(':')
+            filter   = undefined
+            if _.contains _.keys(custom_filters), security
+                columns_names = _.intersection(custom_filters[security], _.pluck(columns, 'name'))
+                filter        = _.map columns_names, (name) -> _.find(columns, (column) -> column.name is name)
+            else
+                filter  = filters['digest']
+
             count   = 2
             if filter
                 for index in [0 ... _.size(filter)] by count
