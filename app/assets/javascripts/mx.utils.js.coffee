@@ -86,7 +86,7 @@ parse_date = (value) ->
 
 process_record = (record, columns, by_name = false) ->
     return record unless record?
-    
+
     decimals = record['DECIMALS']
 
     record.precisions = {}
@@ -126,6 +126,7 @@ render = (value, descriptor = {}) ->
 
 render_number = (value, descriptor = {}) ->
     return value unless value?
+    return null if value is ''
 
     value_for_render = mx.utils.number_with_precision value, { precision: descriptor.precision }
 

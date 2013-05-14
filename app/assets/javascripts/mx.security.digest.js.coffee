@@ -41,11 +41,12 @@ make_container = ->
         .addClass("mx-security-digest")
 
 
-make_last_cell = (value, column) ->
+make_last_cell = (record, column) ->
+    column.precision ||= record.precisions?[column.name]
     $("<li>")
         .addClass("last")
         .attr('title', column.title)
-        .html($("<span>").html(mx.utils.render(value, column) || '&mdash;'))
+        .html($("<span>").html(mx.utils.render(record[column.name], column) || '&mdash;'))
 
 
 make_change_cell = (value, unit, column, trend) ->
@@ -71,6 +72,7 @@ make_cell = (record, columns) ->
     cell = $("<li>")
 
     for column in columns
+        column.precision ||= record.precisions?[column.name]
         cell.append(
             $("<span>")
                 .attr('title', column.title)
@@ -104,29 +106,29 @@ widget = (element, engine, market, board, param, options = {}) ->
         element.trigger('destroy');
 
 
-    ready = (-> $.when(mx.iss.columns(engine, market), mx.iss.filters(engine, market)))()
-    
+    ready =  do -> $.when(mx.iss.columns(engine, market, {force: true}), mx.iss.filters(engine, market))
+
 
     $.when(ready).then (columns, filters) ->
 
         consistent = not _.isEmpty(columns) and (_.size(filters['widget']) > 0 || _.size(filters['digest']) > 0)
 
         render = (data) ->
-            
+
             record  = _.first(data)
             iss     = _.last(data)
-            
+
             if _.isEmpty(record)
                 trigger_render_event(element, 'failure', iss)
                 return destroy({ force: true })
-            
+
             record = mx.utils.process_record(record, columns)
             
             container = make_container()
             
             if filters['widget']
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'LAST')
-                container.append make_last_cell(record[column.name], column) if column
+                container.append make_last_cell(record, column) if column
                 
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
                 container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name]) if column
