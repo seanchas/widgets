@@ -13,7 +13,6 @@ link_params        = "lang=#{mx.locale()}&ranks_only=1&iss.only=ranks&ranks.colu
 
 localization =
     ru:
-        datepicker_locale: "ru"
         csv_options_link:  "&or;"
         csv_options_title: "Параметры выгрузки CSV"
         dp_label:          "Десятичный разделитель:"
@@ -51,7 +50,6 @@ localization =
         placeholder:       "Весь период"
         date_format_label: "ДД.ММ.ГГГГ"
     en:
-        datepicker_locale: "en-GB"
         csv_options_link:  "&or;"
         csv_options_title: "CSV rendering options"
         dp_label:          "Decimal mark:"
@@ -89,38 +87,17 @@ localization =
         placeholder:       "Entire period"
         date_format_label: "DD.MM.YYYY"
 
-l10n = localization[mx.locale()]
+l10n = undefined
 
-$.datepicker.regional['ru'] =
-    closeText:          'Закрыть'
-    prevText:           '&#x3C;'
-    nextText:           '&#x3E;'
-    currentText:        'Сегодня'
-    monthNames:         ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
-    monthNamesShort:    ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
-    dayNames:           ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота']
-    dayNamesShort:      ['вск','пнд','втр','срд','чтв','птн','сбт']
-    dayNamesMin:        ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']
-    weekHeader:         'Нед'
-    dateFormat:         'dd.mm.yy'
-    firstDay:           1
-    isRTL:              false
-    showMonthAfterYear: false
-    yearSuffix:         ''
-
-$.datepicker.regional['en-GB'] =
-    prevText:           '&#x3C;'
-    nextText:           '&#x3E;'
-
-$.datepicker.setDefaults $.datepicker.regional[l10n.datepicker_locale]
-
+mx.utils.datepicker()
+mx.utils.datepicker_locale mx.locale()
 
 check_date = (date) ->
     if typeof date is "string"
         date = date.split(".")
         if date.length is 3
             day  = date[0] ; month = date[1] ; year = date[2]
-            if day and month and year
+            if day? and month? and year?
                 cy  = (new Date).getFullYear()
                 day = parseInt(day) ; month = parseInt(month) ; year = parseInt(year)
                 day   = if day   < 10   then "0#{day}"   else if day   > 31 then "31"    else "#{day}"
@@ -183,6 +160,8 @@ populate_options = (el, options) ->
 widget = (element, options = {}) ->
     element = $(element) ; return unless element.length > 0
     element.addClass("mx-widget-ranks-archive")
+
+    l10n = localization[mx.locale()]
 
     iss_dp        = l10n.dp_options[0][0]
     iss_dl        = l10n.dl_options[0][0]

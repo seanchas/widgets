@@ -7,6 +7,40 @@ global.mx.utils  ?=  {}
 
 scope = global.mx.utils
 
+
+datepicker = _.once () ->
+    $.datepicker.regional['ru'] =
+        closeText:          'Закрыть'
+        prevText:           '&#x3C;'
+        nextText:           '&#x3E;'
+        currentText:        'Сегодня'
+        monthNames:         ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь']
+        monthNamesShort:    ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']
+        dayNames:           ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота']
+        dayNamesShort:      ['вск','пнд','втр','срд','чтв','птн','сбт']
+        dayNamesMin:        ['Вс','Пн','Вт','Ср','Чт','Пт','Сб']
+        weekHeader:         'Нед'
+        dateFormat:         'dd.mm.yy'
+        firstDay:           1
+        isRTL:              false
+        showMonthAfterYear: false
+        yearSuffix:         ''
+
+    $.datepicker.regional['en-GB'] =
+        dateFormat:         'yy-mm-dd'
+        prevText:           '&#x3C;'
+        nextText:           '&#x3E;'
+
+datepicker_locale = (locale) ->
+    default_locale = 'ru'
+    locales =
+        ru: 'ru'
+        en: 'en-GB'
+
+    locale = default_locale unless _.contains(_.keys(locales), locale)
+    $.datepicker.setDefaults $.datepicker.regional[locales[locale]]
+
+
 number_with_delimiter_options =
     ru:
         delimiter: ' '
@@ -253,6 +287,8 @@ _.extend scope,
     parse_date:             parse_date
     sha1:                   sha1
     render:                 render
+    datepicker:             datepicker
+    datepicker_locale:      datepicker_locale
 
 
 # console.log sha1('')

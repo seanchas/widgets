@@ -502,6 +502,149 @@
     }
 }
 
+
+.mx-widget-otc {
+    .otc-datepicker {
+
+        display: inline-block;
+        padding: 1em;
+        min-width: 400px;
+
+        ul.date-type-select {
+            list-style: none;
+            padding: 0;
+            margin:  0;
+
+            overflow: hidden;
+
+            > li {
+                margin:  0;
+                padding: 0 0 1em;
+
+                > input[type=radio] {
+                    display: inline-block;
+                    padding: 0;
+                    vertical-align: top;
+                }
+
+                > label {
+                    margin:  0;
+                    padding: 0 10px;
+                    display: inline-block;
+
+                    .date-title {
+                        margin: 0;
+                        padding: 2px 0 0.5em;
+                    }
+                }
+
+                .input-date {
+                    display:  inline-block;
+                    position: relative;
+                    vertical-align: middle;
+
+                    height: 22px;
+                    width: 130px;
+
+
+                    input[type=text] {
+                        background-color: #f5f5f5;
+                        border: 1px solid #ccc;
+                        border-right: none;
+                        display: block;
+                        font-size: 12px;
+                        height: 16px;
+                        margin:  0;
+                        padding: 0 5px;
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100px;
+                        overflow: hidden;
+
+                        &:focus {
+                            background-color: #fff;
+                            border: 1px solid #c0d0e0;
+                            outline: none;
+                        }
+                    }
+
+                    .ui-datepicker-trigger {
+                        background: #a8a8a8 image-url("widget-ranks-archive-iconset.gif") no-repeat left top;
+                        display: block;
+                        margin: 0;
+                        padding: 0;
+                        position: absolute;
+                        top: 0;
+                        left: 111px;
+                        height: 18px;
+                        text-indent: -1000px;
+                        width: 19px;
+
+                        &:hover {
+                            background-color: #ccc;
+                        }
+                    }
+
+                }
+
+                ul.securities-list {
+                    border: 1px solid #ccc;
+                    max-height: 150px;
+                    list-style: none;
+                    margin:  0;
+                    overflow-y: scroll;
+                    padding: 0;
+
+                    > li {
+                        margin:  0;
+                        padding: 5px;
+
+                        &:hover, &.odd:hover {
+                            background-color: #87ceeb;
+                        }
+
+                        &.odd {
+                            background-color: #fafafa;
+                        }
+
+                        p.short-name {
+                            font-size: 1.1em;
+                            font-weight: bold;
+                            color: #666;
+                            margin: 0;
+                            padding: 0 0 0.5em;
+                        }
+                        p.full-name {
+                            margin: 0;
+                            padding: 0 0 0.5em;
+                        }
+                    }
+                }
+            }
+        }
+
+        .submit {
+            padding: 10px;
+            padding-left: 30px;
+        }
+
+        &.loading {
+            .submit {
+                background: image-url("facebook-ajax-loader.gif") no-repeat 10px center;
+            }
+        }
+
+    }
+
+    .otc-amount {
+        padding: 1em;
+        display: inline-block;
+        vertical-align: top;
+    }
+}
+
+
 .ui-datepicker {
 
     display: none;

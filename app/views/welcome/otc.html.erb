@@ -1,0 +1,12 @@
+<div id="otc">
+</div>
+
+<script type="text/javascript" charset="utf-8">
+
+    $(document).ready(function() {
+        mx.locale("<%= params[:locale] %>");
+        mx.widgets.otc("#otc", { cache: true, refresh_timeout: 5 * 1000 });
+    });
+    
+    
+</script>

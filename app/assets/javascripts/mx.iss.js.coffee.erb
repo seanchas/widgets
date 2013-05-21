@@ -49,6 +49,16 @@ request_meta =
             iss_prepare_columns(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
         key: (engine, market, options = {}) ->
             [engine, market, options.only]
+
+    history_columns:
+        url: (engine, market) ->
+            "#{iss_host}/history/engines/#{engine}/markets/#{market}/securities/columns.jsonp?callback=?"
+        data:  ->
+            'iss.meta': 'off'
+        parse: (json) ->
+            iss_prepare_columns(iss_merge_columns_and_data(json?.history))
+        key: (engine, market) ->
+            [engine, market]
     
     securities:
         url: (engine, market, params, options = {}) ->
@@ -80,7 +90,27 @@ request_meta =
             iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))
 
         key: (engine, market, params, options = {}) ->
-            [engine, market, params, options.boardid]
+            [engine, market, params, options]
+
+    history_securities:
+        url: (engine, market, options = {}) ->
+            "#{iss_host}/history/engines/#{engine}/markets/#{market}/#{if options.boardid? then "boards/#{options.boardid}/" else ""}securities.jsonp?callback=?"
+        data: (engine, market, options = {}) ->
+            known_keys = ['date']
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'history'
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+            _.extend data, options
+            data
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.history)
+
+        key: (engine, market, options = {}) ->
+            [engine, market, options]
 
     security:
         url: (engine, market, board, param) ->
@@ -92,6 +122,49 @@ request_meta =
             [_.first(iss_prepare_records(iss_merge_columns_and_data(json?.securities), iss_merge_columns_and_data(json?.marketdata))), json['iss.status']]
         key: (engine, market, board, param, options = {}) ->
             [engine, market, board, param, options.only]
+
+    search:
+        url: (query) ->
+            "#{iss_host}/securities.jsonp?callback=?"
+        data: (query, options = {}) ->
+            known_keys = ['start', 'limit', 'engine', 'market', 'is_trading', 'group_by']
+            data =
+                'iss.meta': 'off'
+                'q':        query
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+            _.extend data, options
+            data
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.securities)
+        key: (query) ->
+            [query]
+
+    history_security:
+        url: (engine, market, param, options = {}) ->
+            "#{iss_host}/history/engines/#{engine}/markets/#{market}/#{if options.boardid? then "boards/#{options.boardid}/" else ""}securities/#{param}.jsonp?callback=?"
+        data: (engine, market, param, options = {}) ->
+            known_keys = ['from', 'till']
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'history'
+
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+
+            _.extend data, options
+
+            data
+
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.history)
+
+        key: (engine, market, param, options = {}) ->
+            [engine, market, param, options]
     
     description:
         url: (param) ->
@@ -501,8 +574,12 @@ _.extend scope,
     iss_host:                 iss_host
     defaults:                 (args...) -> request('defaults', args...)
     columns:                  (args...) -> request('columns', args...)
+    history_columns:          (args...) -> request('history_columns',    args...)
+    history_security:         (args...) -> request('history_security',   args...)
+    history_securities:       (args...) -> request('history_securities', args...)
     records:                  (args...) -> request('securities', args...)
     security:                 (args...) -> request('security', args...)
+    search:                   (args...) -> request('search', args...)
     security_indices:         (args...) -> request('security_indices', args...)
     index_securities:         (args...) -> request('index_securities', args...)
     orderbook:                (args...) -> request('orderbook', args...)

@@ -1,0 +1,425 @@
+global = module?.exports ? ( exports ? this )
+
+global.mx           ||= {}
+global.mx.widgets   ||= {}
+
+scope = global.mx.widgets
+
+cache = kizzy('widgets.otc.settings')
+
+localization =
+    ru:
+        title:
+            init:   'Сведения о торгах ценными бумагами на внебиржевом рынке'
+            day:    (date) -> "Сведения о торгах ценными бумагами на внебиржевом рынке за #{date}."
+            period: (security, from, till) -> "Сведения о торгах #{security} в период c #{from} по #{till}."
+        datepicker:
+            title:       'Параметры отображения'
+            from:        'Период с:'
+            till:        'по:'
+            security:    'Код инструмента:'
+            choose_date: 'Выбрать дату'
+            submit:      'Показать'
+            day_title:   'Показать за указанную дату'
+            period_title:'Показать за период по бумаге'
+        amount:
+            title_by_day:    'Суммарные показатели за день'
+            title_by_period: (security) -> "Суммарные показатели по #{security} за период"
+        data:
+            large:    'Информация о сделках, на основании которых приобретается 5 и более процентов ценных бумаг эмитента'
+            small:    'Информация о сделках, на основании которых приобретается не более 5 процентов ценных бумаг эмитента'
+            empty:    'Нет данных по сделкам'
+
+    en:
+        title:
+            init:   'OTC market trading data'
+            day:    (date) -> "OTC market trading data for #{date}."
+            period: (security, from, till) -> "#{security} trading data for the period from #{from} till #{till}."
+        datepicker:
+            title:       'View options'
+            from:        'Period from:'
+            till:        'till:'
+            security:    'Security:'
+            choose_date: 'Choose date'
+            submit:      'Show'
+            day_title:   'Show by Date'
+            period_title:'Show by period'
+        amount:
+            title_by_day:    'Cumulative data by day'
+            title_by_period: (security) -> "#{security} cumulative data for the period"
+        data:
+            large:    "Information on trades with a volume of 5 or more percents of emitееr's securities"
+            small:    "Information on trades with a volume of less than 5 percents of emitееr's securities"
+            empty:    'There are no trades'
+
+
+l10n = undefined
+
+
+render_template = (el) ->
+    el = $(el) ; return unless el.size() > 0
+
+    el.html """
+    <div class="mx-widget mx-widget-otc">
+        <h2 class="otc-title">""" + l10n.title.init + """</h2>
+        <div class="otc-datepicker">
+            <h3>""" + l10n?.datepicker.title + """</h3>
+            <form>
+                <ul class="date-type-select">
+                    <li class="date-by-day">
+                        <input type="radio" id="date-type-day" name="date-type" value="day" />
+                        <label for="date-type-day">
+                            <h4 class="date-title">""" + l10n?.datepicker.day_title + """</h4>
+                            <div class="input-date"><input type="text"  id="date-by-day" name="date-by-day" /></div>
+                        </label>
+                    </li>
+                    <li class="date-by-period">
+                        <input type="radio" id="date-type-period" name="date-type" value="period">
+                        <label for="date-type-period">
+                            <h4 class="date-title">""" + l10n?.datepicker.period_title + """</h4>
+                            <label for="date-from">""" + l10n.datepicker.from + """</label>
+                            <div class="input-date"><input type="text"  id="date-from" name="date-from" /></div>
+                            <label for="date-till">""" + l10n.datepicker.till + """</label>
+                            <div class="input-date"><input type="text"  id="date-till"   name="date-till" /></div>
+                            <br />
+                            <label for="date-security">""" + l10n.datepicker.security + """</label>
+                            <input type="text" id="date-security" name="date-security" />
+                            <span id="date-security-description" class="date-security-description"></span>
+                        </label>
+                    </li>
+                </ul>
+                <div class="submit">
+                    <button type="submit" disabled="disabled">""" + l10n.datepicker.submit + """</button>
+                </div>
+            </form>
+        </div>
+        <div class="otc-amount">
+        </div>
+        <div class="otc-data">
+        </div>
+    </div>
+    """
+
+render_data  = (element, data, columns) ->
+    element = $(element) ; return unless element.size() > 0
+
+    columns = _.filter(columns, (column) -> !column.is_hidden and !column.is_system and !(column.name is 'ISLARGE'))
+
+    element.empty()
+
+    unless data.length > 0
+        title = $("<h3>").html(l10n.data.empty)
+        element.append(title)
+        return
+
+    large = _.filter data, (d) -> d['ISLARGE'] == 1
+    small = _.filter data, (d) -> d['ISLARGE'] == 0
+
+    if large.length > 0
+        large_table = $("<div>").addClass("otc-table-large")
+        render_table(large_table, large, columns)
+
+        element
+            .append($("<h3>").html(l10n.data.large))
+            .append(large_table)
+
+    if small.length > 0
+        small_table = $("<div>").addClass("otc-table-small")
+        render_table(small_table, small, columns)
+
+        element
+            .append($("<h3>").html(l10n.data.small))
+            .append(small_table)
+
+
+render_table = (element, data, columns) ->
+
+    table = $("<table>").addClass("mx-widget-table")
+    thead = render_thead(columns)
+    tbody = render_tbody(data, columns)
+
+    table
+        .append(thead)
+        .append(tbody)
+
+    element.append table
+
+
+render_thead = (columns) ->
+    thead = $("<thead>")
+    tr = $("<tr>")
+    _.each columns, (col) -> $("<td>").html(col.short_title).attr('title', col.title).appendTo(tr)
+    thead.append(tr)
+
+
+render_tbody = (data, columns) ->
+    tbody = $("<tbody>")
+    _.each data, (row_data, index) ->
+        tr = $("<tr>").addClass(['odd', 'even'][index % 2])
+        tr.addClass('first') if index is 0
+        tr.addClass('last')  if index is data.length - 1
+        _.each columns, (col) -> $("<td>").html(mx.utils.render(row_data[col.name], col)).addClass(col.type).appendTo(tr)
+        tbody.append tr
+
+    tbody
+
+
+render_amount = (element, data, columns, options = {}) ->
+    element = $(element) ; return unless element.size() > 0
+
+    element.empty()
+
+    return unless (columns? and columns.length > 0) or (data? and data.length > 0)
+
+    filter  = ['NUMTRADES', 'VOLUME']
+    columns = _.filter columns, (column) ->_.contains filter, column.name
+
+    return unless columns.length is 2
+
+    if options.title
+        title = $("<h3>").html(options.title)
+        element.append(title)
+
+    info = _.reduce data, (memo, row) ->
+        memo.numtrades += row['NUMTRADES']
+        memo.volume += row['VOLUME']
+        return memo
+    , { numtrades: 0, volume: 0}
+
+    table = $('<table><tbody><tr></tr></tbody></table>').addClass('mx-widget-table')
+    tbody = $('tbody', table)
+
+    _.each columns, (column, index) ->
+
+        tr = $('<tr>').addClass(['odd', 'even'][index % 2])
+        tr.addClass('first') if index is 0
+        tr.addClass('last')  if index is columns.length - 1
+
+        tr.append($("<td>").html(column.short_title).attr('title', column.title).addClass('string'))
+        tr.append($("<td>").attr('title', column.title).html(mx.utils.render(info[column.name.toLowerCase()], column)).addClass(column.type))
+        tr.appendTo(tbody)
+
+    element.append table
+
+
+render_description = (el, data) ->
+    el = $(el) ; return unless el.size() > 0
+
+    unless data?.length
+        el.empty() ; return
+
+    ul = $("<ul>").addClass("securities-list")
+    for row, index in data
+        li = $("<li>").addClass("list-item").addClass( ['odd', 'even'][ index % 2 ]).attr('data-id', row.secid)
+        li.addClass('first') if index is 0
+        li.addClass('last')  if index is data.length - 1
+
+        li.append $("<p>").addClass("short-name").html(row.shortname)
+        li.append $("<p>").addClass("full-name").html(row.name)
+
+        ul.append(li)
+
+
+    el.empty().append(ul)
+
+
+widget = (element, options = {}) ->
+
+    element = $(element) ; return unless element.size() > 0
+
+    l10n = localization[mx.locale()]
+    mx.utils.datepicker()
+    mx.utils.datepicker_locale mx.locale()
+
+    options.refresh_timeout ||= 60 * 1000 ; if options.refresh_timeout < 5 * 1000 then options.refresh_timeout = 60 * 1000
+    options.cache             = !(options.cache is undefined) || !!options.cache
+
+    engine = 'stock'
+    market = 'otc'
+
+    cache_key  = mx.utils.sha1(['settings', mx.locale()].join('/'))
+    if options.cache is true
+        settings = cache.get cache_key
+        if settings?
+            settings.date_by_day = new Date(settings.date_by_day)
+            settings.date_from   = new Date(settings.date_from)
+            settings.date_till   = new Date(settings.date_till)
+    settings ||= {}
+
+    default_settings =
+        period_type: 'day'
+        date_by_day: new Date()
+        date_from:   new Date((new Date()).setDate((new Date()).getDate() - 8))
+        date_till:   new Date((new Date()).setDate((new Date()).getDate() - 1))
+        security:    ''
+
+    _.defaults settings, default_settings
+
+    render_template element
+
+    otc_title      = $('.otc-title',      element)
+    otc_datepicker = $('.otc-datepicker', element)
+    otc_amount     = $('.otc-amount',     element)
+    otc_data       = $('.otc-data',       element)
+
+    datepicker_day  = $("#date-by-day", otc_datepicker)
+    datepicker_from = $("#date-from",   otc_datepicker)
+    datepicker_till = $("#date-till",   otc_datepicker)
+
+
+    init_datepickers = ->
+        datepicker_defaults =
+            dateFormat: "dd.mm.yy"
+            showOn:     "button"
+            buttonImageOnly: true
+            buttonImage:     "<%= asset_path('blank.gif') %>"
+            buttonText: l10n.datepicker.choose_date
+            beforeShow: (input, inst) ->
+                calendar = inst.dpDiv
+                calendar.css({marginLeft: input.offsetWidth + 'px'})
+
+        datepicker_day .datepicker  datepicker_defaults
+        datepicker_from.datepicker _.extend datepicker_defaults, { onClose: (selectedDate) -> datepicker_day .datepicker("option", "minDate", selectedDate) }
+        datepicker_till.datepicker _.extend datepicker_defaults, { onClose: (selectedDate) -> datepicker_from.datepicker("option", "maxDate", selectedDate) }
+
+
+    apply_settings = ->
+        $("input[name=date-type][value=#{settings.period_type}]", otc_datepicker).prop('checked', true)
+        $("input[name=date-security]", otc_datepicker).val(settings.security)
+        datepicker_day .datepicker( "setDate", settings.date_by_day )
+        datepicker_from.datepicker( "setDate", settings.date_from )
+        datepicker_till.datepicker( "setDate", settings.date_till )
+
+    trigger_submit = ->
+        $('form', otc_datepicker).trigger('submit')
+
+    cleanup_data_elements = ->
+        otc_data.empty()
+        otc_amount.empty()
+        otc_title.html(l10n.title.init)
+
+
+    init_datepickers()
+    apply_settings()
+
+
+    $.when(mx.iss.history_columns(engine,market)).then (columns) ->
+        return  if columns? and !columns
+
+        refresh_timer = undefined
+
+        refresh_data_by_day = _.debounce (date = new Date()) ->
+            otc_datepicker.addClass('loading')
+
+            date        = strftime("%Y-%m-%d", date) if date? and date instanceof Date
+            header_date = date.split('-').reverse().join('.')
+
+            $.when(mx.iss.history_securities(engine, market, {date: date, force: true})).then (data) ->
+                otc_datepicker.removeClass('loading')
+
+                otc_title.html(l10n.title.day(header_date))
+
+                render_data(otc_data, data, columns)
+                render_amount(otc_amount, data, columns, { title: l10n.amount.title_by_day })
+
+                refresh_timer = setTimeout (() -> refresh_data_by_day(date)), options.refresh_timeout
+        , 500
+
+
+        refresh_data_by_period = _.debounce (secid, from = new Date(), till = new Date()) ->
+            otc_datepicker.addClass('loading')
+
+            from = strftime("%Y-%m-%d", from) if from? and from instanceof Date
+            till = strftime("%Y-%m-%d", till) if till? and till instanceof Date
+
+            header_from = from.split('-').reverse().join('.')
+            header_till = till.split('-').reverse().join('.')
+
+            $.when(mx.iss.history_security(engine, market, secid, {from: from, till: till, force: true})).then (data) ->
+                otc_datepicker.removeClass('loading')
+                security_name = _.first(data)?['NAME'] || secid
+
+                otc_title.html(l10n.title.period(security_name, header_from, header_till))
+
+                render_data(otc_data, data, columns)
+                render_amount(otc_amount, data, columns, { title: l10n.amount.title_by_period(security_name) })
+
+                refresh_timer = setTimeout (() -> refresh_data_by_period(secid, from, till)), options.refresh_timeout
+        , 500
+
+
+        search = _.debounce (query) ->
+            description_el = $('#date-security-description', otc_datepicker)
+
+            if query.length < 3
+                settings.security = ''
+                render_description(description_el)
+                validate_form()
+                return
+            $.when(mx.iss.search(query, { engine: engine, market: market, limit: 10})).then (data) ->
+                render_description(description_el, data)
+                settings.security = data[0]?.secid || ''
+                validate_form()
+        , 500
+
+
+        start_events = () ->
+            otc_datepicker.on 'change', 'input[name=date-type]', (event) ->
+                settings.period_type = $('input[name=date-type]:checked', otc_datepicker).val()
+                validate_form()
+
+            otc_datepicker.on 'change keyup', 'input[name=date-by-day], input[name=date-from], input[name=date-till]', (event) ->
+                el       = $(@)
+                value    = el.val()
+                is_valid = /\d{2}\.\d{2}\.\d{4}/.test(value)
+                value    = undefined unless is_valid
+                if is_valid
+                    value = Date.parse value.split('.').reverse().join('-')
+                    value = if _.isNaN(value) then undefined else new Date(value)
+                switch el.prop('name')
+                    when 'date-by-day' then settings.date_by_day = value
+                    when 'date-from'   then settings.date_from   = value
+                    when 'date-till'   then settings.date_till   = value
+                validate_form()
+
+            otc_datepicker.on 'keyup focus', 'input[name=date-security]', (event) ->
+                $("button[type=submit]", otc_datepicker).prop('disabled', true)
+                search $(@).val()
+
+            otc_datepicker.on 'click', '.securities-list > li.list-item', (event) ->
+                secid = $(@).attr('data-id')
+                settings.security = secid
+                $('input[name=date-security]', otc_datepicker).val(secid)
+                search(secid) ; validate_form() ; trigger_submit()
+
+            otc_datepicker.on 'submit', 'form', (event) ->
+                event.preventDefault()
+                event.stopPropagation()
+
+                clearTimeout(refresh_timer)
+
+                return unless validate_form()
+
+                switch settings.period_type
+                    when 'day'    then refresh_data_by_day(settings.date_by_day)
+                    when 'period' then refresh_data_by_period(settings.security, settings.date_from, settings.date_till)
+
+        validate_form = () ->
+            is_valid = false
+            if settings.period_type is 'day' and settings.date_by_day instanceof Date then is_valid = true
+            if settings.period_type is 'period'
+                if settings.date_from instanceof Date and settings.date_till instanceof Date
+                    if settings.security? and settings.security.length > 0
+                        is_valid = true
+
+            $("button[type=submit]", otc_datepicker).prop('disabled', !is_valid)
+            cache.set(cache_key, settings) if options.cache and is_valid
+            is_valid
+
+        start_events()
+        search(settings.security)
+        trigger_submit()
+
+
+_.extend scope,
+    otc: widget
