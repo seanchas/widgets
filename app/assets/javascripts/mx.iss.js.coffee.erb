@@ -96,7 +96,7 @@ request_meta =
         url: (engine, market, options = {}) ->
             "#{iss_host}/history/engines/#{engine}/markets/#{market}/#{if options.boardid? then "boards/#{options.boardid}/" else ""}securities.jsonp?callback=?"
         data: (engine, market, options = {}) ->
-            known_keys = ['date']
+            known_keys = ['date', 'start']
             data =
                 'iss.meta': 'off'
                 'iss.only': 'history'
@@ -146,7 +146,7 @@ request_meta =
         url: (engine, market, param, options = {}) ->
             "#{iss_host}/history/engines/#{engine}/markets/#{market}/#{if options.boardid? then "boards/#{options.boardid}/" else ""}securities/#{param}.jsonp?callback=?"
         data: (engine, market, param, options = {}) ->
-            known_keys = ['from', 'till']
+            known_keys = ['from', 'till', 'start']
             data =
                 'iss.meta': 'off'
                 'iss.only': 'history'
