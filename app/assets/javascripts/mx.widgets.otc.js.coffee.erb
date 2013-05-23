@@ -310,24 +310,37 @@ widget = (element, options = {}) ->
 
         refresh_data_by_day = _.debounce (date = new Date()) ->
             otc_datepicker.addClass('loading')
+            clearTimeout(refresh_timer)
 
             date        = strftime("%Y-%m-%d", date) if date? and date instanceof Date
             header_date = date.split('-').reverse().join('.')
 
-            $.when(mx.iss.history_securities(engine, market, {date: date, force: true})).then (data) ->
-                otc_datepicker.removeClass('loading')
+            concatinated_rows = []
 
-                otc_title.html(l10n.title.day(header_date))
+            get_data = () ->
+                $.when(mx.iss.history_securities(engine, market, {date: date, force: true, start: concatinated_rows.length})).then (data) ->
+                    concatinated_rows = concatinated_rows.concat(data) if data.length > 0
 
-                render_data(otc_data, data, columns)
-                render_amount(otc_amount, data, columns, { title: l10n.amount.title_by_day })
+                    if data.length is 100
+                        get_data()
+                        return
 
-                refresh_timer = setTimeout (() -> refresh_data_by_day(date)), options.refresh_timeout
+                    otc_datepicker.removeClass('loading')
+
+                    otc_title.html(l10n.title.day(header_date))
+
+                    render_data(otc_data, concatinated_rows, columns)
+                    render_amount(otc_amount, concatinated_rows, columns, { title: l10n.amount.title_by_day })
+
+                    refresh_timer = setTimeout (() -> refresh_data_by_day(date)), options.refresh_timeout
+
+            get_data()
         , 500
 
 
         refresh_data_by_period = _.debounce (secid, from = new Date(), till = new Date()) ->
             otc_datepicker.addClass('loading')
+            clearTimeout(refresh_timer)
 
             from = strftime("%Y-%m-%d", from) if from? and from instanceof Date
             till = strftime("%Y-%m-%d", till) if till? and till instanceof Date
@@ -335,16 +348,27 @@ widget = (element, options = {}) ->
             header_from = from.split('-').reverse().join('.')
             header_till = till.split('-').reverse().join('.')
 
-            $.when(mx.iss.history_security(engine, market, secid, {from: from, till: till, force: true})).then (data) ->
-                otc_datepicker.removeClass('loading')
-                security_name = _.first(data)?['NAME'] || secid
+            concatinated_rows = []
+            get_data = () ->
+                $.when(mx.iss.history_security(engine, market, secid, {from: from, till: till, force: true, start: concatinated_rows.length})).then (data) ->
+                    concatinated_rows = concatinated_rows.concat(data) if data.length > 0
 
-                otc_title.html(l10n.title.period(security_name, header_from, header_till))
+                    if data.length is 100
+                        get_data()
+                        return
 
-                render_data(otc_data, data, columns)
-                render_amount(otc_amount, data, columns, { title: l10n.amount.title_by_period(security_name) })
+                    otc_datepicker.removeClass('loading')
+                    security_name = _.first(concatinated_rows)?['NAME'] || secid
 
-                refresh_timer = setTimeout (() -> refresh_data_by_period(secid, from, till)), options.refresh_timeout
+                    otc_title.html(l10n.title.period(security_name, header_from, header_till))
+
+                    render_data(otc_data, concatinated_rows, columns)
+                    otc_amount.empty()
+                    #render_amount(otc_amount, concatinated_rows, columns, { title: l10n.amount.title_by_period(security_name) })
+
+                    #refresh_timer = setTimeout (() -> refresh_data_by_period(secid, from, till)), options.refresh_timeout
+
+            get_data()
         , 500
 
 
@@ -388,15 +412,14 @@ widget = (element, options = {}) ->
 
             otc_datepicker.on 'click', '.securities-list > li.list-item', (event) ->
                 secid = $(@).attr('data-id')
-                settings.security = secid
+                settings.security    = secid
+                settings.period_type = 'period'
                 $('input[name=date-security]', otc_datepicker).val(secid)
                 search(secid) ; validate_form() ; trigger_submit()
 
             otc_datepicker.on 'submit', 'form', (event) ->
                 event.preventDefault()
                 event.stopPropagation()
-
-                clearTimeout(refresh_timer)
 
                 return unless validate_form()
 
