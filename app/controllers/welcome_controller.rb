@@ -28,5 +28,8 @@ class WelcomeController < ApplicationController
 
   def otc
   end
+
+  def search
+  end
   
 end

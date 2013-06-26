@@ -20,6 +20,7 @@
 ##= require mx.widgets.money_market_turnovers
 ##= require mx.widgets.ranks
 ##= require mx.widgets.ranks_archive
+##= require mx.widgets.search
 ##= require mx.widgets.otc
 ##= require mx.cs
 
