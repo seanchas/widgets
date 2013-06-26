@@ -15,27 +15,27 @@ subdomains =
 
 subdomain = subdomains[server] ? ''
 
-domains = ["passport.#{subdomain}micex.ru", "passport.#{subdomain}micex.com"]
+domains = ["passport.#{subdomain}moex.com", "passport.#{subdomain}moex.com/en"]
 
 l10n =
     ru:
         login:        'Вход'
         logout:       'Выход из системы'
         registration: 'Регистрация'
-        auth_domain:  "passport.#{subdomain}micex.ru"
+        auth_domain:  "passport.#{subdomain}moex.com"
         portals_urls: [
-            ['Управление платными услугами', "http://services.#{subdomain}micex.ru/requisite"]
-            ['Настройки',                    "http://passport.#{subdomain}micex.ru/user"]
+            ['Управление платными услугами', "http://services.#{subdomain}moex.com/requisite"]
+            ['Настройки',                    "http://passport.#{subdomain}moex.com/user"]
         ]
 
     en:
         login:        'Login'
         logout:       'Logout'
         registration: 'Registration'
-        auth_domain:  "passport.#{subdomain}micex.com"
+        auth_domain:  "passport.#{subdomain}moex.com/en"
         portals_urls: [
-            ['Paid services management', "http://services.#{subdomain}micex.com/requisite"]
-            ['Settings',                 "http://passport.#{subdomain}micex.com/user"]
+            ['Paid services management', "http://services.#{subdomain}moex.com/en/requisite"]
+            ['Settings',                 "http://passport.#{subdomain}moex.com/en/user"]
         ]
 
 
@@ -185,7 +185,7 @@ class PassportManager
 
 
 widget = (element) ->
-    manager = new PassportManager(element)
+    new PassportManager(element)
 
 
 _.extend scope,
