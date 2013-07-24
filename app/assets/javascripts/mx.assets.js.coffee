@@ -5,4 +5,3 @@
 ##= require json
 ##= require highstock
 ##= require kizzy
-##= require strftime

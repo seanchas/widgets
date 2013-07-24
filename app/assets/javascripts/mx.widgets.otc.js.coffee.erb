@@ -22,6 +22,8 @@ localization =
             submit:      'Показать'
             day_title:   'Показать за указанную дату'
             period_title:'Показать за период по бумаге'
+            date_format: 'dd.mm.yy'
+            date_regexp: /\d{2}\.\d{2}\.\d{4}/
         amount:
             title_by_day:    'Суммарные показатели за день'
             title_by_period: (security) -> "Суммарные показатели по #{security} за период"
@@ -44,6 +46,8 @@ localization =
             submit:      'Show'
             day_title:   'Show by Date'
             period_title:'Show by period'
+            date_format: 'mm/dd/yy'
+            date_regexp: /\d{2}\/\d{2}\/\d{4}/
         amount:
             title_by_day:    'Cumulative data by day'
             title_by_period: (security) -> "#{security} cumulative data for the period"
@@ -68,14 +72,14 @@ render_template = (el) ->
                 <ul class="date-type-select">
                     <li class="date-by-day">
                         <input type="radio" id="date-type-day" name="date-type" value="day" />
-                        <label for="date-type-day">
+                        <div class="controls-container">
                             <h4 class="date-title">""" + l10n?.datepicker.day_title + """</h4>
                             <div class="input-date"><input type="text"  id="date-by-day" name="date-by-day" /></div>
-                        </label>
+                        </div>
                     </li>
                     <li class="date-by-period">
                         <input type="radio" id="date-type-period" name="date-type" value="period">
-                        <label for="date-type-period">
+                        <div class="controls-container">
                             <h4 class="date-title">""" + l10n?.datepicker.period_title + """</h4>
                             <label for="date-from">""" + l10n.datepicker.from + """</label>
                             <div class="input-date"><input type="text"  id="date-from" name="date-from" /></div>
@@ -85,7 +89,7 @@ render_template = (el) ->
                             <label for="date-security">""" + l10n.datepicker.security + """</label>
                             <input type="text" id="date-security" name="date-security" />
                             <span id="date-security-description" class="date-security-description"></span>
-                        </label>
+                        </div>
                     </li>
                 </ul>
                 <div class="submit">
@@ -237,20 +241,16 @@ widget = (element, options = {}) ->
     engine = 'stock'
     market = 'otc'
 
-    cache_key  = mx.utils.sha1(['settings', mx.locale()].join('/'))
-    if options.cache is true
-        settings = cache.get cache_key
-        if settings?
-            settings.date_by_day = new Date(settings.date_by_day)
-            settings.date_from   = new Date(settings.date_from)
-            settings.date_till   = new Date(settings.date_till)
+    cache_key  = mx.utils.sha1(['config', mx.locale()].join('/'))
+    settings   = undefined
+    settings   = cache.get cache_key if options.cache is true
     settings ||= {}
 
     default_settings =
         period_type: 'day'
-        date_by_day: new Date()
-        date_from:   new Date((new Date()).setDate((new Date()).getDate() - 8))
-        date_till:   new Date((new Date()).setDate((new Date()).getDate() - 1))
+        date_by_day: $.datepicker.formatDate("yy-mm-dd", new Date())
+        date_from:   $.datepicker.formatDate("yy-mm-dd", new Date((new Date()).setDate((new Date()).getDate() - 8)))
+        date_till:   $.datepicker.formatDate("yy-mm-dd", new Date((new Date()).setDate((new Date()).getDate() - 1)))
         security:    ''
 
     _.defaults settings, default_settings
@@ -269,7 +269,7 @@ widget = (element, options = {}) ->
 
     init_datepickers = ->
         datepicker_defaults =
-            dateFormat: "dd.mm.yy"
+            dateFormat: l10n.datepicker.date_format
             showOn:     "button"
             buttonImageOnly: true
             buttonImage:     "<%= asset_path('blank.gif') %>"
@@ -286,9 +286,9 @@ widget = (element, options = {}) ->
     apply_settings = ->
         $("input[name=date-type][value=#{settings.period_type}]", otc_datepicker).prop('checked', true)
         $("input[name=date-security]", otc_datepicker).val(settings.security)
-        datepicker_day .datepicker( "setDate", settings.date_by_day )
-        datepicker_from.datepicker( "setDate", settings.date_from )
-        datepicker_till.datepicker( "setDate", settings.date_till )
+        datepicker_day .datepicker( "setDate", $.datepicker.parseDate( "yy-mm-dd", settings.date_by_day ) )
+        datepicker_from.datepicker( "setDate", $.datepicker.parseDate( "yy-mm-dd", settings.date_from ) )
+        datepicker_till.datepicker( "setDate", $.datepicker.parseDate( "yy-mm-dd", settings.date_till ) )
 
     trigger_submit = ->
         $('form', otc_datepicker).trigger('submit')
@@ -297,6 +297,9 @@ widget = (element, options = {}) ->
         otc_data.empty()
         otc_amount.empty()
         otc_title.html(l10n.title.init)
+
+    isYmd = (date) ->
+        /\d{4}-\d{2}-\d{2}/.test(date)
 
 
     init_datepickers()
@@ -308,12 +311,12 @@ widget = (element, options = {}) ->
 
         refresh_timer = undefined
 
-        refresh_data_by_day = _.debounce (date = new Date()) ->
+        refresh_data_by_day = _.debounce (date) ->
             otc_datepicker.addClass('loading')
             clearTimeout(refresh_timer)
 
-            date        = strftime("%Y-%m-%d", date) if date? and date instanceof Date
-            header_date = date.split('-').reverse().join('.')
+            date      ||= $.datepicker.formatDate("yy-mm-dd", new Date)
+            header_date = $.datepicker.formatDate(l10n.datepicker.date_format, $.datepicker.parseDate("yy-mm-dd", date))
 
             concatinated_rows = []
 
@@ -338,15 +341,15 @@ widget = (element, options = {}) ->
         , 500
 
 
-        refresh_data_by_period = _.debounce (secid, from = new Date(), till = new Date()) ->
+        refresh_data_by_period = _.debounce (secid, from, till) ->
             otc_datepicker.addClass('loading')
             clearTimeout(refresh_timer)
 
-            from = strftime("%Y-%m-%d", from) if from? and from instanceof Date
-            till = strftime("%Y-%m-%d", till) if till? and till instanceof Date
+            from ||= $.datepicker.formatDate("yy-mm-dd", new Date)
+            till ||= $.datepicker.formatDate("yy-mm-dd", new Date)
 
-            header_from = from.split('-').reverse().join('.')
-            header_till = till.split('-').reverse().join('.')
+            header_from = $.datepicker.formatDate(l10n.datepicker.date_format, $.datepicker.parseDate("yy-mm-dd", from))
+            header_till = $.datepicker.formatDate(l10n.datepicker.date_format, $.datepicker.parseDate("yy-mm-dd", till))
 
             concatinated_rows = []
             get_data = () ->
@@ -364,9 +367,6 @@ widget = (element, options = {}) ->
 
                     render_data(otc_data, concatinated_rows, columns)
                     otc_amount.empty()
-                    #render_amount(otc_amount, concatinated_rows, columns, { title: l10n.amount.title_by_period(security_name) })
-
-                    #refresh_timer = setTimeout (() -> refresh_data_by_period(secid, from, till)), options.refresh_timeout
 
             get_data()
         , 500
@@ -392,14 +392,17 @@ widget = (element, options = {}) ->
                 settings.period_type = $('input[name=date-type]:checked', otc_datepicker).val()
                 validate_form()
 
+            otc_datepicker.on 'click', 'ul.date-type-select li', (event) ->
+                el = $(@).children('input[type=radio]')
+                unless el.prop('checked')
+                    el.prop('checked', true)
+                    settings.period_type = el.val()
+                    validate_form()
+
             otc_datepicker.on 'change keyup', 'input[name=date-by-day], input[name=date-from], input[name=date-till]', (event) ->
                 el       = $(@)
                 value    = el.val()
-                is_valid = /\d{2}\.\d{2}\.\d{4}/.test(value)
-                value    = undefined unless is_valid
-                if is_valid
-                    value = Date.parse value.split('.').reverse().join('-')
-                    value = if _.isNaN(value) then undefined else new Date(value)
+                value    = if l10n.datepicker.date_regexp.test(value) then $.datepicker.formatDate("yy-mm-dd", el.datepicker("getDate")) else undefined
                 switch el.prop('name')
                     when 'date-by-day' then settings.date_by_day = value
                     when 'date-from'   then settings.date_from   = value
@@ -429,9 +432,9 @@ widget = (element, options = {}) ->
 
         validate_form = () ->
             is_valid = false
-            if settings.period_type is 'day' and settings.date_by_day instanceof Date then is_valid = true
+            if settings.period_type is 'day' and isYmd(settings.date_by_day) then is_valid = true
             if settings.period_type is 'period'
-                if settings.date_from instanceof Date and settings.date_till instanceof Date
+                if isYmd(settings.date_from) and isYmd(settings.date_till)
                     if settings.security? and settings.security.length > 0
                         is_valid = true
 
