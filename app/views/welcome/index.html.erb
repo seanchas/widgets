@@ -131,6 +131,11 @@
     <div id="turnovers">
     </div>
 
+    <h3>Фиксинг (валютный рынок)</h3>
+
+    <div id="currency_fixing">
+    </div>
+
 <%- end -%>
 
 <%- content_for :javascripts do -%>
@@ -395,6 +400,10 @@
             });
 
             mx.widgets.ranks_archive("#mmakers_archive");
+
+            mx.widgets.tiny.currency_fixing("#currency_fixing", {
+                cache: true
+            });
             
         });
     
