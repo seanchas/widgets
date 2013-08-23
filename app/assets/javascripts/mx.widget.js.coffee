@@ -22,6 +22,7 @@
 ##= require mx.widgets.ranks_archive
 ##= require mx.widgets.search
 ##= require mx.widgets.otc
+##= require mx.widgets.fixing
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )

@@ -133,7 +133,7 @@
 
     <h3>Фиксинг (валютный рынок)</h3>
 
-    <div id="currency_fixing">
+    <div id="fixing">
     </div>
 
 <%- end -%>
@@ -401,9 +401,13 @@
 
             mx.widgets.ranks_archive("#mmakers_archive");
 
-            mx.widgets.tiny.currency_fixing("#currency_fixing", {
-                cache: true
-            });
+            mx.widgets.fixing("#fixing"
+            , [ { 'currency:selt:cets:USD000UTSTOM': { 'MARKETPRICETODAY': 'USDFIX', 'MARKETPRICE2': 'USDFIXME' } } ]
+            , {
+                cache: true,
+                refresh_timeout: 60 * 1000
+              }
+            );
             
         });
     
