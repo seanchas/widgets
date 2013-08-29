@@ -87,7 +87,7 @@ render_data = (tbody_el, data, url_cb) ->
             span = $('<span>').html( mx.utils.render(record[column], { type: raw.columns[column].type, precision: record.precisions[column]}) || '&mdash;' )
             tds[column] = $('<td>').addClass(raw.columns[column].type).attr('title', raw.columns[column].title).append(span)
 
-        tds['FIXTIME'] = $('<td>').addClass(raw.columns['UPDATETIME'].type).html( '12:00' )
+        tds['FIXTIME'] = $('<td>').addClass(raw.columns['UPDATETIME'].type).append($('<span>').html( '12:30' ))
 
         tr_upd.append(tds['UPDCOL']).append(tds['UPDATETIME']).append(tds['MARKETPRICETODAY'])
         tr_fix.append(tds['FIXCOL']).append(tds['FIXTIME']   ).append(tds['MARKETPRICE2'])
