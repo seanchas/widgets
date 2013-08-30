@@ -8,6 +8,10 @@ scope = global.mx.security
 custom_filters =
     'stock:shares:FXRB': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ISSUECAPITALIZATION', 'ETFSETTLEPRICE']
 
+asterisk_comment =
+    ru: "* изменение цены по отношению к последней цене предыдущего дня в режиме T+0 2-го Сентября"
+    en: "* percentage change between the last trade price and previous day's closing price on the basis of previous day's closing prices of the T+0 mode"
+
 $ = jQuery
 
 cache       = kizzy('security.digest')
@@ -49,23 +53,26 @@ make_last_cell = (record, column) ->
         .html($("<span>").html(mx.utils.render(record[column.name], column) || '&mdash;'))
 
 
-make_change_cell = (value, unit, column, trend) ->
+make_change_cell = (value, unit, column, trend, is_asterisk_present) ->
     trend_field = $("<span>")
         .attr('title', column.title)
         .toggleClass('trend_up', trend > 0)
         .toggleClass('trend_down', trend < 0)
         .toggleClass('trend_none', trend == 0 || not trend)
         .html(mx.utils.render(value, column) || '&mdash;')
+
+    asterisk = $('<span>').addClass('asterisk').html('*')
     
     if unit == 'SUR' then unit = 'RUB'
     
     unit_field = $("<span>")
         .html(unit ? '&nbsp;')
     
-    $("<li>")
+    li = $("<li>")
         .addClass("change")
         .append(trend_field)
-        .append("<br />")
+    li  .append(asterisk) if is_asterisk_present
+    li  .append("<br />")
         .append(unit_field)
 
 make_cell = (record, columns) ->
@@ -105,6 +112,8 @@ widget = (element, engine, market, board, param, options = {}) ->
         remove_cache cache_key if options.force == true
         element.trigger('destroy');
 
+    is_asterisk_present = engine is 'stock' and market is 'shares'
+
 
     ready =  do -> $.when(mx.iss.columns(engine, market, {force: true}), mx.iss.filters(engine, market))
 
@@ -131,7 +140,7 @@ widget = (element, engine, market, board, param, options = {}) ->
                 container.append make_last_cell(record, column) if column
                 
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
-                container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name]) if column
+                container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name], is_asterisk_present) if column
 
             security = [engine, market, param].join(':')
             filter   = undefined
@@ -151,6 +160,8 @@ widget = (element, engine, market, board, param, options = {}) ->
             element.html(container)
 
             write_cache(element, cache_key) if options.cache == true
+
+            element.append($('<span>').addClass('asterisk').html(asterisk_comment[mx.locale()])) if is_asterisk_present
             
     
         refresh = ->
