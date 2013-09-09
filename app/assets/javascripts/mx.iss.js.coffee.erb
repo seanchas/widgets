@@ -362,6 +362,42 @@ request_meta =
             iss_merge_columns_and_data(json?.history)
         key: ->
             []
+
+    rms_security:
+        url: (engine, market, object, param, options = {}) ->
+            "#{iss_host}/rms/engines/#{engine}/markets/#{market}/objects/#{object}/securities/#{param}.jsonp?callback=?"
+        data: (engine, market, object, param, options = {}) ->
+            known_keys = ['from', 'till']
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'object'
+
+            options = _.reduce options, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+
+            _.extend data, options
+            data
+
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.object)
+
+        key: (engine, market, object, param, options = {}) ->
+            [engine, market, object, param, options = {}]
+
+    rms_columns:
+        url: (engine, market, object) ->
+            "#{iss_host}/rms/engines/#{engine}/markets/#{market}/objects/#{object}/columns.jsonp?callback=?"
+        data: (engine, market, object) ->
+            'iss.meta': 'off'
+
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.object)
+
+        key: (engine, market, object) ->
+            [engine, market, object]
+
     
     money_market_turnovers:
         url: (group) ->
@@ -602,6 +638,8 @@ _.extend scope,
     repo_rates_securities:    (args...) -> request('repo_rates_securities', args...)
     repo_rates_marketdata:    (args...) -> request('repo_rates_marketdata', args...)
     repo_rates_history:       (args...) -> request('repo_rates_history', args...)
+    rms_security:             (args...) -> request('rms_security', args...)
+    rms_columns:              (args...) -> request('rms_columns', args...)
     money_market_turnovers:   (args...) -> request('money_market_turnovers', args...)
     mmakers_ranks:            (args...) -> request('mmakers_ranks', args...)
     mmakers_ranks_columns:    (args...) -> request('mmakers_ranks_columns', args...)
