@@ -418,7 +418,7 @@ widget = (element, engine, market, params, options = {}) ->
         element.on 'click', 'tr.row', (event) ->
             activate_row $(event.currentTarget)
 
-        element.on 'click', "tr.chart div.toolbox a['data-control'=remove]", (event) ->
+        element.on 'click', 'tr.chart div.toolbox a[data-control=remove]', (event) ->
             remove_comparable_security $(event.currentTarget).closest("tr.chart")
 
         element.on 'click', 'a', (event) ->

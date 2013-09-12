@@ -48,6 +48,7 @@ localization =
         xml_download:      "XML"
         choose_date:       "Выбрать дату"
         placeholder:       "Весь период"
+        date_format:       "dd.mm.yy"
         date_format_label: "ДД.ММ.ГГГГ"
     en:
         csv_options_link:  "&or;"
@@ -85,34 +86,16 @@ localization =
         xml_download:      "XML"
         choose_date:       "Choose date"
         placeholder:       "Entire period"
-        date_format_label: "DD.MM.YYYY"
+        date_format:       "mm/dd/yy"
+        date_format_label: "MM/DD/YYYY"
 
 l10n = undefined
-
-mx.utils.datepicker()
-mx.utils.datepicker_locale mx.locale()
-
-check_date = (date) ->
-    if typeof date is "string"
-        date = date.split(".")
-        if date.length is 3
-            day  = date[0] ; month = date[1] ; year = date[2]
-            if day? and month? and year?
-                cy  = (new Date).getFullYear()
-                day = parseInt(day) ; month = parseInt(month) ; year = parseInt(year)
-                day   = if day   < 10   then "0#{day}"   else if day   > 31 then "31"    else "#{day}"
-                month = if month < 10   then "0#{month}" else if month > 12 then "12"    else "#{month}"
-                year  = 2000 + year if year < 100
-                year  = if year  < 2000 then "2000"      else if year  > cy then "#{cy}" else "#{year}"
-                return "#{year}-#{month}-#{day}"
-    undefined
-
 
 render_tempate = (el) ->
     el = $(el) ; return unless el.length > 0
     el.html """
         <div class="datepicker">
-            <input class="datepicker-input" />
+            <input class="datepicker-input" readonly placeholder="#{l10n.placeholder}" />
             <label class="datepicker-label">#{l10n.date_format_label}</label>
         </div>
         <a class="date-period-reset">#{l10n.placeholder}</a>
@@ -161,6 +144,9 @@ widget = (element, options = {}) ->
     element = $(element) ; return unless element.length > 0
     element.addClass("mx-widget-ranks-archive")
 
+    mx.utils.datepicker()
+    mx.utils.datepicker_locale mx.locale()
+
     l10n = localization[mx.locale()]
 
     iss_dp        = l10n.dp_options[0][0]
@@ -192,12 +178,14 @@ widget = (element, options = {}) ->
         onSelect:          (selected) ->
             controls.reset_period_link.addClass("active")
             update_links()
-        dateFormat:        "dd.mm.yy"
+        constrainInput:    true
+        dateFormat:        l10n.date_format
         showOn:            "button"
         buttonImageOnly:   true
         buttonImage:       "<%= asset_path("blank.gif") %>"
         buttonText:        l10n.choose_date
         maxDate:           "-1D"
+        minDate:           null
         beforeShow: (input, inst) ->
             calendar = inst.dpDiv
             calendar.css({marginLeft: input.offsetWidth + 'px'})
@@ -205,27 +193,10 @@ widget = (element, options = {}) ->
     controls.csv_options.hide()
 
     start_events = (ctrls) ->
-        ctrls.datepicker.keyup () ->
-            ctrls.reset_period_link.addClass("active") unless check_date(ctrls.datepicker.val())
-            update_links()
-
-        ctrls.datepicker.focus () ->
-            el    = $(this)
-            value = el.val()
-            el.val("") if value is l10n.placeholder
-
-        ctrls.datepicker.blur () ->
-            el    = $(this)
-            value = el.val()
-            unless check_date(value)
-                el.val(l10n.placeholder)
-                ctrls.reset_period_link.removeClass("active")
-
         ctrls.reset_period_link.click () ->
-            ctrls.datepicker.datepicker("setDate", undefined)
-            ctrls.datepicker.val(l10n.placeholder)
-            update_links()
+            ctrls.datepicker.datepicker("setDate", null)
             $(this).removeClass("active")
+            update_links()
 
         ctrls.csv_options_link.click () ->
             unless $(this).hasClass("disabled")
@@ -250,7 +221,7 @@ widget = (element, options = {}) ->
 
 
     update_links = () ->
-        date   = check_date(controls.datepicker.attr("value"))
+        date   = controls.datepicker.datepicker( "getDate" )
         params = [
             "iss.dp=#{iss_dp}"
             "iss.delimiter=#{iss_dl}"
@@ -258,9 +229,10 @@ widget = (element, options = {}) ->
             "iss.tf=#{iss_tf}"
         ].join("&")
         if date
+            sql_date = $.datepicker.formatDate( 'yy-mm-dd', date )
             controls.csv_options_link.removeClass("disabled")
-            controls.link_to_csv.attr("href", [link_given_date, ".csv", "?date=#{date}&", params, "&#{link_params}"].join("")).html(l10n.csv_download)
-            controls.link_to_xml.attr("href", [link_given_date, ".xml", "?date=#{date}&", link_params].join("")).html(l10n.xml_download)
+            controls.link_to_csv.attr("href", [link_given_date, ".csv", "?date=#{sql_date}&", params, "&#{link_params}"].join("")).html(l10n.csv_download)
+            controls.link_to_xml.attr("href", [link_given_date, ".xml", "?date=#{sql_date}&", link_params].join("")).html(l10n.xml_download)
         else
             controls.csv_options.hide()
             controls.csv_options_link.removeClass("active").addClass("disabled")
