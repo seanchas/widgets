@@ -123,8 +123,6 @@ widget = (element, engine, market, boardid, security, options = {}) ->
         table = $('<table>').addClass('mx-security-rms')
         tbody = $('<tbody>')
 
-        console.log columns['rch']
-
         for row in structure
             tr = $('<tr>')
             switch _.size(row)

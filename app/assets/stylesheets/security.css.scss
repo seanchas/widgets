@@ -122,6 +122,10 @@ table.mx-widget-turnovers {
         padding-left: 25px;
         text-align: right;
     }
+
+    td.nowrap {
+        white-space: nowrap;
+    }
     
     td.trend_up {
         color: #090;
