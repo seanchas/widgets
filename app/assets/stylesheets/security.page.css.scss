@@ -313,6 +313,44 @@ ul.mx-security-chart-periods {
 }
 
 
+.mx-security-rms {
+
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 3em;
+    width: 100%;
+
+    thead {
+        td {
+            font-weight: bold;
+        }
+
+    }
+
+    tbody {
+
+        td,
+        th {
+            border-bottom: 1px solid #eee;
+            color: #666;
+            padding: 7px 5px 7px 0;
+        }
+
+        tr:last-child td,
+        tr:last-child th {
+            border-bottom: none;
+        }
+
+        th {
+            color: #000;
+            font-weight: bold;
+            text-align: left;
+        }
+    }
+
+}
+
+
 .mx-security-boards {
     
     border-collapse: collapse;

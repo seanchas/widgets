@@ -22,7 +22,8 @@ localization =
         deselect: "Deselect all"
 
 
-l10n = localization[mx.locale()]
+l10n = undefined
+
 
 read_cache = (element, key) ->
     element.html cache.get key
@@ -36,6 +37,9 @@ widget = (element, options = {}) ->
 
     element = $(element) ; return unless element.length > 0
     element.addClass("mx-widget-ranks")
+
+    # localize
+    l10n = localization[mx.locale()]
 
     # widget options
     show_threshold      = options.show_threshold? and options.show_threshold != false
@@ -170,7 +174,7 @@ widget = (element, options = {}) ->
 
 
     start_events = () ->
-        $("ul.securities li a", element).live "click", () ->
+        $(element).on "click", "ul.securities li a", () ->
             el    = $(this)
             secid = el.attr("data-secid")
             if _.include(active_securities, secid)
@@ -185,7 +189,7 @@ widget = (element, options = {}) ->
                 refresh()
             cache.set securities_cache_key, active_securities
 
-        $("ul.controls li a.select").live "click", () ->
+        $(element).on "click", "ul.controls li a.select", () ->
             $("ul.securities li").addClass("loading")
             active_securities = "ALL"
             clearTimeout(refresh_timer) if refresh_timer
@@ -193,7 +197,7 @@ widget = (element, options = {}) ->
             refresh()
 
 
-        $("ul.controls li a.deselect").live "click", () ->
+        $(element).on "click", "ul.controls li a.deselect", () ->
             $("ul.securities li a").removeClass("active")
             $("ul.ranks-wrapper li").remove()
             active_securities = []

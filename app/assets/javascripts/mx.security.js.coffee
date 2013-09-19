@@ -8,6 +8,7 @@
 ##= require mx.security.emitter
 ##= require mx.security.description
 ##= require mx.security.boards
+##= require mx.security.rms
 
 
 

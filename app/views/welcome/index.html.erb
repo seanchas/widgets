@@ -37,6 +37,10 @@
 <div id="spot_turnovers">
 </div>
 
+<h2>Акции. Значения уровня ставок рыночного риска</h2>
+<div id="rms_shares">
+</div>
+
 <h2>Рэнкинг маркет-мейкеров</h2>
 
 <h3>Архив рэнкингов</h3>
@@ -408,6 +412,8 @@
                 refresh_timeout: 60 * 1000
               }
             );
+
+            mx.widgets.rms("#rms_shares", "stock", "shares", "extendedparams", { cache: true });
             
         });
     

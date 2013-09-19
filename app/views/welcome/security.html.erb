@@ -9,8 +9,21 @@
 <%- end -%>
 
 <%- content_for :left_column do -%>
-    <h2 data-target="description_container" style="display: none;">Параметры инструмента</h2>
-    <div id="description_container" class="widget">
+    <div id="params_tabs">
+        <ul>
+            <li><a href="#params_tab_1">Параметры инструмента</a></li>
+            <li><a href="#params_tab_2">Параметры RMS</a></li>
+        </ul>
+        <div id="params_tab_1">
+            <h2 data-target="description_container" style="display: none;">Параметры инструмента</h2>
+            <div id="description_container" class="widget">
+            </div>
+        </div>
+        <div id="params_tab_2">
+            <h2>Риск-параметры ценной бумаги</h2>
+            <div id="rms_container" class="widget">
+            </div>
+        </div>
     </div>
 <%- end -%>
 
@@ -54,6 +67,8 @@
     mx.locale('<%= params['locale'] %>');
 
     $(function() {
+
+        $('#params_tabs').tabs({active: 1});
         
         var widgets = {
 
@@ -78,7 +93,6 @@
                     }
                 }
             },
-            
             'description': {
                 container: $('#description_container'),
                 options: {
@@ -87,12 +101,14 @@
                     }
                 }
             },
-            
+            'rms': {
+                container: $('#rms_container'),
+                options: {}
+            },
             'emitter': {
                 container: $('#emitter_container'),
                 options: {}
             },
-            
             'emitter_securities': {
                 container: $('#others_container'),
                 options: {
@@ -101,7 +117,6 @@
                     }
                 }
             },
-            
             'boards': {
                 container: $('#boards_container'),
                 options: {
@@ -112,12 +127,12 @@
             }
 
         }
-        
+
         var markers = {};
-        
+
         function render() {
             var parts = window.location.hash.substr(1).split(":");
-            
+
             $('[data-target]').hide();
             $('#delay').hide();
 
@@ -130,7 +145,7 @@
                         window.location.hash = board.engine + ":" + board.market + ":" + board.boardid + ":" + board.secid;
                     }
                 });
-                
+
                 return;
             }
 
@@ -142,29 +157,29 @@
                     widget.instance = mx.security[key](widget.container, parts[0], parts[1], parts[2], parts[3], widget.options)
                 });
         }
-        
+
         render();
-        
-        
+
+
         function title(element) {
             return $('[data-target=' + element.attr('id') + ']');
         }
-        
+
         function show_title(element) {
             title(element).show();
         }
-        
+
         function hide_title(element) {
             title(element).hide();
         }
-        
+
         function checkMarkers() {
             $('#delay')[_.include(_.values(markers), 'denied') ? 'show' : 'hide']();
         }
-        
-        
+
+
         $(window).on('hashchange', render);
-        
+
 
         $(window).on('render', function(event, memo) {
             element = $(event.target);
@@ -173,7 +188,7 @@
 
             if (memo.iss && memo.iss.headers)
                 markers[element.attr('id')] = memo.iss.headers['X-MicexPassport-Marker']
-                
+
             checkMarkers();
         });
 

@@ -23,6 +23,7 @@
 ##= require mx.widgets.search
 ##= require mx.widgets.otc
 ##= require mx.widgets.fixing
+##= require mx.widgets.rms
 ##= require mx.cs
 
 global = module?.exports ? ( exports ? this )
