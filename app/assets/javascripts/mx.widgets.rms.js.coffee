@@ -11,33 +11,33 @@ cache = kizzy('mx.widgets.rms')
 
 localization =
     ru:
-        n:            '№'
-        'SECID':      'Код цб'
-        'NAME':       'Наименование цб'
-        'ISIN':       'ISIN'
-        discount_min: ['Ставка 1*', 'Ставка 2*', 'Ставка 3*']
-        limit:        ['', 'Лимит 1** (тыс. руб.)', 'Лимит 2** (тыс. руб.)']
+        n:              '№'
+        'SECID':        'Код цб'
+        'NAME':         'Наименование цб'
+        'ISIN':         'ISIN'
+        'DISCOUNT_MIN': ['Ставка 1*', 'Ставка 2*', 'Ставка 3*']
+        'LIMIT':        ['', 'Лимит 1** (тыс. руб.)', 'Лимит 2** (тыс. руб.)']
     en:
-        n:            'N'
-        'SECID':      'SecID'
-        'NAME':       'Security name'
-        'ISIN':       'ISIN'
-        discount_min: ['Discount 1*', 'Discount 2*', 'Discount 3*']
-        limit:        ['', 'Limit 1**', 'Limit 2**']
+        n:              'N'
+        'SECID':        'SecID'
+        'NAME':         'Security name'
+        'ISIN':         'ISIN'
+        'DISCOUNT_MIN': ['Discount 1*', 'Discount 2*', 'Discount 3*']
+        'LIMIT':        ['', 'Limit 1**', 'Limit 2**']
 
 
 
-single_keys       = ['SECID', 'SHORTNAME', 'NAME', 'ISIN', 'tradedate', 'tradetime', 'precisions', 'trends']
+single_keys       = ['SECID', 'SHORTNAME', 'NAME', 'ISIN', 'TRADEDATE', 'TRADETIME', 'precisions', 'trends']
 table_columns     = [
     'n'
     'SECID'
     'NAME'
     'ISIN'
-    ['discount_min', 0]
-    ['limit',        1]
-    ['discount_min', 1]
-    ['limit',        2]
-    ['discount_min', 2]
+    ['DISCOUNT_MIN', 0]
+    ['LIMIT',        1]
+    ['DISCOUNT_MIN', 1]
+    ['LIMIT',        2]
+    ['DISCOUNT_MIN', 2]
 ]
 
 
@@ -63,7 +63,7 @@ collect_records = (engine, market, object) ->
 
 process_records = (records, columns) ->
     records = _.map     records, (record) -> mx.utils.process_record(record, columns)
-    records = _.sortBy  records, (record) -> record['limit']
+    records = _.sortBy  records, (record) -> record['LIMIT']
     records = _.groupBy records, (record) -> record['SECID']
 
     _.each records, (group, sec) ->
@@ -76,7 +76,7 @@ process_records = (records, columns) ->
             return memo
         , {}
 
-    records = _.sortBy records, (record) -> _.max(record?.limit)
+    records = _.sortBy records, (record) -> _.max(record?['LIMIT'])
     records.reverse()
 
 
@@ -88,11 +88,12 @@ process_columns = (columns) ->
     columns
 
 
-widget = (element, engine, market, object, options = {}) ->
+widget = (element, engine, market, options = {}) ->
     element = $(element) ; return unless _.size(element) > 0
 
     element.addClass 'mx-widget-rms'
-    l10n = localization[mx.locale()]
+    l10n   = localization[mx.locale()]
+    object = "extendedparams"
 
     cacheable = !!options.cache
 
@@ -110,7 +111,7 @@ widget = (element, engine, market, object, options = {}) ->
         for column in table_columns
             is_arr     = _.isArray(column)
             [key, pos] = if is_arr then [_.first(column), _.last(column)] else [column, 0]
-            desc       = if is_arr then l10n[key][pos] else l10n[key]
+            desc       = if is_arr then l10n[key]?[pos] else l10n[key]
             td = $('<td>')
                 .addClass(columns[key]?.type || 'number')
                 .addClass('nowrap')
@@ -135,9 +136,8 @@ widget = (element, engine, market, object, options = {}) ->
                     td.addClass('number').html(index + 1)
                 else
                     td.addClass(columns[key]?.type)
-                    value = if is_arr then record[key][pos] else record[key]
-                    console.log record
-                    descriptor = _.extend columns[key], { precision: record.precisions[key]}
+                    value = if is_arr then record[key]?[pos] else record[key]
+                    descriptor = _.extend columns[key] || {}, { precision: record?.precisions?[key]}
                     td.html(mx.utils.render(value, descriptor))
 
                 tr.append td
