@@ -5,6 +5,8 @@ global.mx.security  ||= {}
 
 scope = global.mx.security
 
+cache = kizzy('mx.security.rms')
+
 localization =
     ru:
         p:           'Расчетная цена, руб.'
@@ -23,31 +25,31 @@ localization =
         rtl_l2:      'Нижняя 2-го уровня (PtL_2)'
         rtl_l3:      'Нижняя 3-го уровня (PtL_3)'
 
-
-
 settings =
-    filter:  ['p', 'discount', 'rch', 'rcl', 'rth', 'rtl']
+    filter:  ['SECID', 'TRADEDATE', 'TRADETIME', 'P', 'DISCOUNT', 'RCH', 'RCL', 'RTH', 'RTL']
+    single:  ['SECID', 'TRADEDATE', 'TRADETIME', 'P', 'RCH', 'RCL']
     objects: ['marketrates', 'dynamicrates']
-
 
 structure = [
     # title, value, index
-    [ "p", "p" ]
+    [ "p", "P" ]
     [ "discount" ]
-    [ "discount_l1", "discount", 0]
-    [ "discount_l2", "discount", 1]
-    [ "discount_l3", "discount", 2]
+    [ "discount_l1", "DISCOUNT", 0]
+    [ "discount_l2", "DISCOUNT", 1]
+    [ "discount_l3", "DISCOUNT", 2]
     [ "rcs" ]
-    [ "rch", "rch", 0 ]
-    [ "rcl", "rcl", 0 ]
+    [ "rch", "RCH"]
+    [ "rcl", "RCL"]
     [ "rts" ]
-    [ "rth_l1", "rth", 0 ]
-    [ "rth_l2", "rth", 1 ]
-    [ "rth_l3", "rth", 2 ]
-    [ "rtl_l1", "rtl", 0 ]
-    [ "rtl_l2", "rtl", 1 ]
-    [ "rtl_l3", "rtl", 2 ]
+    [ "rth_l1", "RTH", 0 ]
+    [ "rth_l2", "RTH", 1 ]
+    [ "rth_l3", "RTH", 2 ]
+    [ "rtl_l1", "RTL", 0 ]
+    [ "rtl_l2", "RTL", 1 ]
+    [ "rtl_l3", "RTL", 2 ]
 ]
+
+single_keys = settings.single
 
 
 columns_data_source = (engine, market, objects) ->
@@ -83,23 +85,41 @@ records_data_source = (engine, market, objects, security, options = {}) ->
     deferred.promise()
 
 
-prepare_records = (columns, records, filter) ->
+process_records = (columns, records, filter) ->
+    records    = _.map records, (record) -> _.pick record, filter
+    records    = _.map records, (record) -> mx.utils.process_record(record, columns)
 
-    records = _.reduce columns, (memo, column) ->
-        if _.include filter, column.name
-            _.each records, (record) ->
-                memo[column.name] ||= []
-                memo[column.name].push record[column.name] if record[column.name]?
+    precisions = {}
+    trends     = {}
+
+    records = _.map records, (record) ->
+        precisions = _.extend precisions, record.precisions
+        trends     = _.extend trends,     record.trends
+        _.omit record, 'precisions', 'trends'
+
+    records = _.reduce records, (memo, record) ->
+        _.each record, (value, key) ->
+            if _.include(single_keys, key)
+                memo[key] ||= record[key]
+            else
+                memo[key] ||= []
+                memo[key].push record[key]
         memo
     , {}
 
-    _.each filter, (f) ->
-        records[f] = switch records[f]?.length
-            when 1 then _.first records[f]
-            when 0 then null
-            else records[f]
+    records = _.extend records,
+        precisions: precisions
+        trends:     trends
 
     records
+
+
+process_columns = (columns, filter) ->
+    columns = _.reduce columns, (memo, column) ->
+        memo[column.name] = column if _.include filter, column.name
+        memo
+    , {}
+    columns
 
 
 widget = (element, engine, market, boardid, security, options = {}) ->
@@ -108,7 +128,11 @@ widget = (element, engine, market, boardid, security, options = {}) ->
 
     l10n = localization[mx.locale()]
 
-    options.refresh_timeout ||= 60 * 1000
+    refresh_timeout =   options.refresh_timeout || 60 * 1000
+    cacheable       = !!options.cache
+
+    cache_key = mx.utils.sha1 [engine, market, security, mx.locale()].join('/')
+    element.html(cache.get(cache_key)) if cacheable and cache.get(cache_key)
 
     objects = settings.objects
     filter  = settings.filter
@@ -125,15 +149,21 @@ widget = (element, engine, market, boardid, security, options = {}) ->
 
         for row in structure
             tr = $('<tr>')
-            switch _.size(row)
-                when 1
-                    tr.append $('<th>').attr('colspan', 2).html( l10n[row[0]] || columns[row[0]]?.title || '&mdash;' )
-                when 2
-                    tr.append $('<td>').html( l10n[row[0]] || columns[row[0]]?.short_title || '&mdash;' )
-                    tr.append $('<td>').html( mx.utils.render(records[row[1]], columns[row[1]]) || '&mdash;' )
-                when 3
-                    tr.append $('<td>').html( l10n[row[0]] || columns[row[0]]?.short_title || '&mdash;' )
-                    tr.append $('<td>').html( mx.utils.render(records[row[1]][row[2]], columns[row[1]]) || '&mdash;' )
+            row_size =  _.size(row)
+            if row_size is 1
+                tr.append $('<th>').attr('colspan', 2).html( l10n[row[0]] || columns[row[0]]?.title || '&mdash;' )
+            else
+                descriptor =
+                    precisions: records?.precisions?[row[1]]
+                    trends:     records?.trends?[row[1]]
+
+                descriptor = _.extend columns[row[1]] || {}, descriptor
+
+                title = l10n[row[0]] || columns[row[0]]?.short_title || '&mdash'
+                value = if row_size is 2 then records[row[1]] else records[row[1]]?[row[2]]
+
+                tr.append $('<td>').html( title )
+                tr.append $('<td>').html( mx.utils.render(value, descriptor) )
 
             tbody.append tr
 
@@ -141,16 +171,16 @@ widget = (element, engine, market, boardid, security, options = {}) ->
         element.html(table)
 
     $.when(cds()).then (columns) ->
+        columns = process_columns(columns, filter)
 
         refresh = () ->
             $.when(rds()).then (records) ->
-                records = prepare_records columns, records, filter
+                records = process_records(columns, records, filter)
                 render columns, records
-                timeout = setInterval refresh, options.refresh_timeout
+                cache.set(cache_key, element.html()) if cacheable
+                timeout = setTimeout refresh, refresh_timeout
 
         refresh()
-
-
 
 
     destroy = (options = {}) ->

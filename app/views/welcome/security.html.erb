@@ -20,7 +20,7 @@
             </div>
         </div>
         <div id="params_tab_2">
-            <h2>Риск-параметры ценной бумаги</h2>
+            <h2 data-target="description_container" style="display: none;">Риск-параметры ценной бумаги</h2>
             <div id="rms_container" class="widget">
             </div>
         </div>
@@ -103,7 +103,9 @@
             },
             'rms': {
                 container: $('#rms_container'),
-                options: {}
+                options: {
+                    refresh_timeout: 5 * 1000
+                }
             },
             'emitter': {
                 container: $('#emitter_container'),
