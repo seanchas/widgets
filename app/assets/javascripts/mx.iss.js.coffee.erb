@@ -26,6 +26,29 @@ request_meta =
             , {}
         key: ->
             []
+
+    aggregates:
+        url: ->
+            "#{iss_host}/statistics/engines/stock/markets/bonds/aggregates.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'aggregates'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.aggregates)
+        key: ->
+            []
+
+    aggregates_columns:
+        url: ->
+            "#{iss_host}/statistics/engines/stock/markets/bonds/aggregates/columns.jsonp?callback=?"
+        data: ->
+            'iss.meta': 'off'
+            'iss.only': 'aggregates.columns'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?['aggregates.columns'])
+        key: ->
+            []
+
     
     filters:
         url: (engine, market) ->
@@ -636,6 +659,8 @@ candle_borders = (engine, market, board, param) ->
 _.extend scope,
     iss_host:                 iss_host
     defaults:                 (args...) -> request('defaults', args...)
+    aggregates:               (args...) -> request('aggregates', args...)
+    aggregates_columns:       (args...) -> request('aggregates_columns', args...)
     columns:                  (args...) -> request('columns', args...)
     history_columns:          (args...) -> request('history_columns',    args...)
     history_security:         (args...) -> request('history_security',   args...)

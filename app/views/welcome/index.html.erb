@@ -41,6 +41,10 @@
 <div id="rms_shares">
 </div>
 
+<h2>Агрегированные показатели рынка облигаций</h2>
+<h4 id="aggregates_tradedate"></h4>
+<div id="aggregates"></div>
+
 <h2>Рэнкинг маркет-мейкеров</h2>
 
 <h3>Архив рэнкингов</h3>
@@ -414,6 +418,17 @@
             );
 
             mx.widgets.rms("#rms_shares", "stock", "shares", { cache: false });
+
+            mx.widgets.aggregates("#aggregates", {
+                cache:           false,
+                afterRenderDate: function(tradedate) {
+                    year  = tradedate.getFullYear()
+                    month = tradedate.getMonth() + 1
+                    day   = tradedate.getDate()
+                    date  = "" + (day < 10 ? "0" + day : day) + "." + (month < 10 ? "0" + month : month) + "." + year
+                    $('#aggregates_tradedate').html("Текущее значение на " + date)
+                }
+            });
             
         });
     
