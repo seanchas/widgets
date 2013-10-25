@@ -6,7 +6,8 @@ global.mx.security  ||= {}
 scope = global.mx.security
 
 custom_filters =
-    'stock:shares:FXRB': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ISSUECAPITALIZATION', 'ETFSETTLEPRICE']
+    'stock:shares:FXRB': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ETFSETTLEPRICE', 'ISSUECAPITALIZATION', 'ETFSETTLECURRENCY']
+    'stock:shares:FXGD': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ETFSETTLEPRICE', 'ISSUECAPITALIZATION', 'ETFSETTLECURRENCY']
 
 $ = jQuery
 
