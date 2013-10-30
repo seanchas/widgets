@@ -6,8 +6,8 @@ global.mx.security  ||= {}
 scope = global.mx.security
 
 custom_filters =
-    'stock:shares:FXRB': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ETFSETTLEPRICE', 'ISSUECAPITALIZATION', 'ETFSETTLECURRENCY']
-    'stock:shares:FXGD': ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ETFSETTLEPRICE', 'ISSUECAPITALIZATION', 'ETFSETTLECURRENCY']
+#   SECTYPE: [ columns... ]
+    'E'    : ['OFFER', 'BID', 'HIGH', 'LOW', 'NUMTRADES', 'VOLTODAY', 'ETFSETTLEPRICE', 'ISSUECAPITALIZATION', 'ETFSETTLECURRENCY']
 
 $ = jQuery
 
@@ -134,13 +134,13 @@ widget = (element, engine, market, board, param, options = {}) ->
                 column = _.first(columns[filter.id] for filter in filters['widget'] when filter.alias == 'CHANGE')
                 container.append make_change_cell(record[column.name], record['CURRENCYID'], column, record.trends[column.name]) if column
 
-            security = [engine, market, param].join(':')
             filter   = undefined
-            if _.contains _.keys(custom_filters), security
-                columns_names = _.intersection(custom_filters[security], _.pluck(columns, 'name'))
+
+            if custom_filters[record['SECTYPE']]
+                columns_names = _.intersection(custom_filters[record['SECTYPE']], _.pluck(columns, 'name'))
                 filter        = _.map columns_names, (name) -> _.find(columns, (column) -> column.name is name)
             else
-                filter  = filters['digest']
+                filter = filters['digest']
 
             count   = 2
             if filter
