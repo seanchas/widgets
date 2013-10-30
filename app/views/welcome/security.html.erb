@@ -68,7 +68,7 @@
 
     $(function() {
 
-        $('#params_tabs').tabs({active: 1});
+        $('#params_tabs').tabs({active: 0});
         
         var widgets = {
 
@@ -98,7 +98,8 @@
                 options: {
                     url: function(engine, market, board, security) {
                         return "#" + security;
-                    }
+                    },
+                    extended: false
                 }
             },
             'rms': {

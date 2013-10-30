@@ -88,6 +88,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     return unless element.length > 0
 
     options.only_actual ||= true
+    is_extended           = !!options.extended
 
     cds = mx.iss.columns(engine, market, { only: 'securities' })
     fds = mx.iss.filters(engine, market)
@@ -103,7 +104,8 @@ widget = (element, engine, market, board, param, options = {}) ->
             security = _.first(security)
         
             if security or description
-                render element, description, security, columns, (filters['description'] || filters['full']), indices, index_securities, options
+                current_filter = if is_extended then filters['full'] else (filters['description'] || filters['full'])
+                render element, description, security, columns, current_filter, indices, index_securities, options
                 element.trigger('render', { status: 'success' })
             else
                 element.trigger('render', { status: 'failure' })
