@@ -90,9 +90,12 @@ widget = (element, engine, market, board, param, options = {}) ->
     options.only_actual ||= true
     is_extended           = !!options.extended
 
-    cds = mx.iss.columns(engine, market, { only: 'securities' })
+    only = ['securities', 'marketdata']
+    only = if is_extended then only.join(',') else _.first(only)
+
+    cds = mx.iss.columns(engine, market, { only: only })
     fds = mx.iss.filters(engine, market)
-    sds = mx.iss.security(engine, market, board, param, { only: 'securities' })
+    sds = mx.iss.security(engine, market, board, param, { only: only })
     dds = mx.iss.description(param)
     ids = mx.iss.security_indices(param, options)
     isds = if engine == 'stock' and market == 'index' then mx.iss.index_securities(engine, market, param) else []
