@@ -417,7 +417,7 @@ request_meta =
             known_keys = ['from', 'till', 'start', 'with_description']
             data =
                 'iss.meta': 'off'
-                'iss.only': ['object', 'object.cursor']
+                'iss.only': ['object', 'object.cursor'].join(',')
 
             options = _.reduce options, (memo, value, key) ->
                 memo[key] = value if _.include known_keys, key

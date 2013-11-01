@@ -17,6 +17,7 @@ localization =
         'ISIN':         'ISIN'
         'DISCOUNT_MIN': ['Ставка 1*', 'Ставка 2*', 'Ставка 3*']
         'LIMIT':        ['', 'Лимит 1** (тыс. руб.)', 'Лимит 2** (тыс. руб.)']
+        'REGISTRY_CLOSE_DATE': 'Дата закрытия реестра'
     en:
         n:              'N'
         'SECID':        'SecID'
@@ -24,10 +25,11 @@ localization =
         'ISIN':         'ISIN'
         'DISCOUNT_MIN': ['Discount 1*', 'Discount 2*', 'Discount 3*']
         'LIMIT':        ['', 'Limit 1**', 'Limit 2**']
+        'REGISTRY_CLOSE_DATE': 'Registry close date'
 
 
 
-single_keys       = ['SECID', 'SHORTNAME', 'NAME', 'ISIN', 'TRADEDATE', 'TRADETIME', 'precisions', 'trends']
+single_keys       = ['SECID', 'SHORTNAME', 'NAME', 'ISIN', 'TRADEDATE', 'TRADETIME', 'precisions', 'trends', 'REGISTRY_CLOSE_DATE']
 table_columns     = [
     'n'
     'SECID'
@@ -38,6 +40,7 @@ table_columns     = [
     ['DISCOUNT_MIN', 1]
     ['LIMIT',        2]
     ['DISCOUNT_MIN', 2]
+    'REGISTRY_CLOSE_DATE'
 ]
 
 
