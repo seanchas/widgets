@@ -410,7 +410,10 @@
             mx.widgets.ranks_archive("#mmakers_archive");
 
             mx.widgets.fixing("#fixing"
-            , [ { 'currency:selt:cets:USD000UTSTOM': { 'MARKETPRICETODAY': 'USDFIX', 'MARKETPRICE2': 'USDFIXME' } } ]
+            , [ { 'currency:selt:cets:USD000UTSTOM': { 'MARKETPRICETODAY': 'USDFIX',    'MARKETPRICE2': 'USDFIXME'    } },
+                { 'currency:selt:cets:EUR_RUB__TOM': { 'MARKETPRICETODAY': 'EURFIX',    'MARKETPRICE2': 'EURFIXME'    } },
+                { 'currency:selt:cets:EURUSD000TOM': { 'MARKETPRICETODAY': 'EURUSDFIX', 'MARKETPRICE2': 'EURUSDFIXME' } },
+                { 'currency:selt:cets:CNYRUB_TOM':   { 'MARKETPRICETODAY': 'CNYFIX',    'MARKETPRICE2': 'CNYFIXME'    } } ]
             , {
                 cache: true,
                 refresh_timeout: 60 * 1000
