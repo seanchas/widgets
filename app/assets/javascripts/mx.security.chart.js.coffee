@@ -52,7 +52,7 @@ cs2hs =
     candles:    'candlestick'
 
 
-chart_options = ->
+chart_options = (locale) ->
     
     chart:
         alignTicks: false
@@ -63,7 +63,7 @@ chart_options = ->
         marginLeft: 1
     
     lang:
-        loading: 'Загрузка...'
+        loading: { ru: 'Загрузка...', en: 'Loading...' }[locale]
     
     global:
         useUTC: false
@@ -117,14 +117,14 @@ chart_options = ->
             yAxis: 0
             data: [],
             type: 'line'
-            name: 'Цена'
+            name: { ru: 'Цена', en: 'Price' }[locale]
             tooltip:
                 yDecimals: 2
         }, {
             yAxis: 1
             data: []
             type: 'column'
-            name: 'Объем'
+            name: { ru: 'Объем', en: 'Value' }[locale]
             tooltip:
                 yDecimals: 0
         }
@@ -192,7 +192,7 @@ widget = (element, engine, market, board, param, options = {}) ->
 
 
     make_chart = ->
-        co = chart_options()
+        co = chart_options(mx.locale())
         co.chart.renderTo = $(".mx-security-chart-container", element)[0]
         new Highcharts.StockChart(co);
     
