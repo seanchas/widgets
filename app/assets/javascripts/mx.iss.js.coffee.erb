@@ -90,7 +90,7 @@ request_meta =
             else
                 "#{iss_host}/engines/#{engine}/markets/#{market}/securities.jsonp?callback=?"
         data: (engine, market, params, options = {}) ->
-            known_keys = ['nearest', 'leaders', 'sort_order', 'sort_column', 'first']
+            known_keys = ['nearest', 'leaders', 'sort_order', 'sort_column', 'first', 'previous_session']
 
             params_name = options.params_name || 'securities'
 

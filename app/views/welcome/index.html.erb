@@ -119,9 +119,14 @@
     
     <h3>Срочный рынок</h3>
     
-    <h4>Фондовая секция</h4>
-    
-    <div id="futures_1">
+    <h4>Фондовая секция (текущая сессия)</h4>
+
+    <div id="futures_1_curr">
+    </div>
+
+    <h4>Фондовая секция (предыдущая сессия)</h4>
+
+    <div id="futures_1_prev">
     </div>
 
     <h4>Товарная секция</h4>
@@ -285,13 +290,26 @@
                 refresh_timeout: 5 * 1000
             });
 
-            mx.widgets.table('#futures_1', 'futures', 'forts', [
+            mx.widgets.table('#futures_1_curr', 'futures', 'forts', [
                 'RFUD:RI',
                 'RFUD:MX',
                 'RFUD:VX',
                 'RFUD:SR',
                 'RFUD:GZ'
             ], {
+                sortBy: sortBy_SECTYPE,
+                params_name: 'sectypes',
+                nearest: 1
+            });
+
+            mx.widgets.table('#futures_1_prev', 'futures', 'forts', [
+                'RFUD:RI',
+                'RFUD:MX',
+                'RFUD:VX',
+                'RFUD:SR',
+                'RFUD:GZ'
+            ], {
+                previous_session: 1,
                 sortBy: sortBy_SECTYPE,
                 params_name: 'sectypes',
                 nearest: 1
