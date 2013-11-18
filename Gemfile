@@ -25,6 +25,6 @@ end
 
 group :production do
   gem 'mysql'
-  gem 'therubyracer', '= 0.9.8'
+  gem 'therubyracer'
   gem 'memcache-client'
 end
