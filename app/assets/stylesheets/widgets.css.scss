@@ -816,3 +816,13 @@
         }
     }
 }
+
+.mx-widget-rms {
+    .table-container {
+        &.loading {
+            color: #eee;
+            height: 50px;
+            background: image-url("facebook-ajax-loader.gif") no-repeat left center;
+        }
+    }
+}

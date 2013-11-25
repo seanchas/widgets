@@ -44,11 +44,11 @@ table_columns     = [
 ]
 
 
-collect_records = (engine, market, object) ->
+collect_records = (engine, market, object, group) ->
     deferred    = new $.Deferred()
     records     = []
     get_records = (index) ->
-        $.when(mx.iss.rms_securities engine, market, object, {from: 'today', with_description: 1, start: index }).then (data) ->
+        $.when(mx.iss.rms_securities engine, market, object, { security_groups: group, from: 'today', with_description: 1, start: index }).then (data) ->
             unless _.size(data) > 0
                 deferred.resolve(records)
                 return
@@ -91,20 +91,48 @@ process_columns = (columns) ->
     columns
 
 
-widget = (element, engine, market, options = {}) ->
+widget = (element, options = {}) ->
     element = $(element) ; return unless _.size(element) > 0
 
     element.addClass 'mx-widget-rms'
     l10n   = localization[mx.locale()]
+
+    engine = 'stock'
+    market = 'shares'
     object = "extendedparams"
 
-    cacheable = !!options.cache
+    security_group    =   options.security_group || "stock_shares"
+    is_select_visible =  !options.hide_select
+    cacheable         = !!options.cache
 
-    cache_key = mx.utils.sha1([engine, market, object, mx.locale()].join('/'))
+    cache_key = mx.utils.sha1([object, security_group, is_select_visible, mx.locale()].join('/'))
 
     element.html(cache.get(cache_key)) if cacheable and cache.get(cache_key)
 
-    render = (records, columns) ->
+    select_container = $('<div>').addClass('select-container') if is_select_visible
+    table_container  = $('<div>').addClass('table-container')
+
+    element.append select_container if is_select_visible
+    element.append table_container
+
+
+    render_select = (groups) ->
+        return unless is_select_visible
+
+        select = $('<select>').addClass('security-groups-select')
+        _.each groups, (group) ->
+            option = $('<option>').val(group.name).html(group.title)
+            select.append option
+
+        select.val security_group
+        select.on 'change', (event) ->
+            render_table_by_group $(event.currentTarget).val()
+
+        select_container.empty()
+        select_container.append(select)
+
+
+    render_table = (records, columns) ->
         table = $('<table>').addClass('mx-widget-table')
         thead = $('<thead>')
         tbody = $('<tbody>')
@@ -151,18 +179,28 @@ widget = (element, engine, market, options = {}) ->
         table.append thead
         table.append tbody
 
-        element.empty()
-        element.append(table)
+        table_container.empty()
+        table_container.append(table)
 
 
-    $.when(mx.iss.rms_columns(engine, market, object)).then (columns) ->
+    render_table_by_group = (group) ->
+        table_container.empty()
+        table_container.addClass('loading')
+        $.when(mx.iss.rms_columns(engine, market, object)).then (columns) ->
 
-        $.when(collect_records(engine, market, object)).then (records) ->
-            records = process_records(records, columns)
-            columns = process_columns(columns)
+            $.when(collect_records(engine, market, object, group)).then (records) ->
+                records = process_records(records, columns)
+                columns = process_columns(columns)
 
-            render(records, columns)
-            cache.set(cache_key, element.html()) if cacheable
+                render_table(records, columns)
+
+                cache.set(cache_key, element.html()) if cacheable
+                table_container.removeClass('loading')
+
+
+    $.when(mx.iss.security_groups(engine)).then (groups) ->
+        render_select(groups)
+        render_table_by_group(security_group)
 
 
     destroy = (options = {}) ->

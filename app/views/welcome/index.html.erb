@@ -438,7 +438,11 @@
               }
             );
 
-            mx.widgets.rms("#rms_shares", "stock", "shares", { cache: false });
+            mx.widgets.rms("#rms_shares", {
+                security_group: 'stock_shares',
+                hide_select: false,
+                cache: false
+            });
 
             mx.widgets.aggregates("#aggregates", {
                 cache:           false,

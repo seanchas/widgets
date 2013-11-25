@@ -115,6 +115,18 @@ request_meta =
         key: (engine, market, params, options = {}) ->
             [engine, market, params, options]
 
+    security_groups:
+        url: ->
+            "http://www.beta.micex.ru/iss/securitygroups.jsonp?callback=?"
+        data: (engine) ->
+            'trade_engine': engine
+            'iss.meta':    'off'
+            'iss.only':    'securitygroups'
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.securitygroups)
+        key: (engine) ->
+            [engine]
+
     history_securities:
         url: (engine, market, options = {}) ->
             "#{iss_host}/history/engines/#{engine}/markets/#{market}/#{if options.boardid? then "boards/#{options.boardid}/" else ""}securities.jsonp?callback=?"
@@ -412,9 +424,9 @@ request_meta =
 
     rms_securities:
         url: (engine, market, object, options = {}) ->
-            "#{iss_host}/rms/engines/#{engine}/markets/#{market}/objects/#{object}/securities.jsonp?callback=?"
+            "#{iss_host}/rms/engines/#{engine}/markets/#{market}/objects/#{object}.jsonp?callback=?"
         data: (engine, market, object, options = {}) ->
-            known_keys = ['from', 'till', 'start', 'with_description']
+            known_keys = ['from', 'till', 'start', 'with_description', 'security_groups']
             data =
                 'iss.meta': 'off'
                 'iss.only': ['object', 'object.cursor'].join(',')
@@ -667,6 +679,7 @@ _.extend scope,
     history_securities:       (args...) -> request('history_securities', args...)
     records:                  (args...) -> request('securities', args...)
     security:                 (args...) -> request('security', args...)
+    security_groups:          (args...) -> request('security_groups', args...)
     search:                   (args...) -> request('search', args...)
     security_indices:         (args...) -> request('security_indices', args...)
     index_securities:         (args...) -> request('index_securities', args...)
