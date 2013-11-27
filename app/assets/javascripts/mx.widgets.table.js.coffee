@@ -117,8 +117,9 @@ widget = (element, engine, market, params, options = {}) ->
     chart_width  = 0
     chart_height = 0
 
+    options.previous_session ?= undefined
     options.chart_option = options.chart_options || {}
-    options.previous_session ?= 0
+    options.chart_option.previous_session = options.previous_session
 
 
     add_spinner    = (wrapper) ->
