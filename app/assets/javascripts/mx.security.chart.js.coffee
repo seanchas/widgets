@@ -194,6 +194,7 @@ widget = (element, engine, market, board, param, options = {}) ->
     make_chart = ->
         co = chart_options(mx.locale())
         co.chart.renderTo = $(".mx-security-chart-container", element)[0]
+        co.chart.events   = options.events ? {}
         new Highcharts.StockChart(co);
     
 
