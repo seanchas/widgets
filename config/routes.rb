@@ -60,6 +60,7 @@ Widgets::Application.routes.draw do
     get 'widget'         => 'welcome#widget'
     get 'examples'       => 'welcome#examples'
     get 'otc'            => 'welcome#otc'
+    get 'rms'            => 'welcome#rms'
     get 'search'         => 'welcome#search'
 
     scope "security" do

@@ -24,6 +24,7 @@
 ##= require mx.widgets.otc
 ##= require mx.widgets.fixing
 ##= require mx.widgets.rms
+##= require mx.widgets.rms2
 ##= require mx.widgets.aggregates
 ##= require mx.cs
 

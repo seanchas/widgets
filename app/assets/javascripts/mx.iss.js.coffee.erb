@@ -283,6 +283,32 @@ request_meta =
         key: (param, options) ->
             [param, options]
 
+    security_types:
+        url: ->
+            "#{iss_host}/index.jsonp?callback=?"
+        data: (engine, options = {}) ->
+            'iss.meta': 'off'
+            'iss.only': 'securitytypes'
+            'security_types_only': (if !!options.sectypes_only then '1' else '0')
+            'engine': engine
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.securitytypes)
+        key: (engine, options = {}) ->
+            [engine, options]
+
+    trade_modes:
+        url: ->
+            "#{iss_host}/index.jsonp?callback=?"
+        data: (engine, options = {}) ->
+            'iss.meta': 'off'
+            'iss.only': 'boardgroups'
+            'is_traded': (if !!options.actual then '1' else '0')
+            'engine': engine
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.boardgroups)
+        key: (engine, options = {}) ->
+            [engine, options]
+
     index_securities:
         url: (engine, market, param) ->
             "#{iss_host}/statistics/engines/#{engine}/markets/#{market}/analytics/#{param}/indices.jsonp?callback=?"
@@ -292,6 +318,17 @@ request_meta =
             'iss.only': 'analytics'
         parse: (json) ->
             iss_merge_columns_and_data(json?.analytics)
+        key: (param) ->
+            [param]
+
+    index_groups:
+        url: ->
+            "#{iss_host}/statistics/engines/stock/markets/index/analytics.jsonp?callback=?"
+        data: (param) ->
+            'iss.meta': 'off'
+            'security_collection': param
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.indices)
         key: (param) ->
             [param]
     
@@ -459,6 +496,33 @@ request_meta =
 
         key: (engine, market, object) ->
             [engine, market, object]
+
+
+    rms_stock:
+        url: ->
+            "#{iss_host}/rms/engines/stock/markets/stock/objects/marketrates.jsonp?callback=?"
+        data: (params) ->
+            known_keys = ['sort_column', 'sort_order', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q', 'start', 'limit']
+            data =
+                'iss.meta': 'off'
+                'iss.only': 'object,object.cursor'
+
+            options = _.reduce params, (memo, value, key) ->
+                memo[key] = value if _.include known_keys, key
+                return memo
+            , {}
+
+            _.extend data, options
+            data
+
+        parse: (json) ->
+            {
+                records: iss_merge_columns_and_data(json?.object)
+                cursor:  _.first(iss_merge_columns_and_data(json?['object.cursor']))
+            }
+
+        key: (params) ->
+            [params]
 
     
     money_market_turnovers:
@@ -680,9 +744,12 @@ _.extend scope,
     records:                  (args...) -> request('securities', args...)
     security:                 (args...) -> request('security', args...)
     security_groups:          (args...) -> request('security_groups', args...)
+    security_types:           (args...) -> request('security_types', args...)
+    trade_modes:              (args...) -> request('trade_modes', args...)
     search:                   (args...) -> request('search', args...)
     security_indices:         (args...) -> request('security_indices', args...)
     index_securities:         (args...) -> request('index_securities', args...)
+    index_groups:             (args...) -> request('index_groups', args...)
     orderbook:                (args...) -> request('orderbook', args...)
     description:              (args...) -> request('description', args...)
     boards:                   (args...) -> request('boards', args...)
@@ -706,6 +773,7 @@ _.extend scope,
     rms_security:             (args...) -> request('rms_security',   args...)
     rms_securities:           (args...) -> request('rms_securities', args...)
     rms_columns:              (args...) -> request('rms_columns',    args...)
+    rms_stock:                (args...) -> request('rms_stock',      args...)
     money_market_turnovers:   (args...) -> request('money_market_turnovers', args...)
     mmakers_ranks:            (args...) -> request('mmakers_ranks', args...)
     mmakers_ranks_columns:    (args...) -> request('mmakers_ranks_columns', args...)
