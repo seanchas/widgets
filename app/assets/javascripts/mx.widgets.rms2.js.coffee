@@ -135,7 +135,7 @@ filters_defaults =
     sort_column:    'SECID'
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
-    board_groups:   ['stock_bonds_tplus', 'stock_ndm_tplus']
+    board_groups:   ['stock_shares_tplus', 'stock_ndm_tplus']
     collateral:     1
     listname:       ['А1','А2','Б','В','И','_']
     index:          null
@@ -158,6 +158,11 @@ save_filter_settings = (name, params) ->
 
 
 load_filter_settings = (name) -> filters_settings[name] || filters_defaults[name] || null
+
+
+make_url = (row) ->
+    key = row.data('key')
+    records_urls[key] ?= if options.url and _.isFunction(options.url) then options.url(key.split(":")...) else "##{key}"
 
 
 overlay_select = (element) ->
@@ -317,7 +322,7 @@ widget = (dummy, options = {}) ->
     l10n = localization[mx.locale()]
     filters_settings = filters_defaults
 
-    known_keys = ['rows_per_page', 'filters', 'selected']
+    known_keys = ['rows_per_page', 'filters', 'selected', 'url']
 
     default_options =
         rows_per_page:   50
@@ -415,7 +420,31 @@ widget = (dummy, options = {}) ->
             _.each columns_order, (key, index) ->
                 td = $('<td>')
                 td.addClass columns_descriptors[key].type
-                td.html mx.utils.render(record[key], columns_descriptors[key])
+                td.addClass key.toLowerCase()
+                rendered_string = mx.utils.render(record[key], columns_descriptors[key])
+
+                td.html(rendered_string) unless key is 'SECID'
+                if key is 'SECID'
+                    a = $('<a>').attr('href', '#').data('secid', rendered_string)
+                    a.html(rendered_string)
+
+                    # add event listner
+                    $(a).on 'click', ->
+                        element = $(@)
+                        unless !!element.data('key')
+                            event.preventDefault()
+                            event.stopPropagation()
+
+                            deferred = mx.iss.security_index(element.data('secid'))
+                            $.when(deferred).then (data) ->
+                                datum = _.find data, (datum) -> datum.is_traded is 1
+                                href  = options.url(datum.engine, datum.market, datum.boardid, datum.secid) if _.isFunction(options.url)
+                                ekey  = [datum.engine, datum.market, datum.boardid, datum.secid].join(':')
+                                element.attr('href', href || "##{ekey}")
+                                element.data('key',  ekey)
+                                a[0].click()
+
+                    td.append(a)
                 tr.append(td)
             tbody.append tr
 

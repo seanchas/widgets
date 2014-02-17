@@ -5,7 +5,11 @@
 <script type="text/javascript">
 
     $(function(){
-        mx.widgets.rms2('#rms');
+        mx.widgets.rms2('#rms', {
+            url: function(engine, market, boardid, secid) {
+                return "#" + [engine, market, boardid, secid].join(':')
+            }
+        });
     });
 
 </script>
