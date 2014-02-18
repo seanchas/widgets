@@ -9,7 +9,7 @@
     $(function(){
         mx.widgets.rms2('#rms', {
             url: function(engine, market, boardid, secid) {
-                return "#" + [engine, market, boardid, secid].join(':') }
+                return "/widgets/security#" + [engine, market, boardid, secid].join(':') }
 //            , selected: {
 //                board_groups: ['stock_shares_tplus', 'stock_ndm_tplus'],
 //                listname:     ['I'] }
