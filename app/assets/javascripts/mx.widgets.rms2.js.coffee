@@ -45,6 +45,39 @@ localization =
             'LIMIT2':              'Лимит концентрации 2, шт. (L2)'
             'DISCOUNT3':           'Ставка рыночного риска 3 (S3)'
             'REGISTRY_CLOSE_DATE': 'Дата закрытия реестра'
+    en:
+        title: 'Securities risk parameters'
+        filters:
+            title: 'Filter parameters'
+            unselected: 'Not selected'
+            security_types:
+                title: 'Security type'
+            board_groups:
+                title: 'Trade mode'
+            collateral:
+                title: 'Collateral'
+            listname:
+                title: 'Listing level'
+            index:
+                title: 'Indices'
+            q:
+                title: 'Search'
+                placeholder: 'Search'
+                warn: '* required minimum 3 characters'
+        buttons:
+            apply_title: 'Apply'
+        no_results: 'No results found.'
+        columns:
+            'n':                   'No.'
+            'SECID':               'Security code'
+            'NAME':                'Security name'
+            'ISIN':                'ISIN'
+            'DISCOUNT1':           'Risk rates level 1 (S1)'
+            'LIMIT1':              'Concentration limit 1, unt. (L1)'
+            'DISCOUNT2':           'Risk rates level 2 (S2)'
+            'LIMIT2':              'Concentration limit 2, unt. (L2)'
+            'DISCOUNT3':           'Risk rates level 3 (S3)'
+            'REGISTRY_CLOSE_DATE': 'Divident date'
 
 
 columns_order       = ['SECID', 'NAME', 'ISIN', 'DISCOUNT1', 'LIMIT1', 'DISCOUNT2', 'LIMIT2', 'DISCOUNT3', 'REGISTRY_CLOSE_DATE']
@@ -127,7 +160,7 @@ filters =
             value: '_'
             title:
                 ru: 'Внесписочные'
-                en: 'Unlisted'
+                en: 'Non-Listed'
         }   ]
 
 
@@ -199,7 +232,7 @@ render_select_filter = (container, name, objects, selected_objects, options = {}
     selected_objects = [selected_objects] unless _.isArray(selected_objects)
 
 
-    title_el  = $('<h3>').addClass('rms-filter-title').html(l10n.filters[name]?.title)
+    title_el  = $('<h3>').addClass('rms-filter-title').html(l10n?.filters[name]?.title)
     select_el = if !!options.multiple then $('<select multiple>') else $('<select>')
 
     for obj in objects
@@ -226,9 +259,9 @@ render_search_filter = (container) ->
     container = $(container) ; return unless _.size(container) > 0
     container.addClass('rms-filter search')
 
-    title = $('<h3>').addClass('rms-filter-title').html(l10n.filters.q.title)
-    input = $("<input>").attr({ placeholder: l10n.filters.q.placeholder })
-    warn  = $("<p>").addClass('warning').html(l10n.filters.q.warn).hide()
+    title = $('<h3>').addClass('rms-filter-title').html(l10n?.filters?.q?.title)
+    input = $("<input>").attr({ placeholder: l10n?.filters?.q?.placeholder })
+    warn  = $("<p>").addClass('warning').html(l10n?.filters?.q?.warn).hide()
 
     input.on 'input', ->
         value = $(@).val()
@@ -246,7 +279,7 @@ render_applybtn_filter = (container) ->
     container = $(container) ; return unless _.size(container) > 0
     container.addClass('rms-filter button')
 
-    btn = $('<a>').addClass('apply-filters-btn').text(l10n.buttons.apply_title).on('click', -> render_data() )
+    btn = $('<a>').addClass('apply-filters-btn').text(l10n?.buttons?.apply_title).on('click', -> render_data() )
     container.append(btn)
 
     return container
@@ -257,7 +290,7 @@ render_filters = ( container, options = {} ) ->
     container = $(container) ; return unless _.size(container) > 0
     container.addClass('rms-filters-container')
 
-    title = $('<h3>').addClass('rms-filters-title').html(l10n.filters.title)
+    title = $('<h3>').addClass('rms-filters-title').html(l10n?.filters?.title)
     container.prepend(title)
 
     filter_security_types_container = $('<div>')
@@ -341,14 +374,14 @@ widget = (dummy, options = {}) ->
 
     prerender = do () ->
 
-        title = $('<h2>').addClass('rms-title').html(l10n.title)
+        title = $('<h2>').addClass('rms-title').html(l10n?.title)
 
         el.filters_container = $('<div>')
         el.data_container    = $('<div>').addClass('rms-data-container')
         el.data_table        = $('<table>').addClass('mx-widget-table')
         el.data_table_thead  = $('<thead>')
         el.data_table_tbody  = $('<tbody>')
-        el.data_no_results   = $('<div>').addClass('rms-no-results').html(l10n.no_results)
+        el.data_no_results   = $('<div>').addClass('rms-no-results').html(l10n?.no_results).hide()
         el.paginator         = $('<div>').addClass('rms-data-paginator')
         el.paginator_dup     = el.paginator.clone()
 
@@ -368,10 +401,10 @@ widget = (dummy, options = {}) ->
             el.data_table_thead.empty()
 
             tr = $('<tr>').addClass('row')
-            tr.append $('<td>').addClass('number').html(l10n.columns.n)
+            tr.append $('<td>').addClass('number').html(l10n?.columns?.n)
             _.each columns_order, (column) ->
                 td = $('<td>')
-                    .html(l10n.columns[column])
+                    .html(l10n?.columns?[column])
                     .addClass('sortable')
                     .addClass(columns_descriptors[column].type)
                     .attr('data-column', column)
@@ -421,7 +454,9 @@ widget = (dummy, options = {}) ->
                 td = $('<td>')
                 td.addClass columns_descriptors[key].type
                 td.addClass key.toLowerCase()
-                rendered_string = mx.utils.render(record[key], columns_descriptors[key])
+
+                record[key] = mx.utils.parse_date(record[key]) if columns_descriptors[key].type is 'date'
+                rendered_string = mx.utils.render(record[key], columns_descriptors[key]) || "&mdash;"
 
                 td.html(rendered_string) unless key is 'SECID'
                 if key is 'SECID'
@@ -429,11 +464,11 @@ widget = (dummy, options = {}) ->
                     a.html(rendered_string)
 
                     # add event listner
-                    $(a).on 'click', ->
+                    $(a).on 'click', (e) ->
                         element = $(@)
                         unless !!element.data('key')
-                            event.preventDefault()
-                            event.stopPropagation()
+                            e.preventDefault()
+                            e.stopPropagation()
 
                             deferred = mx.iss.security_index(element.data('secid'))
                             $.when(deferred).then (data) ->
@@ -484,7 +519,7 @@ widget = (dummy, options = {}) ->
         listname        = _.map options.filters.listname,  (name) -> { value: name.value, title: name.title[mx.locale()] }
 
         index           = _.map index, (i) -> { value: i.indexid.replace('&', '__AND__'), title: "#{i.indexid} (#{i.shortname})" }
-        index.unshift( { value: '__UNSELECTED__', title: l10n.filters.unselected })
+        index.unshift( { value: '__UNSELECTED__', title: l10n?.filters?.unselected || '--' })
 
         render_filters  el.filters_container,
             objects:

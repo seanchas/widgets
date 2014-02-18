@@ -4,11 +4,27 @@
 
 <script type="text/javascript">
 
+    mx.locale('<%= params['locale'] %>');
+
     $(function(){
         mx.widgets.rms2('#rms', {
             url: function(engine, market, boardid, secid) {
-                return "#" + [engine, market, boardid, secid].join(':')
-            }
+                return "#" + [engine, market, boardid, secid].join(':') }
+//            , selected: {
+//                board_groups: ['stock_shares_tplus', 'stock_ndm_tplus'],
+//                listname:     ['I'] }
+//            , filters:  { listname:
+//                [   {
+//                    value: 'I',
+//                    title: { ru: 'I', en: 'I' }
+//                },  {
+//                    value: 'II',
+//                    title: { ru: 'II', en: 'II' }
+//                },  {
+//                    value: 'III',
+//                    title: { ru: 'III', en: 'III' }
+//                }   ]
+//            }
         });
     });
 
