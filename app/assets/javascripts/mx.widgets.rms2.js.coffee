@@ -406,7 +406,7 @@ widget = (dummy, options = {}) ->
     l10n = localization[mx.locale()]
     filters_settings = filters_defaults
 
-    known_keys = ['rows_per_page', 'filters', 'selected', 'url']
+    known_keys = ['rows_per_page', 'filters', 'selected', 'url', 'filter_groups']
 
     default_options =
         rows_per_page:   50
