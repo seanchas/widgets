@@ -239,6 +239,10 @@ overlay_select = (element) ->
         options   = $("option", element)
         render_options(container, options)
 
+    element.on 'change', (e)  ->
+        $('li.selected', container).removeClass('selected')
+        $('option:selected', element).each (opt) -> $("li[data-value=#{$(@).val()}]", container).addClass('selected')
+
     container.on 'click', 'li.select-list-item', (e) ->
         el    = $ @
         value = el.attr('data-value')
@@ -290,6 +294,13 @@ render_select_filter = (container, name, objects, selected_objects, options = {}
     container.append title_el
     container.append select_el
     container.append overlay_select(select_el)
+
+    if !!options.multiple
+        title_el.addClass('active')
+        title_el.on 'click', (e) ->
+            if $('option', select_el).length is $('option:selected', select_el).length then $('option', select_el).prop('selected', false) else $('option', select_el).prop('selected', true)
+            select_el.trigger('change')
+
 
     return container
 
@@ -558,8 +569,29 @@ widget = (dummy, options = {}) ->
         groups_of_security_types = options.filter_groups?.security_types || filter_groups.security_types
         groups_of_board_groups   = options.filter_groups?.board_groups   || filter_groups.board_groups
 
-        security_types  = _.map security_types,    (sectype) -> { value: sectype.security_type_name, title: sectype.security_type_title, group: _.find(groups_of_security_types, ((g) -> _.contains(g, sectype.security_type_name)) || 'other') }
-        board_groups    = _.map board_groups,      (group)   -> { value: group.name,                 title: group.title,                 group: _.find(groups_of_board_groups,   ((g) -> _.contains(g, group.name))                 || 'other') }
+        security_types  = _.map security_types, (sectype) ->
+            g = _.inject groups_of_security_types, (memo, val, key) ->
+                memo.push(key) if _.contains(val, sectype.security_type_name)
+                return memo
+            , []
+            g = _.first(g) || 'other'
+            return {
+                value: sectype.security_type_name
+                title: sectype.security_type_title
+                group: g
+            }
+
+        board_groups = _.map board_groups, (group) ->
+            g = _.inject groups_of_board_groups, (memo, val, key) ->
+                memo.push(key) if _.contains(val, group.name)
+                return memo
+            , []
+            g = _.first(g) || 'other'
+            return {
+                value: group.name
+                title: group.title
+                group: g
+            }
 
         collateral      = _.map options.filters.collateral,(col)  -> { value: col.value,  title: col.title[mx.locale()] }
         listname        = _.map options.filters.listname,  (name) -> { value: name.value, title: name.title[mx.locale()] }
