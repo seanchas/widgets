@@ -849,7 +849,7 @@
             margin:  0 0 1em 0;
             padding: 0;
 
-            &.collateral,
+            &.listname,
             &.button {
                 clear: left;
             }
@@ -873,13 +873,16 @@
             }
 
             .apply-filters-btn {
+                display: block;
                 font-weight: bold;
                 text-transform: uppercase;
                 color: #369;
                 border: 2px solid #369;
-                margin:  .5em 0;
+                margin:  1em 1em .25em 0;
                 padding: .5em 1em;
                 cursor: pointer;
+                text-align: center;
+                width: 15%;
                 &:hover {
                     background-color: #fafafa;
                 }
@@ -896,6 +899,11 @@
                 margin:  0 1.5em 0 0;
                 padding: 0;
                 list-style: none;
+
+                li.select-list-separator {
+                    display: block;
+                    height:  4px;
+                }
 
                 li.select-list-item {
                     position: relative;
@@ -1017,6 +1025,10 @@
 
             .even {
                 background-color: #fafafa;
+            }
+
+            td.date {
+                text-align: right;
             }
         }
     }

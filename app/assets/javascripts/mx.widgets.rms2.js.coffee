@@ -117,13 +117,13 @@ filters =
         [   {
             value: 0
             title:
-                ru: 'Не активно'
+                ru: 'Не выбрано'
                 en: 'Disabled'
         },  {
             value: 1
             title:
-                ru: 'Частичное'
-                en: 'Partial'
+                ru: 'Частичное (только для режимов Т+)'
+                en: 'Partial (T+ only)'
         },  {
             value: 2
             title:
@@ -162,6 +162,19 @@ filters =
                 ru: 'Внесписочные'
                 en: 'Non-Listed'
         }   ]
+
+
+filter_groups =
+    security_types:
+        group_1: ['common_share', 'preferred_share', 'depositary_receipt']
+        group_2: ['ofz_bond', 'subfederal_bond', 'cb_bond', 'corporate_bond', 'ifi_bond', 'exchange_bond', 'municipal_bond']
+        group_3: ['public_ppif', 'interval_ppif', 'private_ppif', 'etf_ppif', 'stock_mortgage']
+    board_groups:
+        group_1: ['stock_shares_tplus', 'stock_bonds_tplus', 'stock_ndm_tplus', 'stock_shares_sm', 'stock_qnv_tplus', 'stock_qnv_ndm_tplus']
+        group_2: ['stock_bonds', 'stock_bonds_euro', 'stock_ndm', 'stock_shares_darkpools', 'stock_qnv_main', 'stock_qnv_ndm']
+        group_3: ['stock_psau']
+        group_4: ['stock_ccp', 'stock_shares_repo', 'stock_bond_repo', 'stock_qnv_repo']
+        group_5: ['stock_standard', 'stock_classica']
 
 
 filters_defaults =
@@ -205,15 +218,28 @@ overlay_select = (element) ->
     element.hide()
     container = $('<ul>').addClass('select-list')
     container.addClass('multiple') if multiple
-    options   = $("option", element)
 
-    for option in options
-        option    = $(option)
-        list_item = $('<li>').addClass('select-list-item').attr('data-value', option.attr('value')).html(option.html())
-        list_item.addClass('selected') if option.prop('selected')
-        container.append(list_item)
+    render_options = (target, opts) ->
+        for option in opts
+            option    = $(option)
+            list_item = $('<li>').addClass('select-list-item').attr('data-value', option.attr('value')).html(option.html())
+            list_item.addClass('selected') if option.prop('selected')
+            target.append(list_item)
 
-    container.on 'click', 'li', (e) ->
+    groups     = $("optgroup", element)
+    is_grouped = !!_.size(groups)
+
+    if is_grouped
+        groups = $("optgroup", element)
+        groups.each (index) ->
+            group   = $ @ ; options = $("option", group) ; render_options(container, options)
+            separator = $('<li>').addClass('select-list-separator').html('&nbsp;')
+            container.append(separator) unless index is groups.length - 1
+    else
+        options   = $("option", element)
+        render_options(container, options)
+
+    container.on 'click', 'li.select-list-item', (e) ->
         el    = $ @
         value = el.attr('data-value')
         option = $("option[value=#{value}]", element)
@@ -235,12 +261,25 @@ render_select_filter = (container, name, objects, selected_objects, options = {}
     title_el  = $('<h3>').addClass('rms-filter-title').html(l10n?.filters[name]?.title)
     select_el = if !!options.multiple then $('<select multiple>') else $('<select>')
 
-    for obj in objects
-        option = $('<option>')
-        .attr( "value", obj.value )
-        .text( obj.title )
-        option.prop('selected', true) if _.include(selected_objects, obj.value)
-        select_el.append( option )
+    unless !!options.is_grouped
+        for obj in objects
+            option = $('<option>')
+            .attr( "value", obj.value )
+            .text( obj.title )
+            option.prop('selected', true) if _.include(selected_objects, obj.value)
+            select_el.append( option )
+    else
+        groups  = _.chain(objects).map((obj) -> obj.group).uniq().value()
+        objects = _.groupBy objects, (obj) -> obj.group
+        for group in groups
+            group_el = $('<optgroup>').attr('label', group)
+            for obj in objects[group]
+                option = $('<option>')
+                .attr( "value", obj.value )
+                .text( obj.title )
+                option.prop('selected', true) if _.include(selected_objects, obj.value)
+                group_el.append( option )
+            select_el.append(group_el)
 
     if _.isFunction options.callback
         select_el.on 'change', (e) ->
@@ -288,6 +327,7 @@ render_applybtn_filter = (container) ->
 
 render_filters = ( container, options = {} ) ->
     container = $(container) ; return unless _.size(container) > 0
+    container.removeClass('loading')
     container.addClass('rms-filters-container')
 
     title = $('<h3>').addClass('rms-filters-title').html(l10n?.filters?.title)
@@ -304,14 +344,14 @@ render_filters = ( container, options = {} ) ->
     container.append filter_security_types_container
     container.append filter_board_groups_container
     container.append filter_index_container
-    container.append filter_collateral_container
     container.append filter_listname_container
+    container.append filter_collateral_container
     container.append filter_q_container
     container.append filter_applybtn_container
 
 
-    render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types || [], options.selected_objects.security_types || [], { multiple: true,  callback: (params) -> save_filter_settings('security_types', params) }
-    render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   || [], options.selected_objects.board_groups   || [], { multiple: true,  callback: (params) -> save_filter_settings('board_groups',   params) }
+    render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types || [], options.selected_objects.security_types || [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
+    render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   || [], options.selected_objects.board_groups   || [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('board_groups',   params) }
     render_select_filter   filter_collateral_container,     'collateral',     options.objects.collateral     || [], options.selected_objects.collateral     || [], { multiple: false, callback: (params) -> save_filter_settings('collateral',     params) }
     render_select_filter   filter_listname_container,       'listname',       options.objects.listname       || [], options.selected_objects.listname       || [], { multiple: true,  callback: (params) -> save_filter_settings('listname',       params) }
     render_select_filter   filter_index_container,          'index',          options.objects.index          || [], options.selected_objects.index          || [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
@@ -511,9 +551,15 @@ widget = (dummy, options = {}) ->
     ds.trademodes = mx.iss.trade_modes    'stock', { actual: true }
     ds.indices    = mx.iss.index_groups   'stock_index_listing'
 
+    el.filters_container.addClass('loading')
+
     $.when(ds.sectypes, ds.trademodes, ds.indices).then (security_types, board_groups, index) ->
-        security_types  = _.map security_types,    (sectype) -> { value: sectype.security_type_name, title: sectype.security_type_title }
-        board_groups    = _.map board_groups,      (group)   -> { value: group.name,                 title: group.title }
+
+        groups_of_security_types = options.filter_groups?.security_types || filter_groups.security_types
+        groups_of_board_groups   = options.filter_groups?.board_groups   || filter_groups.board_groups
+
+        security_types  = _.map security_types,    (sectype) -> { value: sectype.security_type_name, title: sectype.security_type_title, group: _.find(groups_of_security_types, ((g) -> _.contains(g, sectype.security_type_name)) || 'other') }
+        board_groups    = _.map board_groups,      (group)   -> { value: group.name,                 title: group.title,                 group: _.find(groups_of_board_groups,   ((g) -> _.contains(g, group.name))                 || 'other') }
 
         collateral      = _.map options.filters.collateral,(col)  -> { value: col.value,  title: col.title[mx.locale()] }
         listname        = _.map options.filters.listname,  (name) -> { value: name.value, title: name.title[mx.locale()] }
