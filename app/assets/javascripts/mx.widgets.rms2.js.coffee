@@ -17,6 +17,8 @@ localization =
         filters:
             title: 'Параметры поиска'
             unselected: 'Не выбрано'
+            select_all: 'Отметить все'
+            deselect_all: 'Очистить'
             security_types:
                 title: 'Тип инструмента'
             board_groups:
@@ -50,6 +52,8 @@ localization =
         filters:
             title: 'Filter parameters'
             unselected: 'Not selected'
+            select_all: 'Select all'
+            deselect_all: 'Clear'
             security_types:
                 title: 'Security type'
             board_groups:
@@ -295,10 +299,24 @@ render_select_filter = (container, name, objects, selected_objects, options = {}
     container.append select_el
     container.append overlay_select(select_el)
 
+
     if !!options.multiple
-        title_el.addClass('active')
-        title_el.on 'click', (e) ->
-            if $('option', select_el).length is $('option:selected', select_el).length then $('option', select_el).prop('selected', false) else $('option', select_el).prop('selected', true)
+        ctrl_wrapper     = $('<span>').addClass('rms-filter-ctrl-wrapper')
+        ctrl_select_el   = $('<span>').addClass('rms-filter-ctrl').html(l10n?.filters?.select_all)
+        ctrl_deselect_el = $('<span>').addClass('rms-filter-ctrl').html(l10n?.filters?.deselect_all)
+
+        ctrl_wrapper.append ctrl_select_el
+        ctrl_wrapper.append '|'
+        ctrl_wrapper.append ctrl_deselect_el
+
+        title_el.append ctrl_wrapper
+
+        ctrl_select_el.on 'click', (e) ->
+            $('option', select_el).prop('selected', true)
+            select_el.trigger('change')
+
+        ctrl_deselect_el.on 'click', (e) ->
+            $('option', select_el).prop('selected', false)
             select_el.trigger('change')
 
 

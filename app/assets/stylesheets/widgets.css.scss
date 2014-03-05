@@ -894,10 +894,19 @@
                 margin:  0 1.5em .25em 0;
                 padding: 0 0 .25em 1.5em;
 
-                &.active {
-                    color:  #369;
-                    cursor: pointer;
+                .rms-filter-ctrl-wrapper {
+                    line-height: 18px;
+                    font-size: 9px;
+                    float: right;
+                    .rms-filter-ctrl {
+                        color:  #369;
+                        cursor: pointer;
+                        text-transform: lowercase;
+                        margin: 0 .5em;
+                    }
                 }
+
+
             }
 
             ul.select-list {
