@@ -17,7 +17,7 @@ localization =
         filters:
             title: 'Параметры поиска'
             unselected: 'Не выбрано'
-            select_all: 'Отметить все'
+            select_all: 'Выбрать все'
             deselect_all: 'Очистить'
             security_types:
                 title: 'Тип инструмента'

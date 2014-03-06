@@ -903,6 +903,11 @@
                         cursor: pointer;
                         text-transform: lowercase;
                         margin: 0 .5em;
+
+                        &:hover {
+                            color: #C8102E;
+                            text-decoration: underline;
+                        }
                     }
                 }
 
