@@ -200,8 +200,8 @@ filters_defaults =
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
     board_groups:   ['stock_shares_tplus', 'stock_ndm_tplus']
-    with_d:         "0"
-    collateral:     "1"
+    with_d:         0
+    collateral:     1
     listname:       ['А1','А2','Б','В','И','_']
     index:          null
     q:              null
