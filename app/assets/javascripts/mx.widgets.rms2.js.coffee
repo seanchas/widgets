@@ -13,9 +13,7 @@ cache = kizzy('mx.widgets.rms2')
 l10n         = undefined
 localization =
     ru:
-        title: 'Риск параметры ценных бумаг'
         filters:
-            title: 'Параметры поиска'
             unselected: 'Не выбрано'
             select_all: 'Выбрать все'
             deselect_all: 'Очистить'
@@ -23,6 +21,8 @@ localization =
                 title: 'Тип инструмента'
             board_groups:
                 title: 'Режим торгов'
+            with_d:
+                title: 'Инструменты режимов торгов "Д"'
             collateral:
                 title: 'Обеспечение'
             listname:
@@ -30,8 +30,8 @@ localization =
             index:
                 title: 'Индексы'
             q:
-                title: 'Поиск по инструменту'
-                placeholder: 'Поиск'
+                label: 'Поиск по инструменту'
+                placeholder: 'Все'
                 warn: '* Необходимо минимум три символа'
         buttons:
             apply_title: 'Применить'
@@ -58,6 +58,8 @@ localization =
                 title: 'Security type'
             board_groups:
                 title: 'Trade mode'
+            with_d:
+                title: 'Trade mode "D" instruments'
             collateral:
                 title: 'Collateral'
             listname:
@@ -65,8 +67,8 @@ localization =
             index:
                 title: 'Indices'
             q:
-                title: 'Search'
-                placeholder: 'Search'
+                label: 'Search instrument'
+                placeholder: 'All'
                 warn: '* required minimum 3 characters'
         buttons:
             apply_title: 'Apply'
@@ -117,6 +119,18 @@ columns_descriptors =
 
 
 filters =
+    with_d:
+        [   {
+            value: 1
+            title:
+                ru: 'Учитывается'
+                en: 'Include'
+        },  {
+            value: 0
+            title:
+                ru: 'Не учитывается'
+                en: 'Ignore'
+        }   ]
     collateral:
         [   {
             value: 0
@@ -186,7 +200,8 @@ filters_defaults =
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
     board_groups:   ['stock_shares_tplus', 'stock_ndm_tplus']
-    collateral:     1
+    with_d:         "0"
+    collateral:     "1"
     listname:       ['А1','А2','Б','В','И','_']
     index:          null
     q:              null
@@ -207,7 +222,7 @@ save_filter_settings = (name, params) ->
     filters_settings[name] = params
 
 
-load_filter_settings = (name) -> filters_settings[name] || filters_defaults[name] || null
+load_filter_settings = (name) -> filters_settings[name] ? filters_defaults[name] ? null
 
 
 make_url = (row) ->
@@ -262,7 +277,8 @@ render_select_filter = (container, name, objects, selected_objects, options = {}
 
     container = $(container) ; return unless _.size(container) > 0
 
-    container.addClass("rms-filter #{if !!options.multiple then 'multiple'} #{name}")
+    container.addClass("rms-filter #{name}")
+    container.addClass("multiple") if !!options.multiple
     selected_objects = [selected_objects] unless _.isArray(selected_objects)
 
 
@@ -327,18 +343,26 @@ render_search_filter = (container) ->
     container = $(container) ; return unless _.size(container) > 0
     container.addClass('rms-filter search')
 
-    title = $('<h3>').addClass('rms-filter-title').html(l10n?.filters?.q?.title)
-    input = $("<input>").attr({ placeholder: l10n?.filters?.q?.placeholder })
-    warn  = $("<p>").addClass('warning').html(l10n?.filters?.q?.warn).hide()
+    label = $("<span>").addClass('label').html(l10n?.filters?.q?.label)
+    input = $("<input>").attr({ placeholder: l10n?.filters?.q?.placeholder, type: 'search' })
+    warn  = $("<span>").addClass('warning').html(l10n?.filters?.q?.warn).hide()
+    form  = $("<form>")
 
-    input.on 'input', ->
+    input.on 'keyup', ->
         value = $(@).val()
         if 0 < value.length and value.length < 3 then warn.show() else warn.hide()
         save_filter_settings 'q', (if value.length > 2 then value else null)
 
-    container.append(title)
-    container.append(input)
-    container.append(warn)
+    form.append(label)
+    form.append(input)
+    form.append(warn)
+
+    form.on 'submit', (e) ->
+        render_data()
+        e.preventDefault()
+        e.stopPropagation()
+
+    container.append(form)
 
     return container
 
@@ -357,33 +381,32 @@ render_applybtn_filter = (container) ->
 render_filters = ( container, options = {} ) ->
     container = $(container) ; return unless _.size(container) > 0
     container.removeClass('loading')
-    container.addClass('rms-filters-container')
-
-    title = $('<h3>').addClass('rms-filters-title').html(l10n?.filters?.title)
-    container.prepend(title)
 
     filter_security_types_container = $('<div>')
     filter_board_groups_container   = $('<div>')
+    filter_with_d_container         = $('<div>')
     filter_collateral_container     = $('<div>')
     filter_listname_container       = $('<div>')
     filter_index_container          = $('<div>')
     filter_q_container              = $('<div>')
     filter_applybtn_container       = $('<div>')
 
+    container.append filter_q_container
     container.append filter_security_types_container
     container.append filter_board_groups_container
     container.append filter_index_container
     container.append filter_listname_container
+    container.append filter_with_d_container
     container.append filter_collateral_container
-    container.append filter_q_container
     container.append filter_applybtn_container
 
 
-    render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types || [], options.selected_objects.security_types || [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
-    render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   || [], options.selected_objects.board_groups   || [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('board_groups',   params) }
-    render_select_filter   filter_collateral_container,     'collateral',     options.objects.collateral     || [], options.selected_objects.collateral     || [], { multiple: false, callback: (params) -> save_filter_settings('collateral',     params) }
-    render_select_filter   filter_listname_container,       'listname',       options.objects.listname       || [], options.selected_objects.listname       || [], { multiple: true,  callback: (params) -> save_filter_settings('listname',       params) }
-    render_select_filter   filter_index_container,          'index',          options.objects.index          || [], options.selected_objects.index          || [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
+    render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types ? [], options.selected_objects.security_types ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
+    render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   ? [], options.selected_objects.board_groups   ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('board_groups',   params) }
+    render_select_filter   filter_with_d_container,         'with_d',         options.objects.with_d         ? [], options.selected_objects.with_d         ? [], { multiple: false, callback: (params) -> save_filter_settings('with_d',         params) }
+    render_select_filter   filter_collateral_container,     'collateral',     options.objects.collateral     ? [], options.selected_objects.collateral     ? [], { multiple: false, callback: (params) -> save_filter_settings('collateral',     params) }
+    render_select_filter   filter_listname_container,       'listname',       options.objects.listname       ? [], options.selected_objects.listname       ? [], { multiple: true,  callback: (params) -> save_filter_settings('listname',       params) }
+    render_select_filter   filter_index_container,          'index',          options.objects.index          ? [], options.selected_objects.index          ? [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
     render_search_filter   filter_q_container
     render_applybtn_filter filter_applybtn_container
 
@@ -429,6 +452,7 @@ widget = (dummy, options = {}) ->
     default_options =
         rows_per_page:   50
         filters:
+            with_d:     filters.with_d
             collateral: filters.collateral
             listname:   filters.listname
         selected:       filters_defaults
@@ -443,9 +467,7 @@ widget = (dummy, options = {}) ->
 
     prerender = do () ->
 
-        title = $('<h2>').addClass('rms-title').html(l10n?.title)
-
-        el.filters_container = $('<div>')
+        el.filters_container = $('<div>').addClass('rms-filters-container')
         el.data_container    = $('<div>').addClass('rms-data-container')
         el.data_table        = $('<table>').addClass('mx-widget-table')
         el.data_table_thead  = $('<thead>')
@@ -462,7 +484,6 @@ widget = (dummy, options = {}) ->
 
         dummy.addClass('mx-widget-rms2')
 
-        dummy.append title
         dummy.append el.filters_container
         dummy.append el.data_container
 
@@ -504,7 +525,7 @@ widget = (dummy, options = {}) ->
     render_data = (start = 0) ->
         query_params = {}
         prepare_query_params = do ->
-            query_params = _.inject ['sort_column', 'sort_order', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q'], (memo, key) ->
+            query_params = _.inject ['sort_column', 'sort_order', 'with_d', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q'], (memo, key) ->
                 if load_filter_settings(key)
                     memo[key] = load_filter_settings(key)
                     memo[key] = memo[key].join(',') if _.isArray(memo[key])
@@ -611,8 +632,9 @@ widget = (dummy, options = {}) ->
                 group: g
             }
 
-        collateral      = _.map options.filters.collateral,(col)  -> { value: col.value,  title: col.title[mx.locale()] }
-        listname        = _.map options.filters.listname,  (name) -> { value: name.value, title: name.title[mx.locale()] }
+        with_d          = _.map options.filters.with_d,    (param) -> { value: param.value, title: param.title[mx.locale()] }
+        collateral      = _.map options.filters.collateral,(col)   -> { value: col.value,   title: col.title[mx.locale()]   }
+        listname        = _.map options.filters.listname,  (name)  -> { value: name.value,  title: name.title[mx.locale()]  }
 
         index           = _.map index, (i) -> { value: i.indexid.replace('&', '__AND__'), title: "#{i.indexid} (#{i.shortname})" }
         index.unshift( { value: '__UNSELECTED__', title: l10n?.filters?.unselected || '--' })
@@ -621,6 +643,7 @@ widget = (dummy, options = {}) ->
             objects:
                 security_types: security_types
                 board_groups:   board_groups
+                with_d:         with_d
                 collateral:     collateral
                 listname:       listname
                 index:          index
@@ -628,6 +651,7 @@ widget = (dummy, options = {}) ->
             selected_objects:
                 security_types: options.selected.security_types
                 board_groups:   options.selected.board_groups
+                with_d:         options.selected.with_d
                 collateral:     options.selected.collateral
                 listname:       options.selected.listname
 

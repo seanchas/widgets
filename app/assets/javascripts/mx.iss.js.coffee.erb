@@ -513,7 +513,7 @@ request_meta =
         url: ->
             "#{iss_host}/rms/engines/stock/markets/stock/objects/marketrates.jsonp?callback=?"
         data: (params) ->
-            known_keys = ['sort_column', 'sort_order', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q', 'start', 'limit']
+            known_keys = ['sort_column', 'sort_order', 'with_d', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q', 'start', 'limit']
             data =
                 'iss.meta': 'off'
                 'iss.only': 'object,object.cursor'
