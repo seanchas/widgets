@@ -20,7 +20,7 @@ localization =
             en: 'Remove'
 
 
-cache = kizzy('widgets.table')
+cache = kizzy('mx.widgets.table')
 
 read_cache = (element, key) ->
     element.html cache.get key
