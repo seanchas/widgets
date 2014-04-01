@@ -191,7 +191,7 @@ filter_groups =
         group_1: ['stock_shares_tplus', 'stock_bonds_tplus', 'stock_ndm_tplus', 'stock_shares_sm', 'stock_qnv_tplus', 'stock_qnv_ndm_tplus']
         group_2: ['stock_bonds', 'stock_bonds_euro', 'stock_ndm', 'stock_shares_darkpools', 'stock_qnv_main', 'stock_qnv_ndm']
         group_3: ['stock_psau']
-        group_4: ['stock_ccp', 'stock_shares_repo', 'stock_bond_repo', 'stock_qnv_repo']
+        group_4: ['stock_ccp', 'stock_ccp_ndm', 'stock_shares_repo', 'stock_bond_repo', 'stock_qnv_repo']
         group_5: ['stock_standard', 'stock_classica']
 
 
