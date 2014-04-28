@@ -1093,6 +1093,15 @@
                     background-color: #fafafa;
                 }
             }
+
+            .rms-paginator-total {
+                white-space: nowrap;
+                color:  #999;
+                display: inline-block;
+                margin:  0.5em .5em 0 0;
+                min-width: 1.5em;
+                padding: .5em;
+            }
         }
     }
 

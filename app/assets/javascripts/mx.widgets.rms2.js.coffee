@@ -47,6 +47,8 @@ localization =
             'LIMIT2':              'Лимит концентрации 2, шт. (L2)'
             'DISCOUNT3':           'Ставка рыночного риска 3 (S3)'
             'REGISTRY_CLOSE_DATE': 'Дата закрытия реестра'
+        paginator:
+            total: 'Выбрано инструментов'
     en:
         title: 'Securities risk parameters'
         filters:
@@ -84,6 +86,8 @@ localization =
             'LIMIT2':              'Concentration limit 2, unt. (L2)'
             'DISCOUNT3':           'Risk rates level 3 (S3)'
             'REGISTRY_CLOSE_DATE': 'Divident date'
+        paginator:
+            total: 'Securities found'
 
 
 columns_order       = ['SECID', 'NAME', 'ISIN', 'DISCOUNT1', 'LIMIT1', 'DISCOUNT2', 'LIMIT2', 'DISCOUNT3', 'REGISTRY_CLOSE_DATE']
@@ -199,7 +203,7 @@ filters_defaults =
     sort_column:    'SECID'
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
-    board_groups:   ['stock_shares_tplus', 'stock_ndm_tplus']
+    board_groups:   ['stock_tplus', 'stock_ndm_tplus']
     with_d:         0
     collateral:     1
     listname:       ['А1','А2','Б','В','И','_']
@@ -417,7 +421,7 @@ render_paginator = (container, cursor = {}) ->
 
     [index, pagesize, total] = _.map ['INDEX', 'PAGESIZE', 'TOTAL'], (prop) -> cursor[prop]
 
-    return if total <= pagesize
+#    return if total <= pagesize
 
     max     = Math.floor(total / pagesize)
     max    -= 1 if max * pagesize is total
@@ -425,12 +429,14 @@ render_paginator = (container, cursor = {}) ->
 
     ul = $('<ul>').addClass('rms-paginator-pagelist')
 
-    for n in [0..max]
+    unless total <= pagesize then for n in [0..max]
         li = $('<li>').html(n + 1).attr('data-page', n).addClass('rms-paginator-page')
         li.addClass('current') if n is current
         ul.append(li)
 
-    ul.on 'click', 'li', (e) -> render_data($(@).attr('data-page') * pagesize)
+    ul.append $('<li>').addClass('rms-paginator-total').html("#{l10n?.paginator?.total}: #{total}") if total > 0
+
+    ul.on 'click', 'li.rms-paginator-page', (e) -> render_data($(@).attr('data-page') * pagesize)
 
     container.append ul
     container.show()
@@ -597,13 +603,13 @@ widget = (dummy, options = {}) ->
 
 
     ds = {} # data sources
-    ds.sectypes   = mx.iss.security_types 'stock', { sectypes_only: true }
-    ds.trademodes = mx.iss.trade_modes    'stock', { actual: true }
-    ds.indices    = mx.iss.index_groups   'stock_index_listing'
+    ds.sectypes     = mx.iss.security_types   'stock', { sectypes_only: true }
+    ds.board_groups = mx.iss.rms_board_groups 'stock', 'main'
+    ds.indices      = mx.iss.index_groups     'stock_index_listing'
 
     el.filters_container.addClass('loading')
 
-    $.when(ds.sectypes, ds.trademodes, ds.indices).then (security_types, board_groups, index) ->
+    $.when(ds.sectypes, ds.board_groups, ds.indices).then (security_types, board_groups, index) ->
 
         groups_of_security_types = options.filter_groups?.security_types || filter_groups.security_types
         groups_of_board_groups   = options.filter_groups?.board_groups   || filter_groups.board_groups
@@ -620,17 +626,7 @@ widget = (dummy, options = {}) ->
                 group: g
             }
 
-        board_groups = _.map board_groups, (group) ->
-            g = _.inject groups_of_board_groups, (memo, val, key) ->
-                memo.push(key) if _.contains(val, group.name)
-                return memo
-            , []
-            g = _.first(g) || 'other'
-            return {
-                value: group.name
-                title: group.title
-                group: g
-            }
+        board_groups = _.map board_groups, (group) -> { value: group.name, title: group.title, group: group.group }
 
         with_d          = _.map options.filters.with_d,    (param) -> { value: param.value, title: param.title[mx.locale()] }
         collateral      = _.map options.filters.collateral,(col)   -> { value: col.value,   title: col.title[mx.locale()]   }

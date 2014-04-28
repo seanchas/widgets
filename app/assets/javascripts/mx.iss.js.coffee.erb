@@ -508,6 +508,19 @@ request_meta =
         key: (engine, market, object) ->
             [engine, market, object]
 
+    rms_board_groups:
+        url: (engine, filter) ->
+            "#{iss_host}/rms/engines/#{engine}/boardgroups.jsonp?callback=?"
+        data: (engine, filter) ->
+            'iss.meta': 'off'
+            'iss.only': 'boardgroups'
+            'filter':   filter || 'main'
+
+        parse: (json) ->
+            iss_merge_columns_and_data(json?.boardgroups)
+
+        key: (engine, filter) ->
+            [engine, filter]
 
     rms_stock:
         url: ->
@@ -786,6 +799,7 @@ _.extend scope,
     rms_securities:           (args...) -> request('rms_securities', args...)
     rms_columns:              (args...) -> request('rms_columns',    args...)
     rms_stock:                (args...) -> request('rms_stock',      args...)
+    rms_board_groups:         (args...) -> request('rms_board_groups', args...)
     money_market_turnovers:   (args...) -> request('money_market_turnovers', args...)
     mmakers_ranks:            (args...) -> request('mmakers_ranks', args...)
     mmakers_ranks_columns:    (args...) -> request('mmakers_ranks_columns', args...)
