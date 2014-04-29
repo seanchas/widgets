@@ -832,7 +832,7 @@
 
     .rms-filters-container {
         border: 1px solid #ccc;
-        margin:  0 0 2em 0;
+        margin:  0 0 1em 0;
         padding: 0 0 .5em 1em;
         overflow: hidden;
 
@@ -885,7 +885,7 @@
                 text-transform: uppercase;
                 color: #369;
                 border: 2px solid #369;
-                margin:  1em 1em .25em 0;
+                margin:  1em 1em 0 0;
                 padding: .5em 1em;
                 cursor: pointer;
                 text-align: center;
@@ -909,6 +909,7 @@
                         color:  #369;
                         cursor: pointer;
                         text-transform: lowercase;
+                        font-weight: lighter;
                         margin: 0 .5em;
 
                         &:hover {
@@ -953,12 +954,12 @@
                             position: absolute;
                             display: block;
                             content: "";
-                            top:  4px;
-                            left: 4px;
-                            width:  6px;
-                            height: 6px;
+                            top:    5px;
+                            left:   5px;
+                            width:  4px;
+                            height: 4px;
                             background-color: #369;
-                            border-radius: 3px;
+                            border-radius: 2px;
                         }
                     }
 
@@ -979,6 +980,13 @@
                      li.select-list-item {
                          &:after, &:before {
                              border-radius: 0;
+                         }
+
+                         &.selected:before {
+                             top:    4px;
+                             left:   4px;
+                             width:  6px;
+                             height: 6px;
                          }
                      }
                 }
@@ -1065,9 +1073,17 @@
         }
     }
 
+    .rms-no-results,
+    .rms-total-securities {
+        color:  #999;
+        margin:  0 1em .75em;
+        min-width: 1.5em;
+        padding: 0;
+    }
+
     .rms-data-paginator {
         .rms-paginator-pagelist {
-            margin:  1em 1em;
+            margin:  0 1em 1em;
             padding: 0;
             overflow: hidden;
 
@@ -1092,15 +1108,6 @@
                 &:hover {
                     background-color: #fafafa;
                 }
-            }
-
-            .rms-paginator-total {
-                white-space: nowrap;
-                color:  #999;
-                display: inline-block;
-                margin:  0.5em .5em 0 0;
-                min-width: 1.5em;
-                padding: .5em;
             }
         }
     }

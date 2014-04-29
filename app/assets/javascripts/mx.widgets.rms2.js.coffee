@@ -21,8 +21,8 @@ localization =
                 title: 'Тип инструмента'
             board_groups:
                 title: 'Режим торгов'
-            with_d:
-                title: 'Инструменты режимов торгов "Д"'
+            currency:
+                title: 'Валюта расчетов'
             collateral:
                 title: 'Обеспечение'
             listname:
@@ -60,8 +60,8 @@ localization =
                 title: 'Security type'
             board_groups:
                 title: 'Trade mode'
-            with_d:
-                title: 'Trade mode "D" instruments'
+            currency:
+                title: 'Currency'
             collateral:
                 title: 'Collateral'
             listname:
@@ -123,17 +123,27 @@ columns_descriptors =
 
 
 filters =
-    with_d:
+    currency:
         [   {
-            value: 1
+            value: ''
             title:
-                ru: 'Учитывается'
-                en: 'Include'
+                ru: 'Не выбрано'
+                en: 'Disabled'
         },  {
-            value: 0
+            value: 'RUB'
             title:
-                ru: 'Не учитывается'
-                en: 'Ignore'
+                ru: 'RUB'
+                en: 'RUB'
+        },  {
+            value: 'USD'
+            title:
+                ru: 'USD'
+                en: 'USD'
+        },  {
+            value: 'EUR'
+            title:
+                ru: 'EUR'
+                en: 'EUR'
         }   ]
     collateral:
         [   {
@@ -189,14 +199,8 @@ filters =
 filter_groups =
     security_types:
         group_1: ['common_share', 'preferred_share', 'depositary_receipt']
-        group_2: ['ofz_bond', 'subfederal_bond', 'cb_bond', 'corporate_bond', 'ifi_bond', 'exchange_bond', 'municipal_bond']
+        group_2: ['ofz_bond', 'subfederal_bond', 'cb_bond', 'corporate_bond', 'ifi_bond', 'exchange_bond', 'municipal_bond', 'euro_bond']
         group_3: ['public_ppif', 'interval_ppif', 'private_ppif', 'etf_ppif', 'stock_mortgage']
-    board_groups:
-        group_1: ['stock_shares_tplus', 'stock_bonds_tplus', 'stock_ndm_tplus', 'stock_shares_sm', 'stock_qnv_tplus', 'stock_qnv_ndm_tplus']
-        group_2: ['stock_bonds', 'stock_bonds_euro', 'stock_ndm', 'stock_shares_darkpools', 'stock_qnv_main', 'stock_qnv_ndm']
-        group_3: ['stock_psau']
-        group_4: ['stock_ccp', 'stock_ccp_ndm', 'stock_shares_repo', 'stock_bond_repo', 'stock_qnv_repo']
-        group_5: ['stock_standard', 'stock_classica']
 
 
 filters_defaults =
@@ -204,7 +208,7 @@ filters_defaults =
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
     board_groups:   ['stock_tplus', 'stock_ndm_tplus']
-    with_d:         0
+    currency:       ''
     collateral:     1
     listname:       ['А1','А2','Б','В','И','_']
     index:          null
@@ -388,7 +392,7 @@ render_filters = ( container, options = {} ) ->
 
     filter_security_types_container = $('<div>')
     filter_board_groups_container   = $('<div>')
-    filter_with_d_container         = $('<div>')
+    filter_currency_container       = $('<div>')
     filter_collateral_container     = $('<div>')
     filter_listname_container       = $('<div>')
     filter_index_container          = $('<div>')
@@ -400,19 +404,31 @@ render_filters = ( container, options = {} ) ->
     container.append filter_board_groups_container
     container.append filter_index_container
     container.append filter_listname_container
-    container.append filter_with_d_container
     container.append filter_collateral_container
+    container.append filter_currency_container
     container.append filter_applybtn_container
 
 
     render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types ? [], options.selected_objects.security_types ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
     render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   ? [], options.selected_objects.board_groups   ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('board_groups',   params) }
-    render_select_filter   filter_with_d_container,         'with_d',         options.objects.with_d         ? [], options.selected_objects.with_d         ? [], { multiple: false, callback: (params) -> save_filter_settings('with_d',         params) }
+    render_select_filter   filter_currency_container,       'currency',       options.objects.currency       ? [], options.selected_objects.currency       ? [], { multiple: false, callback: (params) -> save_filter_settings('currencyid',     params) }
     render_select_filter   filter_collateral_container,     'collateral',     options.objects.collateral     ? [], options.selected_objects.collateral     ? [], { multiple: false, callback: (params) -> save_filter_settings('collateral',     params) }
     render_select_filter   filter_listname_container,       'listname',       options.objects.listname       ? [], options.selected_objects.listname       ? [], { multiple: true,  callback: (params) -> save_filter_settings('listname',       params) }
     render_select_filter   filter_index_container,          'index',          options.objects.index          ? [], options.selected_objects.index          ? [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
     render_search_filter   filter_q_container
     render_applybtn_filter filter_applybtn_container
+
+
+render_total_securities = (container, cursor = {}) ->
+    container = $(container) ; return unless _.size(container) > 0
+    container.empty()
+
+    total = cursor['TOTAL']
+
+    return unless total > 0
+
+    container.html("#{l10n?.paginator?.total}: #{total || '&mdash;'}")
+    container.show()
 
 
 render_paginator = (container, cursor = {}) ->
@@ -421,7 +437,7 @@ render_paginator = (container, cursor = {}) ->
 
     [index, pagesize, total] = _.map ['INDEX', 'PAGESIZE', 'TOTAL'], (prop) -> cursor[prop]
 
-#    return if total <= pagesize
+    return if total <= pagesize
 
     max     = Math.floor(total / pagesize)
     max    -= 1 if max * pagesize is total
@@ -429,12 +445,10 @@ render_paginator = (container, cursor = {}) ->
 
     ul = $('<ul>').addClass('rms-paginator-pagelist')
 
-    unless total <= pagesize then for n in [0..max]
+    for n in [0..max]
         li = $('<li>').html(n + 1).attr('data-page', n).addClass('rms-paginator-page')
         li.addClass('current') if n is current
         ul.append(li)
-
-    ul.append $('<li>').addClass('rms-paginator-total').html("#{l10n?.paginator?.total}: #{total}") if total > 0
 
     ul.on 'click', 'li.rms-paginator-page', (e) -> render_data($(@).attr('data-page') * pagesize)
 
@@ -443,7 +457,7 @@ render_paginator = (container, cursor = {}) ->
 
 
 
-render_data = () ->
+render_data = (() ->)
 
 
 widget = (dummy, options = {}) ->
@@ -458,7 +472,7 @@ widget = (dummy, options = {}) ->
     default_options =
         rows_per_page:   50
         filters:
-            with_d:     filters.with_d
+            currency:   filters.currency
             collateral: filters.collateral
             listname:   filters.listname
         selected:       filters_defaults
@@ -479,10 +493,12 @@ widget = (dummy, options = {}) ->
         el.data_table_thead  = $('<thead>')
         el.data_table_tbody  = $('<tbody>')
         el.data_no_results   = $('<div>').addClass('rms-no-results').html(l10n?.no_results).hide()
+        el.total_securities  = $('<div>').addClass('rms-total-securities')
         el.paginator         = $('<div>').addClass('rms-data-paginator')
         el.paginator_dup     = el.paginator.clone()
 
         el.data_table.append(el.data_table_thead).append(el.data_table_tbody).hide()
+        el.data_container.append el.total_securities
         el.data_container.append el.paginator
         el.data_container.append el.data_table
         el.data_container.append el.data_no_results
@@ -531,7 +547,7 @@ widget = (dummy, options = {}) ->
     render_data = (start = 0) ->
         query_params = {}
         prepare_query_params = do ->
-            query_params = _.inject ['sort_column', 'sort_order', 'with_d', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q'], (memo, key) ->
+            query_params = _.inject ['sort_column', 'sort_order', 'currencyid', 'collateral', 'security_types', 'board_groups', 'listname', 'index', 'q'], (memo, key) ->
                 if load_filter_settings(key)
                     memo[key] = load_filter_settings(key)
                     memo[key] = memo[key].join(',') if _.isArray(memo[key])
@@ -584,6 +600,7 @@ widget = (dummy, options = {}) ->
         el.data_table.hide()
         el.data_no_results.hide()
 
+        el.total_securities.hide()
         el.paginator.hide()
         el.paginator_dup.hide()
 
@@ -595,10 +612,11 @@ widget = (dummy, options = {}) ->
                 _.each data.records, (record, index) ->
                     render_data_row(el.data_table_tbody, record, index + data.cursor['INDEX'])
             else
-
                 el.data_no_results.show()
-            render_paginator el.paginator, data.cursor
-            render_paginator el.paginator_dup, data.cursor
+
+            render_total_securities el.total_securities, data.cursor
+            render_paginator        el.paginator,        data.cursor
+            render_paginator        el.paginator_dup,    data.cursor
 
 
 
@@ -628,7 +646,7 @@ widget = (dummy, options = {}) ->
 
         board_groups = _.map board_groups, (group) -> { value: group.name, title: group.title, group: group.group }
 
-        with_d          = _.map options.filters.with_d,    (param) -> { value: param.value, title: param.title[mx.locale()] }
+        currency        = _.map options.filters.currency,  (param) -> { value: param.value, title: param.title[mx.locale()] }
         collateral      = _.map options.filters.collateral,(col)   -> { value: col.value,   title: col.title[mx.locale()]   }
         listname        = _.map options.filters.listname,  (name)  -> { value: name.value,  title: name.title[mx.locale()]  }
 
@@ -639,7 +657,7 @@ widget = (dummy, options = {}) ->
             objects:
                 security_types: security_types
                 board_groups:   board_groups
-                with_d:         with_d
+                currency:       currency
                 collateral:     collateral
                 listname:       listname
                 index:          index
@@ -647,7 +665,7 @@ widget = (dummy, options = {}) ->
             selected_objects:
                 security_types: options.selected.security_types
                 board_groups:   options.selected.board_groups
-                with_d:         options.selected.with_d
+                currency:       options.selected.currency
                 collateral:     options.selected.collateral
                 listname:       options.selected.listname
 
