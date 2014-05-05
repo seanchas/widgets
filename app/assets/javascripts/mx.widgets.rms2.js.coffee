@@ -209,7 +209,7 @@ filters_defaults =
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
     board_groups:   ['stock_tplus', 'stock_ndm_tplus']
     currency:       ''
-    collateral:     1
+    collateral:     0
     listname:       ['А1','А2','Б','В','И','_']
     index:          null
     q:              null
@@ -356,7 +356,7 @@ render_search_filter = (container) ->
     warn  = $("<span>").addClass('warning').html(l10n?.filters?.q?.warn).hide()
     form  = $("<form>")
 
-    input.on 'keyup', ->
+    input.on 'keyup input', ->
         value = $(@).val()
         if 0 < value.length and value.length < 3 then warn.show() else warn.hide()
         save_filter_settings 'q', (if value.length > 2 then value else null)
