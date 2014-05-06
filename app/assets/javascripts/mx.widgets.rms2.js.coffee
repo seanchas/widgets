@@ -193,6 +193,11 @@ filters =
             title:
                 ru: 'Внесписочные'
                 en: 'Non-Listed'
+        },  {
+            value: 'repo'
+            title:
+                ru: 'Без листинга (только РЕПО)'
+                en: 'Not listed (REPO only)'
         }   ]
 
 
@@ -210,7 +215,7 @@ filters_defaults =
     board_groups:   ['stock_tplus', 'stock_ndm_tplus']
     currency:       ''
     collateral:     0
-    listname:       ['А1','А2','Б','В','И','_']
+    listname:       ['А1','А2','Б','В','И','_','repo']
     index:          null
     q:              null
 
