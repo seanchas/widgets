@@ -164,35 +164,20 @@ filters =
         }   ]
     listname:
         [   {
-            value: 'А1'
+            value: '1'
             title:
-                ru: 'А1'
-                en: 'A1'
+                ru: 'Уровень 1'
+                en: 'Level 1'
         },  {
-            value: 'А2'
+            value: '2'
             title:
-                ru: 'А2'
-                en: 'A2'
+                ru: 'Уровень 2'
+                en: 'Level 2'
         },  {
-            value: 'Б'
+            value: '3'
             title:
-                ru: 'Б'
-                en: 'B'
-        },  {
-            value: 'В'
-            title:
-                ru: 'В'
-                en: 'C'
-        },  {
-            value: 'И'
-            title:
-                ru: 'И'
-                en: 'I'
-        },  {
-            value: '_'
-            title:
-                ru: 'Внесписочные'
-                en: 'Non-Listed'
+                ru: 'Уровень 3'
+                en: 'Level 3'
         },  {
             value: 'repo'
             title:
@@ -215,7 +200,7 @@ filters_defaults =
     board_groups:   ['stock_tplus', 'stock_ndm_tplus']
     currency:       ''
     collateral:     0
-    listname:       ['А1','А2','Б','В','И','_','repo']
+    listname:       ['1','2','3','repo']
     index:          null
     q:              null
 
