@@ -179,7 +179,7 @@ filters =
                 ru: 'Уровень 3'
                 en: 'Level 3'
         },  {
-            value: 'repo'
+            value: '_'
             title:
                 ru: 'Без листинга (только РЕПО)'
                 en: 'Not listed (REPO only)'
