@@ -659,6 +659,11 @@ widget = (dummy, options = {}) ->
                 collateral:     options.selected.collateral
                 listname:       options.selected.listname
 
+        prepare_options = do ->
+            _.each ['collateral', 'security_types', 'board_groups', 'listname', 'index'], (param) ->
+                save_filter_settings(param, options.selected[param])
+
+
         render_data()
 
 
