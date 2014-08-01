@@ -21,7 +21,7 @@ localization =
                 title: 'Тип инструмента'
             board_groups:
                 title: 'Режим торгов'
-            currency:
+            currencyid:
                 title: 'Валюта расчетов'
             collateral:
                 title: 'Обеспечение'
@@ -35,6 +35,7 @@ localization =
                 warn: '* Необходимо минимум три символа'
         buttons:
             apply_title: 'Применить'
+            export_title: 'Экспорт'
         no_results: 'По текущим параметрам поиска ничего не найдено.'
         columns:
             'n':                   '№'
@@ -60,7 +61,7 @@ localization =
                 title: 'Security type'
             board_groups:
                 title: 'Trade mode'
-            currency:
+            currencyid:
                 title: 'Currency'
             collateral:
                 title: 'Collateral'
@@ -74,6 +75,7 @@ localization =
                 warn: '* required minimum 3 characters'
         buttons:
             apply_title: 'Apply'
+            export_title: 'Export'
         no_results: 'No results found.'
         columns:
             'n':                   'No.'
@@ -100,30 +102,30 @@ columns_descriptors =
         type: 'string'
     'DISCOUNT1':
         type: 'number'
-        precision:  2
+        precision:   2
         has_percent: 1
     'LIMIT1':
         type: 'number'
-        precision:  0
+        precision:   0
         has_percent: 0
     'DISCOUNT2':
         type: 'number'
-        precision:  2
+        precision:   2
         has_percent: 1
     'LIMIT2':
         type: 'number'
-        precision:  0
+        precision:   0
         has_percent: 0
     'DISCOUNT3':
         type: 'number'
-        precision:  2
+        precision:   2
         has_percent: 1
     'REGISTRY_CLOSE_DATE':
         type: 'date'
 
 
 filters =
-    currency:
+    currencyid:
         [   {
             value: ''
             title:
@@ -147,17 +149,17 @@ filters =
         }   ]
     collateral:
         [   {
-            value: 0
+            value: '0'
             title:
                 ru: 'Не выбрано'
                 en: 'Disabled'
         },  {
-            value: 1
+            value: '1'
             title:
                 ru: 'Частичное (только для режимов Т+)'
                 en: 'Partial (T+ only)'
         },  {
-            value: 2
+            value: '2'
             title:
                 ru: 'Полное'
                 en: 'Full'
@@ -198,14 +200,17 @@ filters_defaults =
     sort_order:     'ASC'
     security_types: ['common_share', 'preferred_share', 'state_bond', 'cb_bond', 'subfederal_bond', 'municipal_bond', 'corporate_bond', 'exchange_bond', 'ifi_bond']
     board_groups:   ['stock_tplus', 'stock_ndm_tplus']
-    currency:       ''
-    collateral:     0
-    listname:       ['1','2','3','repo']
+    currencyid:     ''
+    collateral:     '0'
+    listname:       ['1','2','3','_']
     index:          null
     q:              null
 
 
 filters_settings     = {}
+
+
+url_hash_keys = ['security_types', 'board_groups', 'listname', 'index', 'collateral', 'currencyid']
 
 
 save_filter_settings = (name, params) ->
@@ -375,6 +380,15 @@ render_applybtn_filter = (container) ->
     return container
 
 
+render_exportbtn = (container) ->
+    container = $(container) ; return unless _.size(container) > 0
+    container.addClass('rms-filter button')
+
+    btn = $('<a>').addClass('export-btn').text(l10n?.buttons?.export_title).on('click', -> export_current() )
+    container.append(btn)
+
+    return container
+
 
 render_filters = ( container, options = {} ) ->
     container = $(container) ; return unless _.size(container) > 0
@@ -382,12 +396,13 @@ render_filters = ( container, options = {} ) ->
 
     filter_security_types_container = $('<div>')
     filter_board_groups_container   = $('<div>')
-    filter_currency_container       = $('<div>')
+    filter_currencyid_container     = $('<div>')
     filter_collateral_container     = $('<div>')
     filter_listname_container       = $('<div>')
     filter_index_container          = $('<div>')
     filter_q_container              = $('<div>')
     filter_applybtn_container       = $('<div>')
+    filter_exportbtn_container      = $('<div>')
 
     container.append filter_q_container
     container.append filter_security_types_container
@@ -395,18 +410,20 @@ render_filters = ( container, options = {} ) ->
     container.append filter_index_container
     container.append filter_listname_container
     container.append filter_collateral_container
-    container.append filter_currency_container
+    container.append filter_currencyid_container
     container.append filter_applybtn_container
+    container.append filter_exportbtn_container
 
 
     render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types ? [], options.selected_objects.security_types ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
     render_select_filter   filter_board_groups_container,   'board_groups',   options.objects.board_groups   ? [], options.selected_objects.board_groups   ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('board_groups',   params) }
-    render_select_filter   filter_currency_container,       'currency',       options.objects.currency       ? [], options.selected_objects.currency       ? [], { multiple: false, callback: (params) -> save_filter_settings('currencyid',     params) }
+    render_select_filter   filter_currencyid_container,     'currencyid',     options.objects.currencyid     ? [], options.selected_objects.currencyid     ? [], { multiple: false, callback: (params) -> save_filter_settings('currencyid',     params) }
     render_select_filter   filter_collateral_container,     'collateral',     options.objects.collateral     ? [], options.selected_objects.collateral     ? [], { multiple: false, callback: (params) -> save_filter_settings('collateral',     params) }
     render_select_filter   filter_listname_container,       'listname',       options.objects.listname       ? [], options.selected_objects.listname       ? [], { multiple: true,  callback: (params) -> save_filter_settings('listname',       params) }
     render_select_filter   filter_index_container,          'index',          options.objects.index          ? [], options.selected_objects.index          ? [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
     render_search_filter   filter_q_container
     render_applybtn_filter filter_applybtn_container
+#    render_exportbtn       filter_exportbtn_container
 
 
 render_total_securities = (container, cursor = {}) ->
@@ -450,6 +467,33 @@ render_paginator = (container, cursor = {}) ->
 render_data = (() ->)
 
 
+export_data = ->
+
+
+update_hash = (params) ->
+    params = _.reduce url_hash_keys, (memo, key) ->
+        memo[key] = params[key] || ''
+        return memo
+    , {}
+    url  = window.location.href.split('#')[0]
+    hash = $.param(params)
+    window.location.href = [url, hash].join('#')
+
+
+parse_hash = ->
+    hash = window.location.href.split('#')[1]
+    return {} unless hash
+
+    hash = decodeURIComponent(hash).split('&')
+    hash = _.reduce hash, (memo, param) ->
+        [key, value] = param.split('=')
+        memo[key] = value.split(',') if _.include(url_hash_keys, key)
+        return memo
+    , {}
+
+    return hash
+
+
 widget = (dummy, options = {}) ->
 
     dummy = $(dummy) ; return unless _.size(dummy) > 0
@@ -462,7 +506,7 @@ widget = (dummy, options = {}) ->
     default_options =
         rows_per_page:   50
         filters:
-            currency:   filters.currency
+            currencyid: filters.currencyid
             collateral: filters.collateral
             listname:   filters.listname
         selected:       filters_defaults
@@ -548,6 +592,7 @@ widget = (dummy, options = {}) ->
                 start: start
                 limit: options.rows_per_page
 
+        update_hash(query_params)
 
         render_data_row = (tbody, record, index) ->
             tr = $('<tr>').addClass('row').addClass(['odd', 'even'][index%2])
@@ -636,32 +681,34 @@ widget = (dummy, options = {}) ->
 
         board_groups = _.map board_groups, (group) -> { value: group.name, title: group.title, group: group.group }
 
-        currency        = _.map options.filters.currency,  (param) -> { value: param.value, title: param.title[mx.locale()] }
-        collateral      = _.map options.filters.collateral,(col)   -> { value: col.value,   title: col.title[mx.locale()]   }
-        listname        = _.map options.filters.listname,  (name)  -> { value: name.value,  title: name.title[mx.locale()]  }
+        currencyid      = _.map options.filters.currencyid, (param) -> { value: param.value, title: param.title[mx.locale()] }
+        collateral      = _.map options.filters.collateral, (col)   -> { value: col.value,   title: col.title[mx.locale()]   }
+        listname        = _.map options.filters.listname,   (name)  -> { value: name.value,  title: name.title[mx.locale()]  }
 
         index           = _.map index, (i) -> { value: i.indexid.replace('&', '__AND__'), title: "#{i.indexid} (#{i.shortname})" }
         index.unshift( { value: '__UNSELECTED__', title: l10n?.filters?.unselected || '--' })
+
+        prepare_options = do ->
+            url_hash = parse_hash()
+            _.each ['collateral', 'security_types', 'board_groups', 'listname', 'index', 'currencyid'], (param) ->
+                if !!url_hash[param] then save_filter_settings(param, url_hash[param]) else save_filter_settings(param, options.selected[param])
 
         render_filters  el.filters_container,
             objects:
                 security_types: security_types
                 board_groups:   board_groups
-                currency:       currency
+                currencyid:     currencyid
                 collateral:     collateral
                 listname:       listname
                 index:          index
 
             selected_objects:
-                security_types: options.selected.security_types
-                board_groups:   options.selected.board_groups
-                currency:       options.selected.currency
-                collateral:     options.selected.collateral
-                listname:       options.selected.listname
-
-        prepare_options = do ->
-            _.each ['collateral', 'security_types', 'board_groups', 'listname', 'index'], (param) ->
-                save_filter_settings(param, options.selected[param])
+                security_types: load_filter_settings('security_types')
+                board_groups:   load_filter_settings('board_groups')
+                currencyid:     load_filter_settings('currencyid')
+                collateral:     load_filter_settings('collateral')
+                listname:       load_filter_settings('listname')
+                index:          load_filter_settings('index')
 
 
         render_data()
