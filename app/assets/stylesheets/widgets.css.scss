@@ -879,8 +879,7 @@
                 }
             }
 
-            .apply-filters-btn,
-            .export-btn {
+            .apply-filters-btn {
                 display: block;
                 font-weight: bold;
                 text-transform: uppercase;
@@ -1113,4 +1112,20 @@
         }
     }
 
+    .rms-export-bar {
+        .rms-export-btn {
+            display: inline-block;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #369;
+            border: 2px solid #369;
+            margin: 1em 1em 0 0;
+            padding: .5em 2em;
+            cursor: pointer;
+            text-align: center;
+            &:hover {
+                background-color: #fafafa;
+            }
+        }
+    }
 }

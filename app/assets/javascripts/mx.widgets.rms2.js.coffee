@@ -35,7 +35,7 @@ localization =
                 warn: '* Необходимо минимум три символа'
         buttons:
             apply_title: 'Применить'
-            export_title: 'Экспорт'
+            export_title: 'Экспорт (CSV)'
         no_results: 'По текущим параметрам поиска ничего не найдено.'
         columns:
             'n':                   '№'
@@ -75,7 +75,7 @@ localization =
                 warn: '* required minimum 3 characters'
         buttons:
             apply_title: 'Apply'
-            export_title: 'Export'
+            export_title: 'Export (CSV)'
         no_results: 'No results found.'
         columns:
             'n':                   'No.'
@@ -380,16 +380,6 @@ render_applybtn_filter = (container) ->
     return container
 
 
-render_exportbtn = (container) ->
-    container = $(container) ; return unless _.size(container) > 0
-    container.addClass('rms-filter button')
-
-    btn = $('<a>').addClass('export-btn').text(l10n?.buttons?.export_title).on('click', -> export_current() )
-    container.append(btn)
-
-    return container
-
-
 render_filters = ( container, options = {} ) ->
     container = $(container) ; return unless _.size(container) > 0
     container.removeClass('loading')
@@ -402,7 +392,6 @@ render_filters = ( container, options = {} ) ->
     filter_index_container          = $('<div>')
     filter_q_container              = $('<div>')
     filter_applybtn_container       = $('<div>')
-    filter_exportbtn_container      = $('<div>')
 
     container.append filter_q_container
     container.append filter_security_types_container
@@ -412,7 +401,6 @@ render_filters = ( container, options = {} ) ->
     container.append filter_collateral_container
     container.append filter_currencyid_container
     container.append filter_applybtn_container
-    container.append filter_exportbtn_container
 
 
     render_select_filter   filter_security_types_container, 'security_types', options.objects.security_types ? [], options.selected_objects.security_types ? [], { multiple: true,  is_grouped: true, callback: (params) -> save_filter_settings('security_types', params) }
@@ -423,7 +411,6 @@ render_filters = ( container, options = {} ) ->
     render_select_filter   filter_index_container,          'index',          options.objects.index          ? [], options.selected_objects.index          ? [], { multiple: false, callback: (params) -> save_filter_settings('index',          params) }
     render_search_filter   filter_q_container
     render_applybtn_filter filter_applybtn_container
-#    render_exportbtn       filter_exportbtn_container
 
 
 render_total_securities = (container, cursor = {}) ->
@@ -463,11 +450,40 @@ render_paginator = (container, cursor = {}) ->
     container.show()
 
 
+export_current = ->
+    host   = mx.iss.iss_host
+    path   = 'rms/engines/stock/objects/marketrates'
+    format = 'csv'
+    params = [
+        "limit=unlimited"
+        "sort_column=#{load_filter_settings('sort_column')}"
+        "sort_order=#{load_filter_settings('sort_order')}"
+        "security_types=#{load_filter_settings('security_types')}"
+        "board_groups=#{load_filter_settings('board_groups')}"
+        "index=#{load_filter_settings('index')}"
+        "listname=#{load_filter_settings('listname')}"
+        "collateral=#{load_filter_settings('collateral')}"
+        "currencyid=#{load_filter_settings('currencyid')}"
+        "lang=#{mx.locale()}"
+    ]
+
+    url = "#{host}/#{path}.#{format}?#{params.join('&')}"
+    window.open(url)
+
+
+
+render_export_bar = (container) ->
+    container = $(container) ; return unless _.size(container) > 0
+    container.empty()
+
+    btn = $('<a>').addClass('rms-export-btn').text(l10n?.buttons?.export_title).on('click', -> export_current() )
+    container.append(btn)
+
+    return container
+
+
 
 render_data = (() ->)
-
-
-export_data = ->
 
 
 update_hash = (params) ->
@@ -530,6 +546,7 @@ widget = (dummy, options = {}) ->
         el.total_securities  = $('<div>').addClass('rms-total-securities')
         el.paginator         = $('<div>').addClass('rms-data-paginator')
         el.paginator_dup     = el.paginator.clone()
+        el.export_bar        = $('<div>').addClass('rms-export-bar')
 
         el.data_table.append(el.data_table_thead).append(el.data_table_tbody).hide()
         el.data_container.append el.total_securities
@@ -537,6 +554,7 @@ widget = (dummy, options = {}) ->
         el.data_container.append el.data_table
         el.data_container.append el.data_no_results
         el.data_container.append el.paginator_dup
+        el.data_container.append el.export_bar
 
         dummy.addClass('mx-widget-rms2')
 
@@ -652,6 +670,7 @@ widget = (dummy, options = {}) ->
             render_total_securities el.total_securities, data.cursor
             render_paginator        el.paginator,        data.cursor
             render_paginator        el.paginator_dup,    data.cursor
+            render_export_bar       el.export_bar
 
 
 
