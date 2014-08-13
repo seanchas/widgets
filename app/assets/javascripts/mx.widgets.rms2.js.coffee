@@ -455,6 +455,8 @@ export_current = ->
     path   = 'rms/engines/stock/objects/marketrates'
     format = 'csv'
     params = [
+        "iss.meta=off"
+        "iss.only=object"
         "limit=unlimited"
         "sort_column=#{load_filter_settings('sort_column')}"
         "sort_order=#{load_filter_settings('sort_order')}"
@@ -503,7 +505,7 @@ parse_hash = ->
     hash = decodeURIComponent(hash).split('&')
     hash = _.reduce hash, (memo, param) ->
         [key, value] = param.split('=')
-        memo[key] = value.split(',') if _.include(url_hash_keys, key)
+        memo[key] = value?.split(',') if _.include(url_hash_keys, key)
         return memo
     , {}
 
