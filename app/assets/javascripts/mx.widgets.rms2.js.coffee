@@ -225,7 +225,7 @@ save_filter_settings = (name, params) ->
     filters_settings[name] = params
 
 
-load_filter_settings = (name) -> filters_settings[name] ? filters_defaults[name] ? null
+load_filter_settings = (name) -> filters_settings[name] ? filters_defaults[name] ? ''
 
 
 make_url = (row) ->
