@@ -455,7 +455,6 @@ export_current = ->
     path   = 'rms/engines/stock/objects/marketrates'
     format = 'csv'
     params = [
-        "iss.meta=off"
         "iss.only=object"
         "limit=unlimited"
         "sort_column=#{load_filter_settings('sort_column')}"
