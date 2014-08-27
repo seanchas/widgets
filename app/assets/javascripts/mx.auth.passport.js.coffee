@@ -24,6 +24,7 @@ l10n =
         registration: 'Регистрация'
         auth_domain:  "passport.#{subdomain}moex.com"
         portals_urls: [
+            ['Личный кабинет Участника',     "http://cabinet.#{subdomain}moex.com/"]
             ['Управление платными услугами', "http://services.#{subdomain}moex.com/requisite"]
             ['Настройки',                    "http://passport.#{subdomain}moex.com/user"]
         ]
