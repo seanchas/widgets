@@ -101,7 +101,8 @@ class PassportManager
 
     user_screen_name: () ->
         unless @authenticated() then return ''
-        @_user_screen_name ||= @user_full_name() ? @authenticated_user.nickname
+#        @_user_screen_name ||= @user_full_name() ? @authenticated_user.nickname
+        @_user_screen_name ||= @authenticated_user.nickname
         _.truncate(@_user_screen_name, 35)
 
 
