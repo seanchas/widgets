@@ -12,7 +12,7 @@ set :format,         :pretty
 set :log_level,      :debug
 set :keep_releases,  5
 
-set :rvm_ruby_version, '2.2.1@widgets'
+set :rvm_ruby_version, '1.9.3-p551@widgets'
 set :rvm_type,         :user
 
 set :linked_dirs,  fetch(:linked_dirs,  []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system')
