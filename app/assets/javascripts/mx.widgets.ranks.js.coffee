@@ -15,11 +15,11 @@ tbody_columns = ["RANK",  "VALUE"]
 
 localization =
     ru:
-        select:   "Выделить все"
-        deselect: "Очистить все"
+        select:   "Выделить все!"
+        deselect: "Очистить все!"
     en:
-        select:   "Select all"
-        deselect: "Deselect all"
+        select:   "Select all!"
+        deselect: "Deselect all!"
 
 
 l10n = undefined
