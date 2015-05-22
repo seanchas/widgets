@@ -10,17 +10,20 @@ end
 
 gem 'jquery-rails'
 
-gem 'capistrano'
-gem 'rvm-capistrano'
 
-gem 'rack', '1.3.3'
+group :development do
+  gem 'capistrano', '~> 3.4.0'
+  gem 'capistrano-rails'
+  gem 'capistrano-bundler'
+  gem 'capistrano-rvm'
+  gem 'sqlite3'
+end
+
+
+# gem 'rack', '1.3.3'
 
 group :test do
   gem 'turn', :require => false
-end
-
-group :development do
-  gem 'sqlite3'
 end
 
 group :production do
