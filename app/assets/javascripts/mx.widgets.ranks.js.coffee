@@ -192,7 +192,7 @@ widget = (element, options = {}) ->
             cache.set securities_cache_key, active_securities
 
         $(element).on "click", "ul.controls li a.select", () ->
-            $("ul.securities li").addClass("loading")
+            $("ul.securities li", element).addClass("loading")
             active_securities = "ALL"
             clearTimeout(refresh_timer) if refresh_timer
             cache.set securities_cache_key, active_securities
@@ -200,8 +200,8 @@ widget = (element, options = {}) ->
 
 
         $(element).on "click", "ul.controls li a.deselect", () ->
-            $("ul.securities li a").removeClass("active")
-            $("ul.ranks-wrapper li").remove()
+            $("ul.securities li a", element).removeClass("active")
+            $("ul.ranks-wrapper li", element).remove()
             active_securities = []
             cache.set securities_cache_key, active_securities
             write_cache(element, cache_key) if cacheable
