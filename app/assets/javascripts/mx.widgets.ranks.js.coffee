@@ -15,11 +15,11 @@ tbody_columns = ["RANK",  "VALUE"]
 
 localization =
     ru:
-        select:   "Выделить все!"
-        deselect: "Очистить все!"
+        select:   "Выделить все"
+        deselect: "Очистить все"
     en:
-        select:   "Select all!"
-        deselect: "Deselect all!"
+        select:   "Select all"
+        deselect: "Deselect all"
 
 
 l10n = undefined
@@ -36,21 +36,23 @@ write_cache = (element, key) ->
 widget = (element, options = {}) ->
 
     element = $(element) ; return unless element.length > 0
-    element.addClass("mx-widget-ranks")
 
     # localize
     l10n = localization[mx.locale()]
 
     # widget options
+    mm_type             = options.mm_type || 'eq'
     show_threshold      = options.show_threshold? and options.show_threshold != false
     show_controls       = options.show_controls?  and options.show_controls  != false
     refresh_timeout     = options.refresh_timeout || 60 * 1000 # 1 minute default
     cacheable           = options.cache == true
 
+    element.addClass("mx-widget-ranks")
+    element.addClass(mm_type)
 
     # cache_keys_for_widget
-    cache_key            = mx.utils.sha1 JSON.stringify( [show_threshold, show_controls, mx.locale()].join("/") )
-    securities_cache_key = mx.utils.sha1 "securities"
+    cache_key            = mx.utils.sha1 JSON.stringify( [mm_type, show_threshold, show_controls, mx.locale()].join("/") )
+    securities_cache_key = mx.utils.sha1 JSON.stringify( [mm_type, "securities"].join("/") )
 
     read_cache(element, cache_key) if cacheable
 
@@ -216,7 +218,7 @@ widget = (element, options = {}) ->
 
     refresh = () ->
 
-        $.when(mx.iss.mmakers_ranks_securities( { force: true } )).then (securities) ->
+        $.when(mx.iss.mmakers_ranks_securities( mm_type, { force: true } )).then (securities) ->
 
             securities = _.sortBy securities, (security) -> security["SECID"]
 
@@ -224,7 +226,8 @@ widget = (element, options = {}) ->
 
             if active_securities is undefined
                 securities = _.map securities, (security) ->
-                    security.is_active = if security["IS_DEFAULT"] is 1 then true else false
+                    security.is_active = security["IS_DEFAULT"] == 1
+                    console.log security
                     return security
             else if active_securities is "ALL"
                 securities = _.map securities, (security) ->
@@ -243,7 +246,7 @@ widget = (element, options = {}) ->
                 render(securities)
                 refresh_timer = setTimeout refresh, refresh_timeout
             else
-                deffered = $.when mx.iss.mmakers_ranks(active_securities, { force: true }), mx.iss.mmakers_ranks_columns()
+                deffered = $.when mx.iss.mmakers_ranks(active_securities, mm_type, { force: true }), mx.iss.mmakers_ranks_columns()
                 deffered.then (ranks, columns) ->
                     render(securities, ranks, columns)
                     refresh_timer = setTimeout refresh, refresh_timeout

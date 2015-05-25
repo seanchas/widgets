@@ -5,7 +5,7 @@ class WelcomeController < ApplicationController
   
   def widget
   end
-  
+
   def widget_docs
     render :layout => "docs"
   end
@@ -30,6 +30,9 @@ class WelcomeController < ApplicationController
   end
 
   def rms
+  end
+
+  def mmakers
   end
 
   def search

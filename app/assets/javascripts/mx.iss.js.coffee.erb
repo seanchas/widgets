@@ -561,26 +561,26 @@ request_meta =
             [group]
 
     mmakers_ranks_securities:
-        url: ->
-            "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?callback=?"
+        url: (mm_type) ->
+            "#{iss_host}/statistics/engines/stock/mmakers/ranks/types/#{mm_type}.jsonp?callback=?"
         data: ->
             'iss.meta': 'off'
             'iss.only': 'ranks.securities'
         parse: (json) ->
             iss_merge_columns_and_data(json?['ranks.securities'])
-        key: ->
-            []
+        key: (mm_type) ->
+            [mm_type]
 
     mmakers_ranks:
-        url: (securities) ->
-            "#{iss_host}/statistics/engines/stock/mmakers/ranks.jsonp?securities=#{securities.join(",")}&callback=?"
+        url: (securities, mm_type) ->
+            "#{iss_host}/statistics/engines/stock/mmakers/ranks/types/#{mm_type}.jsonp?securities=#{securities.join(",")}&callback=?"
         data: ->
             'iss.meta': 'off'
             'iss.only': 'ranks'
         parse: (json) ->
             iss_merge_columns_and_data(json?.ranks)
-        key: (securities) ->
-            [securities]
+        key: (securities, mm_type) ->
+            [securities, mm_type]
 
     mmakers_ranks_columns:
         url: ->

@@ -1,5 +1,3 @@
-##= require mx.utils
-##= require mx.iss
 ##= require mx.widgets.chart
 
 global = module?.exports ? ( exports ? this )

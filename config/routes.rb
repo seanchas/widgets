@@ -61,6 +61,7 @@ Widgets::Application.routes.draw do
     get 'examples'       => 'welcome#examples'
     get 'otc'            => 'welcome#otc'
     get 'rms'            => 'welcome#rms'
+    get 'mmakers'        => 'welcome#mmakers'
     get 'search'         => 'welcome#search'
 
     scope "security" do

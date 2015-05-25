@@ -1,0 +1,51 @@
+<h2>Market Makers</h2>
+
+<h3>EQ</h3>
+
+<div id="mm_ranks_eq"></div>
+
+<h4>Архив</h4>
+<div id="mm_ranks_eq_archive"></div>
+
+<hr/>
+
+<h3>ОФЗ</h3>
+
+<div id="mm_ranks_ofz"></div>
+
+<h4>Архив</h4>
+<div id="mm_ranks_ofz_archive"></div>
+
+<script type="text/javascript">
+
+    mx.locale('<%= params['locale'] %>');
+
+    $(function(){
+
+        mx.widgets.ranks("#mm_ranks_eq", {
+            mm_type: 'eq',
+            cache: true,
+            show_threshold: true,
+            show_controls:  true,
+            refresh_timeout: 60 * 1000
+        });
+
+        mx.widgets.ranks_archive("#mm_ranks_eq_archive", {
+            mm_type: 'eq'
+        });
+
+        mx.widgets.ranks("#mm_ranks_ofz", {
+            mm_type: 'ofz',
+            cache: true,
+            show_threshold: true,
+            show_controls:  true,
+            refresh_timeout: 60 * 1000
+        });
+
+        mx.widgets.ranks_archive("#mm_ranks_ofz_archive", {
+            mm_type: 'ofz'
+        });
+
+    });
+
+</script>

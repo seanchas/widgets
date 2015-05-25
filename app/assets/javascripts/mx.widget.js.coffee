@@ -1,4 +1,7 @@
 ##= require_self
+##= require mx.utils
+##= require mx.iss
+##= require mx.cs
 ##= require mx.widgets.table
 ##= require mx.widgets.chart
 ##= require mx.widgets.orderbook
@@ -26,7 +29,6 @@
 ##= require mx.widgets.rms
 ##= require mx.widgets.rms2
 ##= require mx.widgets.aggregates
-##= require mx.cs
 
 global = module?.exports ? ( exports ? this )
 

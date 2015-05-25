@@ -7,8 +7,8 @@ scope = global.mx.widgets
 
 $ = jQuery
 
-link_given_date    = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks"
-link_entire_period = mx.iss.iss_host + "/downloads/statistics/engines/stock/mmakers/ranks/ranks"
+link_given_date    = mx.iss.iss_host + "/statistics/engines/stock/mmakers/ranks/types/"
+link_entire_period = mx.iss.iss_host + "/downloads/statistics/engines/stock/mmakers/ranks/types/"
 link_params        = "lang=#{mx.locale()}&ranks_only=1&iss.only=ranks&ranks.columns=TRADEDATE,SECID,RANK,VALUE"
 
 localization =
@@ -144,6 +144,8 @@ widget = (element, options = {}) ->
     element = $(element) ; return unless element.length > 0
     element.addClass("mx-widget-ranks-archive")
 
+    mm_type = options.mm_type || 'eq'
+
     mx.utils.datepicker()
     mx.utils.datepicker_locale mx.locale()
 
@@ -231,13 +233,13 @@ widget = (element, options = {}) ->
         if date
             sql_date = $.datepicker.formatDate( 'yy-mm-dd', date )
             controls.csv_options_link.removeClass("disabled")
-            controls.link_to_csv.attr("href", [link_given_date, ".csv", "?date=#{sql_date}&", params, "&#{link_params}"].join("")).html(l10n.csv_download)
-            controls.link_to_xml.attr("href", [link_given_date, ".xml", "?date=#{sql_date}&", link_params].join("")).html(l10n.xml_download)
+            controls.link_to_csv.attr("href", [link_given_date, mm_type, ".csv", "?date=#{sql_date}&", params, "&#{link_params}"].join("")).html(l10n.csv_download)
+            controls.link_to_xml.attr("href", [link_given_date, mm_type, ".xml", "?date=#{sql_date}&", link_params].join("")).html(l10n.xml_download)
         else
             controls.csv_options.hide()
             controls.csv_options_link.removeClass("active").addClass("disabled")
-            controls.link_to_csv.attr("href", [link_entire_period, ".csv.zip"].join("")).html(l10n.csv_download)
-            controls.link_to_xml.attr("href", [link_entire_period, ".xml.zip"].join("")).html(l10n.xml_download)
+            controls.link_to_csv.attr("href", [link_entire_period, "#{mm_type}/#{mm_type}_ranks", ".csv.zip"].join("")).html(l10n.csv_download)
+            controls.link_to_xml.attr("href", [link_entire_period, "#{mm_type}/#{mm_type}_ranks", ".xml.zip"].join("")).html(l10n.xml_download)
 
     start_events(controls) ; controls.reset_period_link.trigger("click") ; update_links()
 
